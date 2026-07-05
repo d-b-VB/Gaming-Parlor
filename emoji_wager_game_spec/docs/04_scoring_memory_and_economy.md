@@ -42,13 +42,15 @@ Rest entries are not punishments and should not be described as bad scores.  The
 
 Do not treat the 25th percentile as the required Club threshold.  Instead, track how each run compares to memory, then estimate time targets for different chance levels.
 
-For the first prototype, generate a small set of pre-round target offers such as:
+For the first prototype, generate five pre-round target offers with harder times paying more:
 
-- **Safe target**: an estimated time the player has about a 50% chance to beat.
-- **Sharp target**: an estimated time the player has about a 25% chance to beat.
-- **Long-shot target**: an estimated time the player has about a 10% chance to beat.
+- **1:2** conservative proposition.
+- **1:1** even proposition.
+- **2:1** double proposition.
+- **5:1** long-shot proposition.
+- **10:1** extreme proposition.
 
-The implementation can start with empirical percentiles over recent actual/rest memory, then improve later.  The UI should frame these as estimates, not guarantees.
+Lower target times must have higher payouts.  A proposition should only become available once that mode has enough actual history to statistically justify showing the odds.  The UI may show unavailable propositions as locked, with the required history count.  The implementation can start with empirical percentiles over recent actual/rest memory, then improve later.  The UI should frame these as estimates, not guarantees.
 
 ## Heart safety threshold
 

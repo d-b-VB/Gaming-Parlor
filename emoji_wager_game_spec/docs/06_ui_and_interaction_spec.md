@@ -6,9 +6,15 @@ Use a minimal, functional card-table aesthetic first.  The game can be abstract.
 
 The first playable version should prioritize a usable game loop and tests over visual polish.
 
+## Screen flow
+
+Between rounds, show the mode selector, shop, Club betting propositions, resources, and setup controls.
+
+When a sorting round starts, the sorting game should take the whole screen. Hide the shop, mode selector, and betting setup until the round ends.
+
 ## Main play screen
 
-The main sorting screen should include:
+The full-screen sorting view should include:
 
 - Active directional zones for the selected mode.
 - Visible target glyph groups assigned to each active direction.
@@ -30,15 +36,17 @@ Locked modes should show their Diamond unlock cost.  After purchase, they should
 
 ## Club betting display
 
-Before a round, show a small set of time-to-beat offers with estimated odds, for example:
+Before a round, show five time-to-beat propositions with estimated odds.  Easier/slower targets should pay less; harder/faster targets should pay more:
 
 ```text
-Safe     Beat 00:35   1.5x
-Sharp    Beat 00:28   2.5x
-Longshot Beat 00:22   5.0x
+Conservative  Beat 00:42   1:2
+Even          Beat 00:35   1:1
+Double        Beat 00:28   2:1
+Fivefold      Beat 00:23   5:1
+Tenfold       Beat 00:19   10:1
 ```
 
-The player selects one offer and buys as many Clubs as desired with Diamonds.  During the round, show the selected target and whether it is still alive.  After the round, show whether the bet paid out and how many Diamonds were won.
+Only enable propositions once the selected mode has enough actual history to justify the estimate.  Locked propositions may be visible with the current and required history counts.  The player selects one available offer and buys as many Clubs as desired with Diamonds.  During the round, show the selected target and whether it is still alive.  After the round, show whether the bet paid out and how many Diamonds were won.
 
 ## Heart display
 

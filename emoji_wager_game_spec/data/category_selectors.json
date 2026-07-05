@@ -535,6 +535,152 @@
       ],
       "eligibleCount": 6,
       "minimumItems": 4
+    },
+    {
+      "id": "food_items",
+      "label": "Food",
+      "selector": {
+        "requiredTags": [
+          "food"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [
+        "tool_items"
+      ],
+      "minimumItems": 4
+    },
+    {
+      "id": "plant_items",
+      "label": "Plants",
+      "selector": {
+        "requiredTags": [
+          "plant"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [
+        "technology_items"
+      ],
+      "minimumItems": 4
+    },
+    {
+      "id": "mammals",
+      "label": "Mammals",
+      "selector": {
+        "requiredTags": [
+          "mammal"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [
+        "arthropod"
+      ],
+      "minimumItems": 4
+    },
+    {
+      "id": "tool_items",
+      "label": "Tools",
+      "selector": {
+        "requiredTags": [
+          "tool"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [
+        "food_items"
+      ],
+      "minimumItems": 4
+    },
+    {
+      "id": "math_symbols",
+      "label": "Math Symbols",
+      "selector": {
+        "requiredTags": [
+          "math"
+        ],
+        "kind": "symbol"
+      },
+      "opposites": [
+        "animals"
+      ],
+      "minimumItems": 4
+    },
+    {
+      "id": "weather_items",
+      "label": "Weather",
+      "selector": {
+        "requiredTags": [
+          "weather"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [
+        "hot"
+      ],
+      "minimumItems": 4
+    },
+    {
+      "id": "vehicle_items",
+      "label": "Vehicles",
+      "selector": {
+        "requiredTags": [
+          "vehicle"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [
+        "plant_items"
+      ],
+      "minimumItems": 4
+    },
+    {
+      "id": "technology_items",
+      "label": "Technology",
+      "selector": {
+        "requiredTags": [
+          "technology"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [
+        "plant_items"
+      ],
+      "minimumItems": 4
+    },
+    {
+      "id": "round_non_flags",
+      "label": "Round Non-Flags",
+      "selector": {
+        "requiredTags": [
+          "round"
+        ],
+        "excludesTags": [
+          "flag"
+        ],
+        "kinds": [
+          "emoji",
+          "symbol"
+        ]
+      },
+      "opposites": [
+        "pointed"
+      ],
+      "minimumItems": 4
+    },
+    {
+      "id": "insects",
+      "label": "Insects",
+      "selector": {
+        "requiredTags": [
+          "insect"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [
+        "mammals"
+      ],
+      "minimumItems": 4
     }
   ]
 }

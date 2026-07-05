@@ -11,6 +11,8 @@ test('selector matching supports required tags and exact colors', () => {
   assert.equal(matchesSelector({ kind: 'emoji', tags: ['animal', 'arthropod'], colors: [], glyph: '🐜' }, { requiredTags: ['arthropod'] }), true);
   assert.equal(matchesSelector({ kind: 'flag', tags: ['flag'], colors: ['red', 'white'], glyph: '🇯🇵' }, { exactColors: ['white', 'red'] }), true);
   assert.equal(matchesSelector({ kind: 'flag', tags: ['flag'], colors: ['red', 'white', 'blue'], glyph: '🇺🇸' }, { exactColors: ['white', 'red'] }), false);
+  assert.equal(matchesSelector({ kind: 'emoji', tags: ['round'], colors: [], glyph: '⚽' }, { kinds: ['emoji', 'symbol'], requiredTags: ['round'] }), true);
+  assert.equal(matchesSelector({ kind: 'flag', tags: ['round'], colors: [], glyph: '🏳️' }, { kinds: ['emoji', 'symbol'], requiredTags: ['round'] }), false);
 });
 
 test('board generation creates valid unique boards for each mode', () => {
@@ -41,8 +43,21 @@ test('economy handles unlocks, club bets, spades, memory, and winnings', () => {
   assert.equal(state.upgrades.spades.sort_2, 1);
   state = settleRound(state, 'sort_2', offer.timeSeconds - 1, 0, 'economy-seed', 'test');
   assert.equal(state.activeClubBet, null);
-  assert.equal(state.eventLog.at(-1).betWinnings, 3);
+  assert.equal(state.eventLog.at(-1).betWinnings, 1);
   assert.equal(state.gameMemory.sort_3.entries.at(-1).entryType, 'rest');
+});
+
+
+test('bet propositions use sensible odds and require enough actual history', () => {
+  const lowHistory = structuredClone(defaultState).gameMemory.sort_2.entries.slice(0, 5);
+  const lowTargets = estimateTargets('sort_2', lowHistory);
+  assert.deepEqual(lowTargets.map((target) => target.oddsLabel), ['1:2', '1:1', '2:1', '5:1', '10:1']);
+  assert.deepEqual(lowTargets.map((target) => target.available), [true, false, false, false, false]);
+  const richHistory = Array.from({ length: 20 }, (_, index) => ({ timeSeconds: 45 - index, entryType: 'actual', createdAt: `t${index}` }));
+  const richTargets = estimateTargets('sort_2', richHistory);
+  assert.deepEqual(richTargets.map((target) => target.oddsLabel), ['1:2', '1:1', '2:1', '5:1', '10:1']);
+  assert.deepEqual(richTargets.map((target) => target.available), [true, true, true, true, true]);
+  assert.ok(richTargets[4].timeSeconds < richTargets[0].timeSeconds);
 });
 
 test('spade costs and streak animation scale upward and downward respectively', () => {
