@@ -28,7 +28,7 @@ The full-screen sorting view should include:
 - Current Hearts, Diamonds, and Spade payout upgrades.
 - Current streak.
 
-The first UI should show only the target glyphs for each group.  Directional category groups should stack vertically on the sides to frame the board.  Category labels, swatches, and explanatory text can be added later if needed.
+The first UI should show only the target glyphs for each group.  Directional category groups on the left and right should stack glyphs vertically to frame the board.  The prompt queue should be rendered as a shrink-to-content strip under the countdown bars so the remaining queue becomes visually shorter over time.  Category labels, swatches, and explanatory text can be added later if needed.
 
 ## Mode select and unlocks
 
@@ -101,6 +101,7 @@ Future upgrade slots may be visible but disabled for animation speed, pause brea
 - High-contrast mode should be easy to add.
 - Reduced-motion mode should disable long travel animations and use instant movement plus flashes.
 - Do not rely only on color to identify correctness.
+- Flag glyphs need a fallback rendering path for browsers that display regional indicators as two-letter abbreviations instead of flag emoji.
 
 ## Post-round summary
 

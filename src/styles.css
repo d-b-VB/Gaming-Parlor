@@ -94,3 +94,14 @@ input { width: 100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1
   .timer-label { font-size: 0.78rem; }
   .summary-grid { grid-template-columns: 1fr; }
 }
+/* Refinements for framed sorting board and browser-independent flags */
+.framed-board .zone-left .glyph-group, .framed-board .zone-right .glyph-group { flex-direction: column; align-items: center; }
+.framed-board .zone-left .glyph-group > *, .framed-board .zone-right .glyph-group > * { display: block; }
+.queue-strip { width: max-content; max-width: 100%; }
+.queue-glyph { flex: 0 0 auto; width: 1.55rem; }
+.rendered-flag { display: inline-grid; place-items: center; width: 1.35em; height: 0.95em; position: relative; vertical-align: -0.08em; }
+.rendered-flag::before { content: ""; position: absolute; left: 0.03em; top: -0.06em; width: 0.08em; height: 1.08em; border-radius: 999px; background: #3a2a1d; box-shadow: 0 0 0 1px rgba(255,255,255,0.2); }
+.flag-cloth { display: flex; width: 1.12em; height: 0.78em; margin-left: 0.18em; overflow: hidden; border-radius: 0.12em; border: 1px solid rgba(255,255,255,0.35); box-shadow: 0 0.08em 0.18em rgba(0,0,0,0.35); }
+.flag-cloth span { flex: 1 1 0; min-width: 0.12em; }
+.prompt .rendered-flag, .moving-glyph .rendered-flag { width: 1.65em; height: 1.18em; }
+.prompt .flag-cloth, .moving-glyph .flag-cloth { width: 1.4em; height: 0.98em; }

@@ -38,13 +38,14 @@ test('economy handles unlocks, club bets, spades, memory, and winnings', () => {
   const offer = estimateTargets('sort_2', state.gameMemory.sort_2.entries)[0];
   state = buyClubBet(state, createClubBet('sort_2', offer, 2));
   assert.equal(state.activeClubBet.oddsLabel, offer.oddsLabel);
+  assert.throws(() => buyClubBet(structuredClone(defaultState), createClubBet('sort_2', offer, 1)), /multiples of 2/);
   assert.equal(state.resources.diamonds, 3);
   state.resources.diamonds = 100;
   state = buySpade(state, 'sort_2');
   assert.equal(state.upgrades.spades.sort_2, 1);
   state = settleRound(state, 'sort_2', offer.timeSeconds - 1, 0, 'economy-seed', 'test');
   assert.equal(state.activeClubBet, null);
-  assert.equal(state.eventLog.at(-1).betWinnings, 1);
+  assert.equal(state.eventLog.at(-1).betWinnings, 3);
   assert.equal(state.gameMemory.sort_3.entries.at(-1).entryType, 'rest');
 });
 

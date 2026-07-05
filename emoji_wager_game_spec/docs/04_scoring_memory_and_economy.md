@@ -109,12 +109,12 @@ Suggested first-prototype settlement:
 
 ```text
 if completionTime <= selectedTarget:
-  diamondWinnings = clubStake * oddsMultiplier
+  diamondWinnings = clubStake + floor(clubStake * oddsMultiplier)
 else:
   diamondWinnings = 0
 ```
 
-The Club purchase cost is paid before the round and is not refunded.  The odds should increase as the target becomes harder to beat.
+The Club purchase cost is paid before the round.  On a winning bet, return the stake plus the odds profit.  For the 1:2 proposition, only accept stakes in multiples of 2; for example, a 4-Club stake returns the 4-Club stake plus 2 Diamonds of profit when it wins.  The odds should increase as the target becomes harder to beat.
 
 ## Purchases and upgrades
 

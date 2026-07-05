@@ -30,11 +30,22 @@ function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 function loadSaved(defaultState) { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || structuredClone(defaultState); } catch { return structuredClone(defaultState); } }
 function groupByDirection(direction) { return board.groups.filter((group) => group.direction === direction); }
 function currentTargets() { return estimateTargets(modeId, state.gameMemory[modeId].entries); }
+function escapeHtml(value) {
+  return String(value).replace(/[&<>\"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;' }[char]));
+}
+function flagHtml(item) {
+  const colors = item.colors?.length ? item.colors : ['white', 'red'];
+  const stripes = colors.map((color) => `<span style="background:${escapeHtml(color)}"></span>`).join('');
+  return `<span class="rendered-flag" title="${escapeHtml(item.name)}" aria-label="flag ${escapeHtml(item.name)}"><span class="flag-cloth">${stripes}</span></span>`;
+}
+function glyphHtml(item) {
+  return item?.kind === 'flag' ? flagHtml(item) : `<span class="emoji-glyph">${item?.glyph ?? ''}</span>`;
+}
 function heartsHtml() {
   return `<span class="hearts" aria-label="${state.resources.hearts} of ${state.resources.maxHearts} hearts">${Array.from({ length: state.resources.maxHearts }, (_, index) => `<span class="heart ${index < state.resources.hearts ? 'full' : 'empty'}">${index < state.resources.hearts ? '♥' : '♥'}</span>`).join('')}</span>`;
 }
 function queueStripHtml() {
-  return `<div class="queue-strip" aria-label="Full prompt queue">${queue.map((prompt, index) => `<span class="queue-glyph ${index === 0 ? 'next' : ''}">${prompt.item.glyph}</span>`).join('')}</div>`;
+  return `<div class="queue-strip" aria-label="Full prompt queue">${queue.map((prompt, index) => `<span class="queue-glyph ${index === 0 ? 'next' : ''}">${glyphHtml(prompt.item)}</span>`).join('')}</div>`;
 }
 function barsHtml(safety, activeBet) {
   const heartPct = Math.max(0, Math.min(100, ((safety - elapsed) / Math.max(1, safety)) * 100));
@@ -105,8 +116,8 @@ function dispatch(direction) {
   ensureTimer();
   const prompt = queue[0];
   const isCorrect = prompt.direction === direction;
-  motion = { glyph: prompt.item.glyph, direction, result: isCorrect ? 'correct' : 'wrong' };
-  feedback = isCorrect ? `${prompt.item.glyph} flying ${arrows[direction]}…` : `${prompt.item.glyph} rejected ${arrows[direction]} and returning to the queue…`;
+  motion = { html: glyphHtml(prompt.item), direction, result: isCorrect ? 'correct' : 'wrong' };
+  feedback = isCorrect ? `${prompt.item.name} flying ${arrows[direction]}…` : `${prompt.item.name} rejected ${arrows[direction]} and returning to the queue…`;
   render();
   window.setTimeout(() => {
     if (isCorrect) {
@@ -119,7 +130,7 @@ function dispatch(direction) {
       queue = [...queue.slice(1), prompt];
       streak = 0;
       mistakes += 1;
-      feedback = `Wrong ${arrows[direction]} — ${prompt.item.glyph} slowly returned to the back.`;
+      feedback = `Wrong ${arrows[direction]} — ${prompt.item.name} slowly returned to the back.`;
       motion = null;
       render();
     }
@@ -140,9 +151,9 @@ function render() {
   const safety = heartSafety(modeId, state.gameMemory[modeId].entries);
   const current = queue[0];
   const progress = board.queue.length - queue.length;
-  const sideZone = (direction) => `<button class="zone zone-${direction}" data-dispatch="${direction}"><span class="direction">${arrows[direction]}</span><span class="groups vertical-groups">${groupByDirection(direction).map((group) => `<span class="glyph-group" title="${group.label}">${group.items.map((item) => `<span>${item.glyph}</span>`).join('')}</span>`).join('')}</span></button>`;
+  const sideZone = (direction) => `<button class="zone zone-${direction}" data-dispatch="${direction}"><span class="direction">${arrows[direction]}</span><span class="groups vertical-groups">${groupByDirection(direction).map((group) => `<span class="glyph-group" title="${group.label}">${group.items.map((item) => glyphHtml(item)).join('')}</span>`).join('')}</span></button>`;
   const boardHtml = `<div class="play-hud"><div class="status-row"><span>⏱ ${elapsed.toFixed(1)}s</span><span>${heartsHtml()}</span><span>Queue ${queue.length}/${board.queue.length}</span><span>Streak ${streak}</span></div>${barsHtml(safety, state.activeClubBet)}</div>
-      <div class="sort-board framed-board mode-${mode.directions.length}">${mode.directions.map(sideZone).join('')}<div class="center-card ${motion ? 'busy' : ''}"><span class="prompt ${motion ? 'ghost-prompt' : ''}">${current?.item.glyph || '🏁'}</span><span>${current ? `${progress}/${board.queue.length} sorted` : 'Round finished'}</span>${motion ? `<span class="moving-glyph move-${motion.direction} ${motion.result}">${motion.glyph}</span>` : ''}</div></div><p class="feedback" role="status">${feedback}</p>`;
+      <div class="sort-board framed-board mode-${mode.directions.length}">${mode.directions.map(sideZone).join('')}<div class="center-card ${motion ? 'busy' : ''}"><span class="prompt ${motion ? 'ghost-prompt' : ''}">${current ? glyphHtml(current.item) : '🏁'}</span><span>${current ? `${progress}/${board.queue.length} sorted` : 'Round finished'}</span>${motion ? `<span class="moving-glyph move-${motion.direction} ${motion.result}">${motion.html}</span>` : ''}</div></div><p class="feedback" role="status">${feedback}</p>`;
   const summaryHtml = lastSummary ? `<section class="panel post-round"><h2>Round summary</h2><div class="summary-grid"><span>Mode</span><strong>${lastSummary.modeName}</strong><span>Time</span><strong>${lastSummary.timeSeconds.toFixed(2)}s</strong><span>Percentile score</span><strong>${Math.round(lastSummary.percentile * 100)}%</strong><span>Mistakes</span><strong>${lastSummary.mistakes}</strong><span>Diamond payout</span><strong>♦ ${lastSummary.diamondsDelta}</strong><span>Heart change</span><strong>${lastSummary.heartsDelta}</strong><span>Bet result</span><strong>${lastSummary.betTarget ? `${lastSummary.betWon ? 'Won' : 'Lost'} vs ${fmt(lastSummary.betTarget)} (${lastSummary.betWinnings ? `♦ ${lastSummary.betWinnings}` : 'no payout'})` : 'No bet'}</strong></div><button id="continue-lobby" class="primary-action">Continue</button></section>` : '';
   root.innerHTML = inRound ? `
     <main class="play-shell">
@@ -155,12 +166,12 @@ function render() {
       ${summaryHtml}
       <section class="panel mode-panel"><h2>Modes</h2><div class="mode-grid">${modeList.map((candidate) => `<button data-mode="${candidate.id}" class="${candidate.id === modeId ? 'selected' : ''}"><strong>${candidate.name}</strong><span>${state.unlockedModes[candidate.id] ? 'Select' : `Unlock ♦${candidate.unlockCost}`}</span></button>`).join('')}</div></section>
       <section class="lobby-layout"><section class="panel"><h2>Ready: ${mode.name}</h2><p>${board.queue.length} glyphs queued. Active directions: ${mode.directions.map((direction) => arrows[direction]).join(' ')}</p>${queueStripHtml()}<button id="start-round" class="primary-action">Start full-screen round</button><button id="new-board">New board</button><p class="feedback" role="status">${feedback}</p></section>
-      <section class="panel"><h2>Club wager</h2><p class="hint">Harder times pay more. Locked propositions need more actual history in this mode.</p><div class="target-list">${targets.map((offer) => `<button data-target="${offer.id}" class="${offer.id === selectedTarget ? 'selected' : ''}" ${offer.available ? '' : 'disabled'}><strong>${offer.label}</strong><span>Beat ${fmt(offer.timeSeconds)}</span><span>${offer.oddsLabel}</span><small>${offer.available ? 'Available' : `${offer.actualCount}/${offer.minHistory} history`}</small></button>`).join('')}</div><label class="stake-row">Clubs<input id="stake" type="number" min="1" value="${stake}"></label><button id="buy-bet" ${targets.find((offer) => offer.id === selectedTarget)?.available ? '' : 'disabled'}>Buy bet for ♦${stake}</button></section>
+      <section class="panel"><h2>Club wager</h2><p class="hint">Harder times pay more. Locked propositions need more actual history in this mode.</p><div class="target-list">${targets.map((offer) => `<button data-target="${offer.id}" class="${offer.id === selectedTarget ? 'selected' : ''}" ${offer.available ? '' : 'disabled'}><strong>${offer.label}</strong><span>Beat ${fmt(offer.timeSeconds)}</span><span>${offer.oddsLabel}</span><small>${offer.available ? 'Available' : `${offer.actualCount}/${offer.minHistory} history`}</small></button>`).join('')}</div><label class="stake-row">Clubs<input id="stake" type="number" min="${selectedTarget === 'half' ? 2 : 1}" step="${selectedTarget === 'half' ? 2 : 1}" value="${stake}"></label><button id="buy-bet" ${targets.find((offer) => offer.id === selectedTarget)?.available && !(selectedTarget === 'half' && stake % 2 !== 0) ? '' : 'disabled'}>Buy bet for ♦${stake}</button></section>
       <section class="panel shop"><h2>Spade shop</h2><button id="restore-heart">Restore Heart ♦5</button><button id="buy-global">+1 Global ♠ ♦${spadeCost('global', state.upgrades.spades.global)}</button><button id="buy-mode">+1 ${mode.name} ♠ ♦${spadeCost(modeId, state.upgrades.spades[modeId])}</button><button disabled>Faster glyphs soon</button><button disabled>Pause breaks soon</button><button disabled>Choose/rearrange categories soon</button><button id="reset-save">Reset save</button></section></section>
     </main>`;
   root.querySelectorAll('[data-dispatch]').forEach((button) => button.addEventListener('click', () => dispatch(button.dataset.dispatch)));
   root.querySelectorAll('[data-mode]').forEach((button) => button.addEventListener('click', () => { const id = button.dataset.mode; if (state.unlockedModes[id]) startBoard(id); else tryAction(() => unlockMode(state, id)); }));
-  root.querySelectorAll('[data-target]').forEach((button) => button.addEventListener('click', () => { selectedTarget = button.dataset.target; render(); }));
+  root.querySelectorAll('[data-target]').forEach((button) => button.addEventListener('click', () => { selectedTarget = button.dataset.target; if (selectedTarget === 'half' && stake % 2 !== 0) stake += 1; render(); }));
   root.querySelector('#stake')?.addEventListener('input', (event) => { stake = Math.max(1, Number(event.target.value || 1)); render(); });
   root.querySelector('#buy-bet')?.addEventListener('click', buyBet);
   root.querySelector('#restore-heart')?.addEventListener('click', () => tryAction(() => restoreHeart(state)));
