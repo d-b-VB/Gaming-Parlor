@@ -20,13 +20,15 @@ The full-screen sorting view should include:
 - Visible target glyph groups assigned to each active direction.
 - A center prompt glyph.
 - A queue/progress indicator.
+- Full visible emoji prompt queue under the timer bars.
 - Completion timer.
-- Current Club bet target and odds, if a bet is active.
-- Heart safety indicator.
+- Countdown bar for Heart safety.
+- Countdown bar for the active Club bet, if a bet is active.
+- Five visible Heart symbols; lost Hearts remain visible as black/empty Hearts.
 - Current Hearts, Diamonds, and Spade payout upgrades.
 - Current streak.
 
-The first UI should show only the target glyphs for each group.  Category labels, swatches, and explanatory text can be added later if needed.
+The first UI should show only the target glyphs for each group.  Directional category groups should stack vertically on the sides to frame the board.  Category labels, swatches, and explanatory text can be added later if needed.
 
 ## Mode select and unlocks
 
@@ -56,17 +58,17 @@ Show the Heart safety target separately from the Club bet.  If the active timer 
 
 Correct answer:
 
-- Glyph moves to edge.
+- Glyph visibly moves from the queue/current prompt position to the center, then flies to the selected edge.
 - Soft success animation.
 - Streak increments.
 - Movement and next-entry animations get faster as streak rises.
 
 Wrong answer:
 
-- Glyph starts toward chosen edge.
+- Glyph visibly moves toward the chosen edge.
 - Reject animation.
 - Streak resets.
-- Glyph returns to back of queue.
+- Glyph slowly returns to the back of the queue.
 
 Winning Club bet:
 
@@ -99,3 +101,7 @@ Future upgrade slots may be visible but disabled for animation speed, pause brea
 - High-contrast mode should be easy to add.
 - Reduced-motion mode should disable long travel animations and use instant movement plus flashes.
 - Do not rely only on color to identify correctness.
+
+## Post-round summary
+
+After each round, show a post-round screen or panel with completion time, percentile score, mistakes, Diamond payout, Heart change, and Club bet result.
