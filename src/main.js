@@ -33,10 +33,13 @@ function currentTargets() { return estimateTargets(modeId, state.gameMemory[mode
 function escapeHtml(value) {
   return String(value).replace(/[&<>\"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;' }[char]));
 }
+function flagCodepoints(glyph) {
+  return Array.from(glyph || '').map((char) => char.codePointAt(0).toString(16)).join('-');
+}
 function flagHtml(item) {
-  const colors = item.colors?.length ? item.colors : ['white', 'red'];
-  const stripes = colors.map((color) => `<span style="background:${escapeHtml(color)}"></span>`).join('');
-  return `<span class="rendered-flag" title="${escapeHtml(item.name)}" aria-label="flag ${escapeHtml(item.name)}"><span class="flag-cloth">${stripes}</span></span>`;
+  const codepoints = flagCodepoints(item.glyph);
+  const src = `https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/${codepoints}.svg`;
+  return `<img class="flag-img" src="${src}" alt="flag ${escapeHtml(item.name)}" title="${escapeHtml(item.name)}" loading="eager" decoding="async" draggable="false" />`;
 }
 function glyphHtml(item) {
   return item?.kind === 'flag' ? flagHtml(item) : `<span class="emoji-glyph">${item?.glyph ?? ''}</span>`;
@@ -45,7 +48,8 @@ function heartsHtml() {
   return `<span class="hearts" aria-label="${state.resources.hearts} of ${state.resources.maxHearts} hearts">${Array.from({ length: state.resources.maxHearts }, (_, index) => `<span class="heart ${index < state.resources.hearts ? 'full' : 'empty'}">${index < state.resources.hearts ? '♥' : '♥'}</span>`).join('')}</span>`;
 }
 function queueStripHtml() {
-  return `<div class="queue-strip" aria-label="Full prompt queue">${queue.map((prompt, index) => `<span class="queue-glyph ${index === 0 ? 'next' : ''}">${glyphHtml(prompt.item)}</span>`).join('')}</div>`;
+  const remainingPct = Math.max(0, Math.min(100, (queue.length / Math.max(1, board.queue.length)) * 100));
+  return `<div class="queue-strip" aria-label="Full prompt queue"><div class="queue-strip-inner" style="width:${remainingPct}%">${queue.map((prompt, index) => `<span class="queue-glyph ${index === 0 ? 'next' : ''}">${glyphHtml(prompt.item)}</span>`).join('')}</div></div>`;
 }
 function barsHtml(safety, activeBet) {
   const heartPct = Math.max(0, Math.min(100, ((safety - elapsed) / Math.max(1, safety)) * 100));
@@ -134,7 +138,7 @@ function dispatch(direction) {
       motion = null;
       render();
     }
-  }, isCorrect ? 260 : 760);
+  }, isCorrect ? 620 : 980);
 }
 function setState(next) { state = next; save(); render(); }
 function tryAction(fn) { try { setState(fn()); } catch (error) { feedback = error.message; render(); } }

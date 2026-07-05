@@ -28,7 +28,7 @@ The full-screen sorting view should include:
 - Current Hearts, Diamonds, and Spade payout upgrades.
 - Current streak.
 
-The first UI should show only the target glyphs for each group.  Directional category groups on the left and right should stack glyphs vertically to frame the board.  The prompt queue should be rendered as a shrink-to-content strip under the countdown bars so the remaining queue becomes visually shorter over time.  Category labels, swatches, and explanatory text can be added later if needed.
+The first UI should show only the target glyphs for each group.  Directional category groups on the left and right should stack glyphs vertically in tight boxes to frame the board.  The prompt queue should start at the same visual width as the initial countdown bars, then shrink as prompts are removed so the remaining queue becomes visually shorter over time.  Category labels, swatches, and explanatory text can be added later if needed.
 
 ## Mode select and unlocks
 
@@ -58,7 +58,7 @@ Show the Heart safety target separately from the Club bet.  If the active timer 
 
 Correct answer:
 
-- Glyph visibly moves from the queue/current prompt position to the center, then flies to the selected edge.
+- Glyph visibly moves from the head of the queue to the center of the table, then smoothly flies to the selected edge.
 - Soft success animation.
 - Streak increments.
 - Movement and next-entry animations get faster as streak rises.
@@ -68,7 +68,7 @@ Wrong answer:
 - Glyph visibly moves toward the chosen edge.
 - Reject animation.
 - Streak resets.
-- Glyph slowly returns to the back of the queue.
+- Glyph slowly returns toward the queue before being appended to the back.
 
 Winning Club bet:
 
@@ -101,7 +101,7 @@ Future upgrade slots may be visible but disabled for animation speed, pause brea
 - High-contrast mode should be easy to add.
 - Reduced-motion mode should disable long travel animations and use instant movement plus flashes.
 - Do not rely only on color to identify correctness.
-- Flag glyphs need a fallback rendering path for browsers that display regional indicators as two-letter abbreviations instead of flag emoji.
+- Flag glyphs should be preloaded/rendered through a flag emoji asset path, such as Twemoji SVGs, for browsers that display regional indicators as two-letter abbreviations instead of flag emoji.
 
 ## Post-round summary
 
