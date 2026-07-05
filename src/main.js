@@ -1,6 +1,7 @@
 import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, createClubBet, buyClubBet, unlockMode, buySpade, restoreHeart, settleRound, spadeCost, streakDuration } from './game/core.js';
 
 const root = document.querySelector('#root');
+const APP_VERSION = 'v0.2.1';
 const arrows = { left: '←', right: '→', up: '↑', down: '↓' };
 let items = [];
 let selectors = [];
@@ -89,6 +90,7 @@ function render() {
   const progress = board.queue.length - queue.length;
   root.innerHTML = `
     <main class="app-shell">
+      <div class="version-banner"><span>Emoji Wager Sort ${APP_VERSION}</span><span>Playable build</span></div>
       <header class="hero"><div><p class="eyebrow">Gaming Parlor</p><h1>Emoji Wager Sort</h1><p>Sort the center glyph into the matching visible gadget glyphs. 2-way is free; buy into 3-way and 4-way when you are ready.</p></div><div class="resources"><span>♥ ${state.resources.hearts}/${state.resources.maxHearts}</span><span>♦ ${state.resources.diamonds}</span><span>♠ ${state.upgrades.spades.global + state.upgrades.spades[modeId]} payout</span></div></header>
       <section class="panel mode-panel"><h2>Modes</h2><div class="mode-grid">${modeList.map((candidate) => `<button data-mode="${candidate.id}" class="${candidate.id === modeId ? 'selected' : ''}"><strong>${candidate.name}</strong><span>${state.unlockedModes[candidate.id] ? 'Play' : `Unlock ♦${candidate.unlockCost}`}</span></button>`).join('')}</div></section>
       <section class="game-layout"><div class="panel table"><div class="status-row"><span>⏱ ${elapsed.toFixed(1)}s</span><span>Queue ${queue.length}/${board.queue.length}</span><span>Streak ${streak}</span><span>♥ danger after ${fmt(safety)}</span>${state.activeClubBet ? `<span>♣ beat ${fmt(state.activeClubBet.targetSeconds)} for ♦${Math.floor(state.activeClubBet.stake * state.activeClubBet.oddsMultiplier)}</span>` : ''}</div>
