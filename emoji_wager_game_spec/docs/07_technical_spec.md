@@ -20,6 +20,8 @@ Persist all player state to `localStorage`:
 
 The exact memory structure is an implementation concern, but it must support actual entries, rest entries, percentile-at-run tracking, and probability-style target estimates.
 
+The prototype save is local-only.  It should include visible save metadata such as a local save id, app version, schema version, and last-saved timestamp so players can distinguish one browser/device profile from another.  Do not imply account sync unless a later version adds an explicit import/export or backend sync feature.
+
 ## Sorting mode config
 
 Represent sorting modes as data/configuration rather than separate hard-coded games.

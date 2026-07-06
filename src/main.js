@@ -1,7 +1,8 @@
 import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, percentileAtRun, createClubBet, buyClubBet, unlockMode, buySpade, restoreHeart, settleRound, spadeCost, streakDuration } from './game/core.js';
 
 const root = document.querySelector('#root');
-const APP_VERSION = 'v0.2.1';
+const APP_VERSION = 'v0.2.2';
+const SAVE_SCHEMA_VERSION = '0.2.2-local';
 const arrows = { left: '←', right: '→', up: '↑', down: '↓' };
 let items = [];
 let selectors = [];
@@ -26,8 +27,29 @@ function fmt(seconds) {
 }
 function seed() { return `${modeId}-${Date.now()}-${Math.random().toString(16).slice(2)}`; }
 async function json(path) { const response = await fetch(path); if (!response.ok) throw new Error(`Unable to load ${path}`); return response.json(); }
-function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-function loadSaved(defaultState) { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || structuredClone(defaultState); } catch { return structuredClone(defaultState); } }
+function makeLocalSaveId() {
+  if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID().slice(0, 8);
+  return Math.random().toString(16).slice(2, 10);
+}
+function normalizeSave(candidate, defaultState) {
+  const next = structuredClone(candidate || defaultState);
+  next.saveMeta = {
+    localSaveId: next.saveMeta?.localSaveId || makeLocalSaveId(),
+    schemaVersion: SAVE_SCHEMA_VERSION,
+    appVersion: APP_VERSION,
+    saveScope: 'This browser profile on this device',
+    createdAt: next.saveMeta?.createdAt || new Date().toISOString(),
+    savedAt: next.saveMeta?.savedAt || new Date().toISOString(),
+  };
+  return next;
+}
+function save() {
+  state.saveMeta = { ...state.saveMeta, schemaVersion: SAVE_SCHEMA_VERSION, appVersion: APP_VERSION, savedAt: new Date().toISOString() };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+function loadSaved(defaultState) {
+  try { return normalizeSave(JSON.parse(localStorage.getItem(STORAGE_KEY)), defaultState); } catch { return normalizeSave(defaultState, defaultState); }
+}
 function groupByDirection(direction) { return board.groups.filter((group) => group.direction === direction); }
 function currentTargets() { return estimateTargets(modeId, state.gameMemory[modeId].entries); }
 function escapeHtml(value) {
@@ -38,7 +60,7 @@ function flagCodepoints(glyph) {
 }
 function flagHtml(item) {
   const codepoints = flagCodepoints(item.glyph);
-  const src = `https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/${codepoints}.svg`;
+  const src = `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/${codepoints}.svg`;
   return `<img class="flag-img" src="${src}" alt="flag ${escapeHtml(item.name)}" title="${escapeHtml(item.name)}" loading="eager" decoding="async" draggable="false" />`;
 }
 function glyphHtml(item) {
@@ -48,8 +70,7 @@ function heartsHtml() {
   return `<span class="hearts" aria-label="${state.resources.hearts} of ${state.resources.maxHearts} hearts">${Array.from({ length: state.resources.maxHearts }, (_, index) => `<span class="heart ${index < state.resources.hearts ? 'full' : 'empty'}">${index < state.resources.hearts ? '♥' : '♥'}</span>`).join('')}</span>`;
 }
 function queueStripHtml() {
-  const remainingPct = Math.max(0, Math.min(100, (queue.length / Math.max(1, board.queue.length)) * 100));
-  return `<div class="queue-strip" aria-label="Full prompt queue"><div class="queue-strip-inner" style="width:${remainingPct}%">${queue.map((prompt, index) => `<span class="queue-glyph ${index === 0 ? 'next' : ''}">${glyphHtml(prompt.item)}</span>`).join('')}</div></div>`;
+  return `<div class="queue-strip" style="--queue-total:${board.queue.length}" aria-label="Full prompt queue">${queue.map((prompt, index) => `<span class="queue-glyph ${index === 0 ? 'next' : ''}">${glyphHtml(prompt.item)}</span>`).join('')}</div>`;
 }
 function barsHtml(safety, activeBet) {
   const heartPct = Math.max(0, Math.min(100, ((safety - elapsed) / Math.max(1, safety)) * 100));
@@ -84,6 +105,20 @@ function startRound() {
   lastSummary = null;
   feedback = 'Full-screen round started. Sort every glyph as fast as you can.';
   render();
+}
+function motionPoint(rect) {
+  return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+}
+function motionFor(direction, result, html) {
+  const from = motionPoint(root.querySelector('.queue-glyph.next')?.getBoundingClientRect() || root.querySelector('.center-card').getBoundingClientRect());
+  const center = motionPoint(root.querySelector('.center-card').getBoundingClientRect());
+  const zone = motionPoint(root.querySelector(`.zone-${direction}`)?.getBoundingClientRect() || root.querySelector('.center-card').getBoundingClientRect());
+  const back = motionPoint(root.querySelector('.queue-strip')?.getBoundingClientRect() || root.querySelector('.center-card').getBoundingClientRect());
+  return { html, direction, result, from, center, zone, back };
+}
+function motionStyle() {
+  if (!motion) return '';
+  return `--from-x:${motion.from.x}px;--from-y:${motion.from.y}px;--center-x:${motion.center.x}px;--center-y:${motion.center.y}px;--zone-x:${motion.zone.x}px;--zone-y:${motion.zone.y}px;--back-x:${motion.back.x}px;--back-y:${motion.back.y}px;`;
 }
 function finishRound() {
   const final = Math.max(1, Number(((Date.now() - startedAt) / 1000).toFixed(2)));
@@ -120,7 +155,7 @@ function dispatch(direction) {
   ensureTimer();
   const prompt = queue[0];
   const isCorrect = prompt.direction === direction;
-  motion = { html: glyphHtml(prompt.item), direction, result: isCorrect ? 'correct' : 'wrong' };
+  motion = motionFor(direction, isCorrect ? 'correct' : 'wrong', glyphHtml(prompt.item));
   feedback = isCorrect ? `${prompt.item.name} flying ${arrows[direction]}…` : `${prompt.item.name} rejected ${arrows[direction]} and returning to the queue…`;
   render();
   window.setTimeout(() => {
@@ -157,7 +192,7 @@ function render() {
   const progress = board.queue.length - queue.length;
   const sideZone = (direction) => `<button class="zone zone-${direction}" data-dispatch="${direction}"><span class="direction">${arrows[direction]}</span><span class="groups vertical-groups">${groupByDirection(direction).map((group) => `<span class="glyph-group" title="${group.label}">${group.items.map((item) => glyphHtml(item)).join('')}</span>`).join('')}</span></button>`;
   const boardHtml = `<div class="play-hud"><div class="status-row"><span>⏱ ${elapsed.toFixed(1)}s</span><span>${heartsHtml()}</span><span>Queue ${queue.length}/${board.queue.length}</span><span>Streak ${streak}</span></div>${barsHtml(safety, state.activeClubBet)}</div>
-      <div class="sort-board framed-board mode-${mode.directions.length}">${mode.directions.map(sideZone).join('')}<div class="center-card ${motion ? 'busy' : ''}"><span class="prompt ${motion ? 'ghost-prompt' : ''}">${current ? glyphHtml(current.item) : '🏁'}</span><span>${current ? `${progress}/${board.queue.length} sorted` : 'Round finished'}</span>${motion ? `<span class="moving-glyph move-${motion.direction} ${motion.result}">${motion.html}</span>` : ''}</div></div><p class="feedback" role="status">${feedback}</p>`;
+      <div class="sort-board framed-board mode-${mode.directions.length}">${mode.directions.map(sideZone).join('')}<div class="center-card ${motion ? 'busy' : ''}"><span class="prompt ${motion ? 'ghost-prompt' : ''}">${current ? glyphHtml(current.item) : '🏁'}</span><span>${current ? `${progress}/${board.queue.length} sorted` : 'Round finished'}</span></div></div>${motion ? `<span class="moving-glyph ${motion.result}" style="${motionStyle()}">${motion.html}</span>` : ''}<p class="feedback" role="status">${feedback}</p>`;
   const summaryHtml = lastSummary ? `<section class="panel post-round"><h2>Round summary</h2><div class="summary-grid"><span>Mode</span><strong>${lastSummary.modeName}</strong><span>Time</span><strong>${lastSummary.timeSeconds.toFixed(2)}s</strong><span>Percentile score</span><strong>${Math.round(lastSummary.percentile * 100)}%</strong><span>Mistakes</span><strong>${lastSummary.mistakes}</strong><span>Diamond payout</span><strong>♦ ${lastSummary.diamondsDelta}</strong><span>Heart change</span><strong>${lastSummary.heartsDelta}</strong><span>Bet result</span><strong>${lastSummary.betTarget ? `${lastSummary.betWon ? 'Won' : 'Lost'} vs ${fmt(lastSummary.betTarget)} (${lastSummary.betWinnings ? `♦ ${lastSummary.betWinnings}` : 'no payout'})` : 'No bet'}</strong></div><button id="continue-lobby" class="primary-action">Continue</button></section>` : '';
   root.innerHTML = inRound ? `
     <main class="play-shell">
@@ -166,7 +201,7 @@ function render() {
     </main>` : `
     <main class="app-shell">
       <div class="version-banner"><span>Emoji Wager Sort ${APP_VERSION}</span><span>Between rounds</span></div>
-      <header class="hero"><div><p class="eyebrow">Gaming Parlor</p><h1>Emoji Wager Sort</h1><p>Set your mode, shop, and bet here. When the round starts, sorting takes the whole screen.</p></div><div class="resources"><span>${heartsHtml()}</span><span>♦ ${state.resources.diamonds}</span><span>♠ ${state.upgrades.spades.global + state.upgrades.spades[modeId]} payout</span></div></header>
+      <header class="hero"><div><p class="eyebrow">Gaming Parlor</p><h1>Emoji Wager Sort</h1><p>Set your mode, shop, and bet here. When the round starts, sorting takes the whole screen.</p><p class="save-scope">Save ${escapeHtml(state.saveMeta.localSaveId)} is local to this browser profile. If another device looks identical, it is probably still on the seeded starter stats unless you imported or synced site data outside the game.</p></div><div class="resources"><span>${heartsHtml()}</span><span>♦ ${state.resources.diamonds}</span><span>♠ ${state.upgrades.spades.global + state.upgrades.spades[modeId]} payout</span></div></header>
       ${summaryHtml}
       <section class="panel mode-panel"><h2>Modes</h2><div class="mode-grid">${modeList.map((candidate) => `<button data-mode="${candidate.id}" class="${candidate.id === modeId ? 'selected' : ''}"><strong>${candidate.name}</strong><span>${state.unlockedModes[candidate.id] ? 'Select' : `Unlock ♦${candidate.unlockCost}`}</span></button>`).join('')}</div></section>
       <section class="lobby-layout"><section class="panel"><h2>Ready: ${mode.name}</h2><p>${board.queue.length} glyphs queued. Active directions: ${mode.directions.map((direction) => arrows[direction]).join(' ')}</p>${queueStripHtml()}<button id="start-round" class="primary-action">Start full-screen round</button><button id="new-board">New board</button><p class="feedback" role="status">${feedback}</p></section>
@@ -184,7 +219,7 @@ function render() {
   root.querySelector('#start-round')?.addEventListener('click', startRound);
   root.querySelector('#new-board')?.addEventListener('click', () => startBoard());
   root.querySelector('#continue-lobby')?.addEventListener('click', () => { lastSummary = null; startBoard(modeId); });
-  root.querySelector('#reset-save')?.addEventListener('click', async () => { state = structuredClone(await json('./emoji_wager_game_spec/data/default_state.json')); save(); startBoard('sort_2'); });
+  root.querySelector('#reset-save')?.addEventListener('click', async () => { state = normalizeSave(await json('./emoji_wager_game_spec/data/default_state.json')); save(); startBoard('sort_2'); });
 }
 window.addEventListener('keydown', (event) => { const map = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down' }; if (map[event.key]) { event.preventDefault(); dispatch(map[event.key]); } });
 try {
@@ -192,6 +227,7 @@ try {
   items = itemsData.items;
   selectors = selectorsData.selectors;
   state = loadSaved(stateData);
+  save();
   startBoard('sort_2');
 } catch (error) {
   root.innerHTML = `<main class="app-shell"><section class="panel"><h1>Unable to start</h1><p>${error.message}</p></section></main>`;
