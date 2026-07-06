@@ -92,9 +92,15 @@ payout = max(0, baseDiamonds + spadeBonus + heartPenalty)
 
 Suggested mode base payouts:
 
-- 2-way sort: 1 Diamond.
-- 3-way sort: 2 Diamonds.
-- 4-way sort: 3 Diamonds.
+- 2-way sort: 2 Diamonds.
+- 3-way sort: 3 Diamonds.
+- 4-way sort: 4 Diamonds.
+
+The UI should show this total expected per-round payout before a round starts as the mode's **Spade score**:
+
+```text
+spadeScore = modeBaseDiamonds + globalSpades + modeSpecificSpades[mode]
+```
 
 ## Club betting and payout
 
@@ -124,9 +130,9 @@ First-prototype purchases:
 - Unlock 3-way sort: 15 Diamonds.
 - Unlock 4-way sort: 30 Diamonds.
 - Buy 1 global Spade payout upgrade: cost starts at 25 Diamonds and increases by 1.6x per global Spade, rounded up.
-- Buy 1 2-way Spade payout upgrade: cost starts at 8 Diamonds and increases by 1.5x per 2-way Spade, rounded up.
-- Buy 1 3-way Spade payout upgrade: cost starts at 12 Diamonds and increases by 1.5x per 3-way Spade, rounded up.
-- Buy 1 4-way Spade payout upgrade: cost starts at 10 Diamonds and increases by 1.5x per 4-way Spade, rounded up.
+- Buy 1 2-way Spade payout upgrade: cost starts at 12 Diamonds and increases by 1.5x per 2-way Spade, rounded up.
+- Buy 1 3-way Spade payout upgrade: cost starts at 9 Diamonds and increases by 1.5x per 3-way Spade, rounded up.
+- Buy 1 4-way Spade payout upgrade: cost starts at 6 Diamonds and increases by 1.5x per 4-way Spade, rounded up.
 - Increase max Hearts by 1: cost starts at 20 Diamonds and doubles each time.
 
 Future upgrade families:

@@ -25,7 +25,7 @@ The full-screen sorting view should include:
 - Countdown bar for Heart safety.
 - Countdown bar for the active Club bet, if a bet is active.
 - Five visible Heart symbols; lost Hearts remain visible as black/empty Hearts.
-- Current Hearts, Diamonds, and Spade payout upgrades.
+- Current Hearts, Diamonds, and total Spade score / expected Diamond payout for the selected mode.
 - Current streak.
 
 The first UI should show only the target glyphs for each group.  Directional category groups on the left and right should stack glyphs vertically in tight boxes to frame the board.  The prompt queue should start at the same visual width as the initial countdown bars, then shrink as prompts are removed so the remaining queue becomes visually shorter over time.  Category labels, swatches, and explanatory text can be added later if needed.
@@ -101,7 +101,7 @@ Future upgrade slots may be visible but disabled for animation speed, pause brea
 - High-contrast mode should be easy to add.
 - Reduced-motion mode should disable long travel animations and use instant movement plus flashes.
 - Do not rely only on color to identify correctness.
-- Flag glyphs should be preloaded/rendered through a flag emoji asset path, such as Twemoji SVGs, for browsers that display regional indicators as two-letter abbreviations instead of flag emoji.
+- Emoji rendering should prefer a preloaded consistent color emoji font, such as Noto Color Emoji, with flag glyphs rendered through a flag emoji asset path, such as Twemoji SVGs, for browsers that display regional indicators as two-letter abbreviations instead of flag emoji.
 
 ## Post-round summary
 

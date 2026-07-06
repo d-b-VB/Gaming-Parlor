@@ -48,7 +48,9 @@ The initial Spade upgrade family should include payout upgrades:
 
 Example: if the player buys +1 global Spade and +1 3-way Spade, then each 3-way sort round pays +2 Diamonds before other modifiers.
 
-Mode-specific Spade pricing should be cheaper than global Spades.  The first placeholder economy can keep 2-way Spades cheap for onboarding and discount 4-way Spades to reward the more difficult mode; tune the exact relationship during playtesting.
+Show the resulting total payout before each game as that mode's Spade score.  The starter Spade scores are 2 for 2-way sort, 3 for 3-way sort, and 4 for 4-way sort before upgrades.
+
+Mode-specific Spade pricing should be cheaper than global Spades.  Harder modes should have cheaper mode-specific payout upgrades: 3-way Spades should cost less than 2-way Spades, and 4-way Spades should cost less than 3-way Spades.
 
 Additional Spade-style upgrades can include:
 

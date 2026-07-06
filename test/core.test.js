@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { generateBoard, matchesSelector, estimateTargets, createClubBet, buyClubBet, settleRound, unlockMode, buySpade, spadeCost, streakDuration } from '../src/game/core.js';
+import { generateBoard, matchesSelector, estimateTargets, createClubBet, buyClubBet, settleRound, unlockMode, buySpade, spadeCost, payoutScore, streakDuration } from '../src/game/core.js';
 
 const items = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/items.json', import.meta.url))).items;
 const selectors = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/category_selectors.json', import.meta.url))).selectors;
@@ -22,6 +22,19 @@ test('board generation creates valid unique boards for each mode', () => {
     assert.equal(board.groups.length, groups);
     assert.equal(board.queue.length, prompts);
     assert.equal(new Set(board.queue.map((prompt) => prompt.item.glyph)).size, prompts);
+  }
+});
+
+test('board generation prevents cross-matching active categories', () => {
+  const board = generateBoard('sort_4', 'strict-category-seed', items, selectors);
+  const selectorById = Object.fromEntries(selectors.map((selector) => [selector.id, selector]));
+  for (const group of board.groups) {
+    const selector = selectorById[group.id];
+    for (const prompt of board.queue) {
+      if (prompt.groupId !== group.id) {
+        assert.equal(matchesSelector(prompt.item, selector.selector), false, `${prompt.item.id} should not match ${group.id}`);
+      }
+    }
   }
 });
 
@@ -63,8 +76,14 @@ test('bet propositions use sensible odds and require enough actual history', () 
 });
 
 test('spade costs and streak animation scale upward and downward respectively', () => {
-  assert.equal(spadeCost('sort_2', 0), 8);
-  assert.equal(spadeCost('sort_4', 0), 10);
+  assert.equal(payoutScore(defaultState, 'sort_2'), 2);
+  assert.equal(payoutScore(defaultState, 'sort_3'), 3);
+  assert.equal(payoutScore(defaultState, 'sort_4'), 4);
+  assert.equal(spadeCost('sort_2', 0), 12);
+  assert.equal(spadeCost('sort_3', 0), 9);
+  assert.equal(spadeCost('sort_4', 0), 6);
+  assert.ok(spadeCost('sort_4', 0) < spadeCost('sort_3', 0));
+  assert.ok(spadeCost('sort_3', 0) < spadeCost('sort_2', 0));
   assert.ok(spadeCost('global', 1) > spadeCost('global', 0));
   assert.ok(streakDuration(220, 10) < 220);
   assert.equal(streakDuration(220, 100), 121);

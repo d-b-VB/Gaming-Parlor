@@ -46,7 +46,7 @@ Examples:
 5. Prefer known opposite pairs across opposite directions when possible.
 6. For each selector, choose 4 unique items.
 7. No glyph may appear twice on the same board.
-8. Avoid choosing an item for one group if it also matches another active group, unless no valid board can be generated after retries.
+8. Enforce strict category isolation: for every active category, no glyph assigned to any other active category may also match it.
 9. If generation fails, retry with different selectors.
 10. Use a seedable pseudo-random number generator so bad boards can be reproduced.
 

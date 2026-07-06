@@ -1,8 +1,8 @@
-import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, percentileAtRun, createClubBet, buyClubBet, unlockMode, buySpade, restoreHeart, settleRound, spadeCost, streakDuration } from './game/core.js';
+import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, percentileAtRun, createClubBet, buyClubBet, unlockMode, buySpade, restoreHeart, settleRound, spadeCost, payoutScore, streakDuration } from './game/core.js?v=0.2.4';
 
 const root = document.querySelector('#root');
-const APP_VERSION = 'v0.2.2';
-const SAVE_SCHEMA_VERSION = '0.2.2-local';
+const APP_VERSION = 'v0.2.4';
+const SAVE_SCHEMA_VERSION = '0.2.4-local';
 const arrows = { left: '←', right: '→', up: '↑', down: '↓' };
 let items = [];
 let selectors = [];
@@ -52,6 +52,7 @@ function loadSaved(defaultState) {
 }
 function groupByDirection(direction) { return board.groups.filter((group) => group.direction === direction); }
 function currentTargets() { return estimateTargets(modeId, state.gameMemory[modeId].entries); }
+function modePayout(id) { return payoutScore(state, id); }
 function escapeHtml(value) {
   return String(value).replace(/[&<>\"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;' }[char]));
 }
@@ -109,16 +110,46 @@ function startRound() {
 function motionPoint(rect) {
   return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
 }
-function motionFor(direction, result, html) {
-  const from = motionPoint(root.querySelector('.queue-glyph.next')?.getBoundingClientRect() || root.querySelector('.center-card').getBoundingClientRect());
-  const center = motionPoint(root.querySelector('.center-card').getBoundingClientRect());
-  const zone = motionPoint(root.querySelector(`.zone-${direction}`)?.getBoundingClientRect() || root.querySelector('.center-card').getBoundingClientRect());
-  const back = motionPoint(root.querySelector('.queue-strip')?.getBoundingClientRect() || root.querySelector('.center-card').getBoundingClientRect());
-  return { html, direction, result, from, center, zone, back };
+function nextFrame() {
+  return new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 }
-function motionStyle() {
-  if (!motion) return '';
-  return `--from-x:${motion.from.x}px;--from-y:${motion.from.y}px;--center-x:${motion.center.x}px;--center-y:${motion.center.y}px;--zone-x:${motion.zone.x}px;--zone-y:${motion.zone.y}px;--back-x:${motion.back.x}px;--back-y:${motion.back.y}px;`;
+function backOfQueuePoint() {
+  const rect = root.querySelector('.queue-strip')?.getBoundingClientRect() || root.querySelector('.center-card').getBoundingClientRect();
+  return { x: rect.right - Math.min(24, rect.width / 2), y: rect.top + rect.height / 2 };
+}
+async function animateGlyphTravel(html, direction, isCorrect) {
+  await nextFrame();
+  const centerCard = root.querySelector('.center-card');
+  const from = motionPoint(root.querySelector('.queue-glyph.next')?.getBoundingClientRect() || centerCard.getBoundingClientRect());
+  const center = motionPoint(centerCard.getBoundingClientRect());
+  const zone = motionPoint(root.querySelector(`.zone-${direction}`)?.getBoundingClientRect() || centerCard.getBoundingClientRect());
+  const back = backOfQueuePoint();
+  const clone = document.createElement('span');
+  clone.className = 'motion-clone';
+  clone.innerHTML = html;
+  clone.style.left = `${from.x}px`;
+  clone.style.top = `${from.y}px`;
+  document.body.append(clone);
+  if (!clone.animate) {
+    await new Promise((resolve) => window.setTimeout(resolve, isCorrect ? 620 : 980));
+    clone.remove();
+    return;
+  }
+  const keyframes = isCorrect
+    ? [
+        { left: `${from.x}px`, top: `${from.y}px`, transform: 'translate(-50%, -50%) scale(0.72)', opacity: 0.9, offset: 0 },
+        { left: `${center.x}px`, top: `${center.y}px`, transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 0.46 },
+        { left: `${zone.x}px`, top: `${zone.y}px`, transform: 'translate(-50%, -50%) scale(0.42)', opacity: 0, offset: 1 },
+      ]
+    : [
+        { left: `${from.x}px`, top: `${from.y}px`, transform: 'translate(-50%, -50%) scale(0.72)', opacity: 0.9, offset: 0 },
+        { left: `${center.x}px`, top: `${center.y}px`, transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 0.34 },
+        { left: `${zone.x}px`, top: `${zone.y}px`, transform: 'translate(-50%, -50%) scale(0.58) rotate(-7deg)', opacity: 0.96, offset: 0.62 },
+        { left: `${back.x}px`, top: `${back.y}px`, transform: 'translate(-50%, -50%) scale(0.34)', opacity: 0, offset: 1 },
+      ];
+  const animation = clone.animate(keyframes, { duration: isCorrect ? 620 : 980, easing: 'cubic-bezier(0.18, 0.84, 0.24, 1)', fill: 'forwards' });
+  await animation.finished.catch(() => {});
+  clone.remove();
 }
 function finishRound() {
   const final = Math.max(1, Number(((Date.now() - startedAt) / 1000).toFixed(2)));
@@ -149,31 +180,30 @@ function finishRound() {
   motion = null;
   render();
 }
-function dispatch(direction) {
+async function dispatch(direction) {
   const mode = MODES[modeId];
   if (motion || !inRound || !queue[0] || !mode.directions.includes(direction)) return;
   ensureTimer();
   const prompt = queue[0];
   const isCorrect = prompt.direction === direction;
-  motion = motionFor(direction, isCorrect ? 'correct' : 'wrong', glyphHtml(prompt.item));
+  motion = { busy: true };
   feedback = isCorrect ? `${prompt.item.name} flying ${arrows[direction]}…` : `${prompt.item.name} rejected ${arrows[direction]} and returning to the queue…`;
   render();
-  window.setTimeout(() => {
-    if (isCorrect) {
-      queue.shift();
-      streak += 1;
-      feedback = `Correct ${arrows[direction]} — streak ${streak}; glide ${streakDuration(220, streak)}ms.`;
-      motion = null;
-      if (queue.length === 0) finishRound(); else render();
-    } else {
-      queue = [...queue.slice(1), prompt];
-      streak = 0;
-      mistakes += 1;
-      feedback = `Wrong ${arrows[direction]} — ${prompt.item.name} slowly returned to the back.`;
-      motion = null;
-      render();
-    }
-  }, isCorrect ? 620 : 980);
+  await animateGlyphTravel(glyphHtml(prompt.item), direction, isCorrect);
+  if (isCorrect) {
+    queue.shift();
+    streak += 1;
+    feedback = `Correct ${arrows[direction]} — streak ${streak}; glide ${streakDuration(220, streak)}ms.`;
+    motion = null;
+    if (queue.length === 0) finishRound(); else render();
+  } else {
+    queue = [...queue.slice(1), prompt];
+    streak = 0;
+    mistakes += 1;
+    feedback = `Wrong ${arrows[direction]} — ${prompt.item.name} slunk back to the end of the queue.`;
+    motion = null;
+    render();
+  }
 }
 function setState(next) { state = next; save(); render(); }
 function tryAction(fn) { try { setState(fn()); } catch (error) { feedback = error.message; render(); } }
@@ -192,7 +222,7 @@ function render() {
   const progress = board.queue.length - queue.length;
   const sideZone = (direction) => `<button class="zone zone-${direction}" data-dispatch="${direction}"><span class="direction">${arrows[direction]}</span><span class="groups vertical-groups">${groupByDirection(direction).map((group) => `<span class="glyph-group" title="${group.label}">${group.items.map((item) => glyphHtml(item)).join('')}</span>`).join('')}</span></button>`;
   const boardHtml = `<div class="play-hud"><div class="status-row"><span>⏱ ${elapsed.toFixed(1)}s</span><span>${heartsHtml()}</span><span>Queue ${queue.length}/${board.queue.length}</span><span>Streak ${streak}</span></div>${barsHtml(safety, state.activeClubBet)}</div>
-      <div class="sort-board framed-board mode-${mode.directions.length}">${mode.directions.map(sideZone).join('')}<div class="center-card ${motion ? 'busy' : ''}"><span class="prompt ${motion ? 'ghost-prompt' : ''}">${current ? glyphHtml(current.item) : '🏁'}</span><span>${current ? `${progress}/${board.queue.length} sorted` : 'Round finished'}</span></div></div>${motion ? `<span class="moving-glyph ${motion.result}" style="${motionStyle()}">${motion.html}</span>` : ''}<p class="feedback" role="status">${feedback}</p>`;
+      <div class="sort-board framed-board mode-${mode.directions.length}">${mode.directions.map(sideZone).join('')}<div class="center-card ${motion ? 'busy' : ''}"><span class="prompt ${motion ? 'ghost-prompt' : ''}">${current ? glyphHtml(current.item) : '🏁'}</span><span>${current ? `${progress}/${board.queue.length} sorted` : 'Round finished'}</span></div></div><p class="feedback" role="status">${feedback}</p>`;
   const summaryHtml = lastSummary ? `<section class="panel post-round"><h2>Round summary</h2><div class="summary-grid"><span>Mode</span><strong>${lastSummary.modeName}</strong><span>Time</span><strong>${lastSummary.timeSeconds.toFixed(2)}s</strong><span>Percentile score</span><strong>${Math.round(lastSummary.percentile * 100)}%</strong><span>Mistakes</span><strong>${lastSummary.mistakes}</strong><span>Diamond payout</span><strong>♦ ${lastSummary.diamondsDelta}</strong><span>Heart change</span><strong>${lastSummary.heartsDelta}</strong><span>Bet result</span><strong>${lastSummary.betTarget ? `${lastSummary.betWon ? 'Won' : 'Lost'} vs ${fmt(lastSummary.betTarget)} (${lastSummary.betWinnings ? `♦ ${lastSummary.betWinnings}` : 'no payout'})` : 'No bet'}</strong></div><button id="continue-lobby" class="primary-action">Continue</button></section>` : '';
   root.innerHTML = inRound ? `
     <main class="play-shell">
@@ -201,12 +231,12 @@ function render() {
     </main>` : `
     <main class="app-shell">
       <div class="version-banner"><span>Emoji Wager Sort ${APP_VERSION}</span><span>Between rounds</span></div>
-      <header class="hero"><div><p class="eyebrow">Gaming Parlor</p><h1>Emoji Wager Sort</h1><p>Set your mode, shop, and bet here. When the round starts, sorting takes the whole screen.</p><p class="save-scope">Save ${escapeHtml(state.saveMeta.localSaveId)} is local to this browser profile. If another device looks identical, it is probably still on the seeded starter stats unless you imported or synced site data outside the game.</p></div><div class="resources"><span>${heartsHtml()}</span><span>♦ ${state.resources.diamonds}</span><span>♠ ${state.upgrades.spades.global + state.upgrades.spades[modeId]} payout</span></div></header>
+      <header class="hero"><div><p class="eyebrow">Gaming Parlor</p><h1>Emoji Wager Sort</h1><p>Set your mode, shop, and bet here. When the round starts, sorting takes the whole screen.</p><p class="save-scope">Save ${escapeHtml(state.saveMeta.localSaveId)} is local to this browser profile. If another device looks identical, it is probably still on the seeded starter stats unless you imported or synced site data outside the game.</p></div><div class="resources"><span>${heartsHtml()}</span><span>♦ ${state.resources.diamonds}</span><span>♠ ${modePayout(modeId)} ${mode.name} payout</span></div></header>
       ${summaryHtml}
-      <section class="panel mode-panel"><h2>Modes</h2><div class="mode-grid">${modeList.map((candidate) => `<button data-mode="${candidate.id}" class="${candidate.id === modeId ? 'selected' : ''}"><strong>${candidate.name}</strong><span>${state.unlockedModes[candidate.id] ? 'Select' : `Unlock ♦${candidate.unlockCost}`}</span></button>`).join('')}</div></section>
+      <section class="panel mode-panel"><h2>Modes</h2><div class="mode-grid">${modeList.map((candidate) => `<button data-mode="${candidate.id}" class="${candidate.id === modeId ? 'selected' : ''}"><strong>${candidate.name}</strong><span>♠ score ${modePayout(candidate.id)} · pays ♦${modePayout(candidate.id)}</span><span>${state.unlockedModes[candidate.id] ? 'Select' : `Unlock ♦${candidate.unlockCost}`}</span></button>`).join('')}</div></section>
       <section class="lobby-layout"><section class="panel"><h2>Ready: ${mode.name}</h2><p>${board.queue.length} glyphs queued. Active directions: ${mode.directions.map((direction) => arrows[direction]).join(' ')}</p>${queueStripHtml()}<button id="start-round" class="primary-action">Start full-screen round</button><button id="new-board">New board</button><p class="feedback" role="status">${feedback}</p></section>
       <section class="panel"><h2>Club wager</h2><p class="hint">Harder times pay more. Locked propositions need more actual history in this mode.</p><div class="target-list">${targets.map((offer) => `<button data-target="${offer.id}" class="${offer.id === selectedTarget ? 'selected' : ''}" ${offer.available ? '' : 'disabled'}><strong>${offer.label}</strong><span>Beat ${fmt(offer.timeSeconds)}</span><span>${offer.oddsLabel}</span><small>${offer.available ? 'Available' : `${offer.actualCount}/${offer.minHistory} history`}</small></button>`).join('')}</div><label class="stake-row">Clubs<input id="stake" type="number" min="${selectedTarget === 'half' ? 2 : 1}" step="${selectedTarget === 'half' ? 2 : 1}" value="${stake}"></label><button id="buy-bet" ${targets.find((offer) => offer.id === selectedTarget)?.available && !(selectedTarget === 'half' && stake % 2 !== 0) ? '' : 'disabled'}>Buy bet for ♦${stake}</button></section>
-      <section class="panel shop"><h2>Spade shop</h2><button id="restore-heart">Restore Heart ♦5</button><button id="buy-global">+1 Global ♠ ♦${spadeCost('global', state.upgrades.spades.global)}</button><button id="buy-mode">+1 ${mode.name} ♠ ♦${spadeCost(modeId, state.upgrades.spades[modeId])}</button><button disabled>Faster glyphs soon</button><button disabled>Pause breaks soon</button><button disabled>Choose/rearrange categories soon</button><button id="reset-save">Reset save</button></section></section>
+      <section class="panel shop"><h2>Spade shop</h2><p class="hint">Current ${mode.name} spade score: ${modePayout(modeId)} Diamonds before Heart penalties.</p><button id="restore-heart">Restore Heart ♦5</button><button id="buy-global">+1 Global ♠ ♦${spadeCost('global', state.upgrades.spades.global)}</button><button id="buy-mode">+1 ${mode.name} ♠ ♦${spadeCost(modeId, state.upgrades.spades[modeId])}</button><button disabled>Faster glyphs soon</button><button disabled>Pause breaks soon</button><button disabled>Choose/rearrange categories soon</button><button id="reset-save">Reset save</button></section></section>
     </main>`;
   root.querySelectorAll('[data-dispatch]').forEach((button) => button.addEventListener('click', () => dispatch(button.dataset.dispatch)));
   root.querySelectorAll('[data-mode]').forEach((button) => button.addEventListener('click', () => { const id = button.dataset.mode; if (state.unlockedModes[id]) startBoard(id); else tryAction(() => unlockMode(state, id)); }));
