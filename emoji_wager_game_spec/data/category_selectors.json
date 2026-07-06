@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "0.2.0",
+  "schemaVersion": "0.2.1",
   "description": "Curated group selectors. A group is not necessarily a tag; it may be a selector over tags, colors, kind, and exclusions.",
   "selectors": [
     {
@@ -201,7 +201,7 @@
         "equatorial",
         "tropical"
       ],
-      "eligibleCount": 5,
+      "eligibleCount": 10,
       "minimumItems": 4
     },
     {
@@ -215,7 +215,7 @@
       "opposites": [
         "polar"
       ],
-      "eligibleCount": 8,
+      "eligibleCount": 6,
       "minimumItems": 4
     },
     {
@@ -256,36 +256,9 @@
         ]
       },
       "opposites": [
-        "island",
-        "coastal"
+        "island"
       ],
       "eligibleCount": 8,
-      "minimumItems": 4
-    },
-    {
-      "id": "coastal",
-      "label": "Coastal",
-      "selector": {
-        "requiredTags": [
-          "coastal"
-        ]
-      },
-      "opposites": [
-        "landlocked"
-      ],
-      "eligibleCount": 31,
-      "minimumItems": 4
-    },
-    {
-      "id": "mountainous",
-      "label": "Mountainous",
-      "selector": {
-        "requiredTags": [
-          "mountainous"
-        ]
-      },
-      "opposites": [],
-      "eligibleCount": 16,
       "minimumItems": 4
     },
     {
@@ -548,7 +521,8 @@
       "opposites": [
         "tool_items"
       ],
-      "minimumItems": 4
+      "minimumItems": 4,
+      "eligibleCount": 19
     },
     {
       "id": "plant_items",
@@ -562,7 +536,8 @@
       "opposites": [
         "technology_items"
       ],
-      "minimumItems": 4
+      "minimumItems": 4,
+      "eligibleCount": 19
     },
     {
       "id": "mammals",
@@ -576,7 +551,8 @@
       "opposites": [
         "arthropod"
       ],
-      "minimumItems": 4
+      "minimumItems": 4,
+      "eligibleCount": 23
     },
     {
       "id": "tool_items",
@@ -590,7 +566,8 @@
       "opposites": [
         "food_items"
       ],
-      "minimumItems": 4
+      "minimumItems": 4,
+      "eligibleCount": 10
     },
     {
       "id": "math_symbols",
@@ -604,7 +581,8 @@
       "opposites": [
         "animals"
       ],
-      "minimumItems": 4
+      "minimumItems": 4,
+      "eligibleCount": 10
     },
     {
       "id": "weather_items",
@@ -618,7 +596,8 @@
       "opposites": [
         "hot"
       ],
-      "minimumItems": 4
+      "minimumItems": 4,
+      "eligibleCount": 5
     },
     {
       "id": "vehicle_items",
@@ -632,7 +611,8 @@
       "opposites": [
         "plant_items"
       ],
-      "minimumItems": 4
+      "minimumItems": 4,
+      "eligibleCount": 6
     },
     {
       "id": "technology_items",
@@ -646,7 +626,8 @@
       "opposites": [
         "plant_items"
       ],
-      "minimumItems": 4
+      "minimumItems": 4,
+      "eligibleCount": 5
     },
     {
       "id": "round_non_flags",
@@ -666,7 +647,8 @@
       "opposites": [
         "pointed"
       ],
-      "minimumItems": 4
+      "minimumItems": 4,
+      "eligibleCount": 15
     },
     {
       "id": "insects",
@@ -680,7 +662,8 @@
       "opposites": [
         "mammals"
       ],
-      "minimumItems": 4
+      "minimumItems": 4,
+      "eligibleCount": 4
     }
   ]
 }

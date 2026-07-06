@@ -8,6 +8,8 @@ A penguin can be `animal`, `bird`, `vertebrate`, `polar`, `cold`, `land`, `sea`,
 
 A flag can be `flag`, `island`, `Europe`, `subpolar`, `cross`, and have colors `blue`, `red`, and `white`.
 
+Country-flag categories must be objective.  Do not use subjective geography categories such as `mountainous`, and avoid broad categories such as `coastal` that apply to most countries.  For flags, `equatorial` should mean the country touches the equator, and `polar` should mean the country or territory touches or lies within a polar circle.
+
 ## Items
 
 Each item in `data/items.json` has:

@@ -15,6 +15,18 @@ test('selector matching supports required tags and exact colors', () => {
   assert.equal(matchesSelector({ kind: 'flag', tags: ['round'], colors: [], glyph: '🏳️' }, { kinds: ['emoji', 'symbol'], requiredTags: ['round'] }), false);
 });
 
+test('flag geography categories are categorical and non-subjective', () => {
+  assert.equal(selectors.some((selector) => selector.id === 'mountainous' || selector.id === 'coastal'), false);
+  const byId = Object.fromEntries(items.map((item) => [item.id, item]));
+  const equatorialFlags = items.filter((item) => item.kind === 'flag' && item.tags.includes('equatorial')).map((item) => item.id).sort();
+  const polarFlags = items.filter((item) => item.kind === 'flag' && item.tags.includes('polar')).map((item) => item.id).sort();
+  assert.deepEqual(equatorialFlags, ['flag:brazil', 'flag:democratic_republic_congo', 'flag:ecuador', 'flag:indonesia', 'flag:kenya', 'flag:uganda']);
+  assert.deepEqual(polarFlags, ['flag:antarctica', 'flag:canada', 'flag:finland', 'flag:greenland', 'flag:norway', 'flag:sweden', 'flag:united_states']);
+  assert.equal(byId['flag:rwanda'].tags.includes('equatorial'), false);
+  assert.equal(byId['flag:singapore'].tags.includes('equatorial'), false);
+});
+
+
 test('board generation creates valid unique boards for each mode', () => {
   const expectations = { sort_2: [4, 16], sort_3: [6, 24], sort_4: [8, 32] };
   for (const [modeId, [groups, prompts]] of Object.entries(expectations)) {
