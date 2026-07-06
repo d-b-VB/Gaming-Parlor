@@ -52,7 +52,7 @@ Only enable propositions once the selected mode has enough actual history to jus
 
 ## Heart display
 
-Show the Heart safety target separately from the Club bet.  If the active timer passes the Heart safety target, the Heart display should enter a danger state.
+Show the Heart safety target separately from the Club bet.  If the selected mode has no actual completed rounds yet, show that the first run has no Heart timer and let the player take as long as needed.  If the active timer passes an established Heart safety target, the Heart display should enter a danger state.
 
 ## Feedback
 

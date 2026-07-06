@@ -1,8 +1,8 @@
-import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, percentileAtRun, createClubBet, buyClubBet, unlockMode, buySpade, restoreHeart, settleRound, spadeCost, payoutScore, streakDuration } from './game/core.js?v=0.2.4';
+import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, percentileAtRun, createClubBet, buyClubBet, unlockMode, buySpade, restoreHeart, settleRound, spadeCost, payoutScore, streakDuration } from './game/core.js?v=0.2.5';
 
 const root = document.querySelector('#root');
-const APP_VERSION = 'v0.2.4';
-const SAVE_SCHEMA_VERSION = '0.2.4-local';
+const APP_VERSION = 'v0.2.5';
+const SAVE_SCHEMA_VERSION = '0.2.5-local';
 const arrows = { left: '←', right: '→', up: '↑', down: '↓' };
 let items = [];
 let selectors = [];
@@ -74,10 +74,12 @@ function queueStripHtml() {
   return `<div class="queue-strip" style="--queue-total:${board.queue.length}" aria-label="Full prompt queue">${queue.map((prompt, index) => `<span class="queue-glyph ${index === 0 ? 'next' : ''}">${glyphHtml(prompt.item)}</span>`).join('')}</div>`;
 }
 function barsHtml(safety, activeBet) {
-  const heartPct = Math.max(0, Math.min(100, ((safety - elapsed) / Math.max(1, safety)) * 100));
+  const hasHeartLimit = Number.isFinite(safety);
+  const heartPct = hasHeartLimit ? Math.max(0, Math.min(100, ((safety - elapsed) / Math.max(1, safety)) * 100)) : 100;
   const betTarget = activeBet?.targetSeconds;
   const betPct = betTarget ? Math.max(0, Math.min(100, ((betTarget - elapsed) / Math.max(1, betTarget)) * 100)) : 0;
-  return `<div class="timer-stack"><div class="timer-label"><span>♥ Heart safe ${fmt(Math.max(0, safety - elapsed))}</span><span>${fmt(safety)}</span></div><div class="timer-bar heart-bar"><span style="width:${heartPct}%"></span></div>${activeBet ? `<div class="timer-label"><span>♣ Bet alive ${fmt(Math.max(0, activeBet.targetSeconds - elapsed))}</span><span>${activeBet.oddsLabel || `${activeBet.oddsMultiplier}:1`} / ${fmt(activeBet.targetSeconds)}</span></div><div class="timer-bar bet-bar"><span style="width:${betPct}%"></span></div>` : '<div class="timer-label muted"><span>♣ No active bet</span><span>Buy between rounds</span></div><div class="timer-bar bet-bar empty"><span style="width:0%"></span></div>'}${queueStripHtml()}</div>`;
+  const heartLabel = hasHeartLimit ? `<span>♥ Heart safe ${fmt(Math.max(0, safety - elapsed))}</span><span>${fmt(safety)}</span>` : '<span>♥ First run: no Heart timer</span><span>Take your time</span>';
+  return `<div class="timer-stack"><div class="timer-label">${heartLabel}</div><div class="timer-bar heart-bar ${hasHeartLimit ? '' : 'untimed'}"><span style="width:${heartPct}%"></span></div>${activeBet ? `<div class="timer-label"><span>♣ Bet alive ${fmt(Math.max(0, activeBet.targetSeconds - elapsed))}</span><span>${activeBet.oddsLabel || `${activeBet.oddsMultiplier}:1`} / ${fmt(activeBet.targetSeconds)}</span></div><div class="timer-bar bet-bar"><span style="width:${betPct}%"></span></div>` : '<div class="timer-label muted"><span>♣ No active bet</span><span>Buy between rounds</span></div><div class="timer-bar bet-bar empty"><span style="width:0%"></span></div>'}${queueStripHtml()}</div>`;
 }
 function stopTimer() { if (timerId) window.clearInterval(timerId); timerId = null; }
 function startBoard(nextMode = modeId) {

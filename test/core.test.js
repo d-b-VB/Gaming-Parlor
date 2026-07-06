@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { generateBoard, matchesSelector, estimateTargets, createClubBet, buyClubBet, settleRound, unlockMode, buySpade, spadeCost, payoutScore, streakDuration } from '../src/game/core.js';
+import { generateBoard, matchesSelector, estimateTargets, heartSafety, createClubBet, buyClubBet, settleRound, unlockMode, buySpade, spadeCost, payoutScore, streakDuration } from '../src/game/core.js';
 
 const items = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/items.json', import.meta.url))).items;
 const selectors = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/category_selectors.json', import.meta.url))).selectors;
@@ -48,6 +48,7 @@ test('economy handles unlocks, club bets, spades, memory, and winnings', () => {
   let state = structuredClone(defaultState);
   state = unlockMode(state, 'sort_3');
   assert.equal(state.unlockedModes.sort_3, true);
+  state.gameMemory.sort_2.entries = Array.from({ length: 8 }, (_, index) => ({ timeSeconds: 42 - index, entryType: 'actual', createdAt: `history-${index}` }));
   const offer = estimateTargets('sort_2', state.gameMemory.sort_2.entries)[0];
   state = buyClubBet(state, createClubBet('sort_2', offer, 2));
   assert.equal(state.activeClubBet.oddsLabel, offer.oddsLabel);
@@ -64,15 +65,23 @@ test('economy handles unlocks, club bets, spades, memory, and winnings', () => {
 
 
 test('bet propositions use sensible odds and require enough actual history', () => {
-  const lowHistory = structuredClone(defaultState).gameMemory.sort_2.entries.slice(0, 5);
+  const lowHistory = structuredClone(defaultState).gameMemory.sort_2.entries;
   const lowTargets = estimateTargets('sort_2', lowHistory);
   assert.deepEqual(lowTargets.map((target) => target.oddsLabel), ['1:2', '1:1', '2:1', '5:1', '10:1']);
-  assert.deepEqual(lowTargets.map((target) => target.available), [true, false, false, false, false]);
+  assert.deepEqual(lowTargets.map((target) => target.available), [false, false, false, false, false]);
   const richHistory = Array.from({ length: 20 }, (_, index) => ({ timeSeconds: 45 - index, entryType: 'actual', createdAt: `t${index}` }));
   const richTargets = estimateTargets('sort_2', richHistory);
   assert.deepEqual(richTargets.map((target) => target.oddsLabel), ['1:2', '1:1', '2:1', '5:1', '10:1']);
   assert.deepEqual(richTargets.map((target) => target.available), [true, true, true, true, true]);
   assert.ok(richTargets[4].timeSeconds < richTargets[0].timeSeconds);
+});
+
+test('first round has no presumed Heart timer or loss', () => {
+  const state = structuredClone(defaultState);
+  assert.equal(heartSafety('sort_2', state.gameMemory.sort_2.entries), Infinity);
+  const next = settleRound(state, 'sort_2', 999, 0, 'first-round', 'test');
+  assert.equal(next.resources.hearts, state.resources.hearts);
+  assert.equal(next.gameMemory.sort_2.entries.at(-1).timeSeconds, 999);
 });
 
 test('spade costs and streak animation scale upward and downward respectively', () => {

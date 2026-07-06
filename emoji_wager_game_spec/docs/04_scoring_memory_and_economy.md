@@ -56,7 +56,7 @@ Lower target times must have higher payouts.  A proposition should only become a
 
 Heart loss still needs a clear safety line.  The first prototype may use the estimated 50% target, median remembered time, or a slightly easier line as the Heart safety threshold.  The chosen approach should be centralized in scoring configuration and covered by tests.
 
-If fewer than 5 memory entries exist for a mode, use starter defaults per mode.
+If a mode has no actual completed rounds yet, the first round for that mode should have no Heart safety timer and no Heart loss for taking too long.  It is a calibration run; let the player take as long as needed.  After at least one actual score exists but fewer than 5 memory entries exist for a mode, use starter defaults per mode.
 
 Suggested starter defaults:
 

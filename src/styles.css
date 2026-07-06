@@ -60,6 +60,7 @@ input { width: 100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1
 .timer-bar { width: 100%; height: 13px; border-radius: 999px; overflow: hidden; background: rgba(255,255,255,0.12); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12); }
 .timer-bar span { display: block; height: 100%; border-radius: inherit; transform-origin: left center; transition: width 160ms linear; }
 .heart-bar span { background: linear-gradient(90deg, #ff4d6d, #ffd27a); }
+.heart-bar.untimed span { background: linear-gradient(90deg, #70e1a1, #ffd27a); }
 .bet-bar span { background: linear-gradient(90deg, #80ffdb, #5e60ce); }
 .bet-bar.empty span { background: transparent; }
 .queue-strip { display: flex; align-items: center; gap: 0.25rem; min-height: 2.15rem; padding: 0.35rem; border-radius: 14px; background: rgba(0,0,0,0.28); overflow: hidden; }

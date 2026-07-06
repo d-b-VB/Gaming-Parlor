@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "0.2.0",
+  "schemaVersion": "0.2.1",
   "resources": {
     "hearts": 5,
     "maxHearts": 5,
@@ -24,16 +24,7 @@
   },
   "gameMemory": {
     "sort_2": {
-      "entries": [
-        { "timeSeconds": 42, "entryType": "actual", "createdAt": "seed" },
-        { "timeSeconds": 40, "entryType": "actual", "createdAt": "seed" },
-        { "timeSeconds": 38, "entryType": "actual", "createdAt": "seed" },
-        { "timeSeconds": 36, "entryType": "actual", "createdAt": "seed" },
-        { "timeSeconds": 35, "entryType": "actual", "createdAt": "seed" },
-        { "timeSeconds": 34, "entryType": "actual", "createdAt": "seed" },
-        { "timeSeconds": 33, "entryType": "actual", "createdAt": "seed" },
-        { "timeSeconds": 32, "entryType": "actual", "createdAt": "seed" }
-      ]
+      "entries": []
     },
     "sort_3": {
       "entries": []

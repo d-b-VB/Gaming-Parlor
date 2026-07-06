@@ -51,6 +51,7 @@
 - Buying Clubs for a bet spends Diamonds before the round.
 - Finishing at or below the selected Club target pays Diamonds based on the odds.
 - Finishing above the selected Club target pays no Club winnings.
+- A mode with no actual completed rounds has no Heart safety timer, and the first run does not lose Hearts for taking too long.
 - Finishing after the Heart safety threshold loses Hearts.
 - Finishing worse than every actual memory entry for that mode loses 2 Hearts total.
 - Completing one unlocked mode adds rest entries to other unlocked modes.

@@ -4,7 +4,7 @@
 
 Hearts are the player's tolerance for slow or deteriorating performance.
 
-A Heart is lost when the player finishes after the Heart safety threshold for the current round.  If the player runs out of Hearts, the first prototype should show a simple game-over or reset panel.  Do not delete history automatically unless the user chooses reset.
+A Heart is lost when the player finishes after the Heart safety threshold for the current round.  The first actual round in a mode is a calibration run with no Heart timer and no Heart loss for taking too long.  If the player runs out of Hearts, the first prototype should show a simple game-over or reset panel.  Do not delete history automatically unless the user chooses reset.
 
 Hearts are not village trust, hit points in combat, or physical health.  They are an abstract loss buffer.
 
