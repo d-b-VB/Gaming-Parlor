@@ -1,0 +1,669 @@
+{
+  "schemaVersion": "0.2.1",
+  "description": "Curated group selectors. A group is not necessarily a tag; it may be a selector over tags, colors, kind, and exclusions.",
+  "selectors": [
+    {
+      "id": "arthropod",
+      "label": "Arthropods",
+      "selector": {
+        "requiredTags": [
+          "arthropod"
+        ]
+      },
+      "opposites": [
+        "vertebrate"
+      ],
+      "eligibleCount": 9,
+      "minimumItems": 4
+    },
+    {
+      "id": "vertebrate",
+      "label": "Vertebrates",
+      "selector": {
+        "requiredTags": [
+          "vertebrate"
+        ]
+      },
+      "opposites": [
+        "arthropod",
+        "invertebrate"
+      ],
+      "eligibleCount": 37,
+      "minimumItems": 4
+    },
+    {
+      "id": "flying",
+      "label": "Flying",
+      "selector": {
+        "requiredTags": [
+          "flying"
+        ]
+      },
+      "opposites": [
+        "flightless"
+      ],
+      "eligibleCount": 9,
+      "minimumItems": 4
+    },
+    {
+      "id": "sea",
+      "label": "Sea / Water",
+      "selector": {
+        "requiredTags": [
+          "sea"
+        ]
+      },
+      "opposites": [
+        "land"
+      ],
+      "eligibleCount": 13,
+      "minimumItems": 4
+    },
+    {
+      "id": "land",
+      "label": "Land",
+      "selector": {
+        "requiredTags": [
+          "land"
+        ]
+      },
+      "opposites": [
+        "sea"
+      ],
+      "eligibleCount": 39,
+      "minimumItems": 4
+    },
+    {
+      "id": "plant",
+      "label": "Plants",
+      "selector": {
+        "requiredTags": [
+          "plant"
+        ]
+      },
+      "opposites": [
+        "animal"
+      ],
+      "eligibleCount": 19,
+      "minimumItems": 4
+    },
+    {
+      "id": "animal",
+      "label": "Animals",
+      "selector": {
+        "requiredTags": [
+          "animal"
+        ]
+      },
+      "opposites": [
+        "plant"
+      ],
+      "eligibleCount": 49,
+      "minimumItems": 4
+    },
+    {
+      "id": "flower",
+      "label": "Flowers",
+      "selector": {
+        "requiredTags": [
+          "flower"
+        ]
+      },
+      "opposites": [],
+      "eligibleCount": 5,
+      "minimumItems": 4
+    },
+    {
+      "id": "tool",
+      "label": "Tools",
+      "selector": {
+        "requiredTags": [
+          "tool"
+        ]
+      },
+      "opposites": [],
+      "eligibleCount": 10,
+      "minimumItems": 4
+    },
+    {
+      "id": "science",
+      "label": "Science Things",
+      "selector": {
+        "requiredTags": [
+          "science"
+        ]
+      },
+      "opposites": [],
+      "eligibleCount": 4,
+      "minimumItems": 4
+    },
+    {
+      "id": "drink",
+      "label": "Drinks",
+      "selector": {
+        "requiredTags": [
+          "drink"
+        ]
+      },
+      "opposites": [],
+      "eligibleCount": 7,
+      "minimumItems": 4
+    },
+    {
+      "id": "food",
+      "label": "Food",
+      "selector": {
+        "requiredTags": [
+          "food"
+        ]
+      },
+      "opposites": [],
+      "eligibleCount": 19,
+      "minimumItems": 4
+    },
+    {
+      "id": "hot",
+      "label": "Hot",
+      "selector": {
+        "requiredTags": [
+          "hot"
+        ]
+      },
+      "opposites": [
+        "cold"
+      ],
+      "eligibleCount": 5,
+      "minimumItems": 4
+    },
+    {
+      "id": "cold",
+      "label": "Cold",
+      "selector": {
+        "requiredTags": [
+          "cold"
+        ]
+      },
+      "opposites": [
+        "hot"
+      ],
+      "eligibleCount": 17,
+      "minimumItems": 4
+    },
+    {
+      "id": "polar",
+      "label": "Polar",
+      "selector": {
+        "requiredTags": [
+          "polar"
+        ]
+      },
+      "opposites": [
+        "equatorial",
+        "tropical"
+      ],
+      "eligibleCount": 10,
+      "minimumItems": 4
+    },
+    {
+      "id": "equatorial",
+      "label": "Equatorial",
+      "selector": {
+        "requiredTags": [
+          "equatorial"
+        ]
+      },
+      "opposites": [
+        "polar"
+      ],
+      "eligibleCount": 6,
+      "minimumItems": 4
+    },
+    {
+      "id": "tropical",
+      "label": "Tropical",
+      "selector": {
+        "requiredTags": [
+          "tropical"
+        ]
+      },
+      "opposites": [
+        "polar",
+        "cold"
+      ],
+      "eligibleCount": 29,
+      "minimumItems": 4
+    },
+    {
+      "id": "island",
+      "label": "Island",
+      "selector": {
+        "requiredTags": [
+          "island"
+        ]
+      },
+      "opposites": [
+        "landlocked"
+      ],
+      "eligibleCount": 13,
+      "minimumItems": 4
+    },
+    {
+      "id": "landlocked",
+      "label": "Landlocked",
+      "selector": {
+        "requiredTags": [
+          "landlocked"
+        ]
+      },
+      "opposites": [
+        "island"
+      ],
+      "eligibleCount": 8,
+      "minimumItems": 4
+    },
+    {
+      "id": "red_items",
+      "label": "Contains Red",
+      "selector": {
+        "containsColors": [
+          "red"
+        ]
+      },
+      "opposites": [
+        "no_blue"
+      ],
+      "eligibleCount": 27,
+      "minimumItems": 4
+    },
+    {
+      "id": "blue_items",
+      "label": "Contains Blue",
+      "selector": {
+        "containsColors": [
+          "blue"
+        ]
+      },
+      "opposites": [],
+      "eligibleCount": 18,
+      "minimumItems": 4
+    },
+    {
+      "id": "white_items",
+      "label": "Contains White",
+      "selector": {
+        "containsColors": [
+          "white"
+        ]
+      },
+      "opposites": [],
+      "eligibleCount": 28,
+      "minimumItems": 4
+    },
+    {
+      "id": "red_no_blue",
+      "label": "Red, No Blue",
+      "selector": {
+        "containsColors": [
+          "red"
+        ],
+        "excludesColors": [
+          "blue"
+        ]
+      },
+      "opposites": [
+        "blue_items"
+      ],
+      "eligibleCount": 15,
+      "minimumItems": 4
+    },
+    {
+      "id": "blue_white_exact",
+      "label": "Exactly Blue and White",
+      "selector": {
+        "exactColors": [
+          "blue",
+          "white"
+        ]
+      },
+      "opposites": [
+        "red_white_exact"
+      ],
+      "eligibleCount": 3,
+      "minimumItems": 4
+    },
+    {
+      "id": "red_white_exact",
+      "label": "Exactly Red and White",
+      "selector": {
+        "exactColors": [
+          "red",
+          "white"
+        ]
+      },
+      "opposites": [
+        "blue_white_exact"
+      ],
+      "eligibleCount": 6,
+      "minimumItems": 4
+    },
+    {
+      "id": "red_white_blue_exact",
+      "label": "Exactly Red, White, and Blue",
+      "selector": {
+        "exactColors": [
+          "blue",
+          "red",
+          "white"
+        ]
+      },
+      "opposites": [],
+      "eligibleCount": 9,
+      "minimumItems": 4
+    },
+    {
+      "id": "two_colors",
+      "label": "Two Colors",
+      "selector": {
+        "colorCount": 2,
+        "kinds": [
+          "flag",
+          "symbol"
+        ]
+      },
+      "opposites": [
+        "three_colors"
+      ],
+      "eligibleCount": 10,
+      "minimumItems": 4
+    },
+    {
+      "id": "three_colors",
+      "label": "Three Colors",
+      "selector": {
+        "colorCount": 3,
+        "kinds": [
+          "flag"
+        ]
+      },
+      "opposites": [
+        "two_colors"
+      ],
+      "eligibleCount": 16,
+      "minimumItems": 4
+    },
+    {
+      "id": "cross_flags",
+      "label": "Cross Flags/Symbols",
+      "selector": {
+        "requiredTags": [
+          "cross"
+        ]
+      },
+      "opposites": [],
+      "eligibleCount": 11,
+      "minimumItems": 4
+    },
+    {
+      "id": "stars",
+      "label": "Stars",
+      "selector": {
+        "requiredTags": [
+          "stars"
+        ]
+      },
+      "opposites": [],
+      "eligibleCount": 5,
+      "minimumItems": 4
+    },
+    {
+      "id": "horizontal_stripes",
+      "label": "Horizontal Stripes",
+      "selector": {
+        "requiredTags": [
+          "horizontal_stripes"
+        ]
+      },
+      "opposites": [
+        "vertical_stripes"
+      ],
+      "eligibleCount": 6,
+      "minimumItems": 4
+    },
+    {
+      "id": "vertical_stripes",
+      "label": "Vertical Stripes",
+      "selector": {
+        "requiredTags": [
+          "vertical_stripes"
+        ]
+      },
+      "opposites": [
+        "horizontal_stripes"
+      ],
+      "eligibleCount": 3,
+      "minimumItems": 4
+    },
+    {
+      "id": "card_suits",
+      "label": "Card Suits",
+      "selector": {
+        "requiredTags": [
+          "card_suit"
+        ]
+      },
+      "opposites": [],
+      "eligibleCount": 8,
+      "minimumItems": 4
+    },
+    {
+      "id": "arrows",
+      "label": "Arrows",
+      "selector": {
+        "requiredTags": [
+          "arrow"
+        ]
+      },
+      "opposites": [],
+      "eligibleCount": 5,
+      "minimumItems": 4
+    },
+    {
+      "id": "math_ops",
+      "label": "Math Operators",
+      "selector": {
+        "requiredTags": [
+          "operator"
+        ]
+      },
+      "opposites": [],
+      "eligibleCount": 9,
+      "minimumItems": 4
+    },
+    {
+      "id": "outline_shapes",
+      "label": "Outline Shapes",
+      "selector": {
+        "requiredTags": [
+          "outline",
+          "shape"
+        ]
+      },
+      "opposites": [
+        "filled_shapes"
+      ],
+      "eligibleCount": 8,
+      "minimumItems": 4
+    },
+    {
+      "id": "filled_shapes",
+      "label": "Filled Shapes",
+      "selector": {
+        "requiredTags": [
+          "filled",
+          "shape"
+        ]
+      },
+      "opposites": [
+        "outline_shapes"
+      ],
+      "eligibleCount": 6,
+      "minimumItems": 4
+    },
+    {
+      "id": "food_items",
+      "label": "Food",
+      "selector": {
+        "requiredTags": [
+          "food"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [
+        "tool_items"
+      ],
+      "minimumItems": 4,
+      "eligibleCount": 19
+    },
+    {
+      "id": "plant_items",
+      "label": "Plants",
+      "selector": {
+        "requiredTags": [
+          "plant"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [
+        "technology_items"
+      ],
+      "minimumItems": 4,
+      "eligibleCount": 19
+    },
+    {
+      "id": "mammals",
+      "label": "Mammals",
+      "selector": {
+        "requiredTags": [
+          "mammal"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [
+        "arthropod"
+      ],
+      "minimumItems": 4,
+      "eligibleCount": 23
+    },
+    {
+      "id": "tool_items",
+      "label": "Tools",
+      "selector": {
+        "requiredTags": [
+          "tool"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [
+        "food_items"
+      ],
+      "minimumItems": 4,
+      "eligibleCount": 10
+    },
+    {
+      "id": "math_symbols",
+      "label": "Math Symbols",
+      "selector": {
+        "requiredTags": [
+          "math"
+        ],
+        "kind": "symbol"
+      },
+      "opposites": [
+        "animals"
+      ],
+      "minimumItems": 4,
+      "eligibleCount": 10
+    },
+    {
+      "id": "weather_items",
+      "label": "Weather",
+      "selector": {
+        "requiredTags": [
+          "weather"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [
+        "hot"
+      ],
+      "minimumItems": 4,
+      "eligibleCount": 5
+    },
+    {
+      "id": "vehicle_items",
+      "label": "Vehicles",
+      "selector": {
+        "requiredTags": [
+          "vehicle"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [
+        "plant_items"
+      ],
+      "minimumItems": 4,
+      "eligibleCount": 6
+    },
+    {
+      "id": "technology_items",
+      "label": "Technology",
+      "selector": {
+        "requiredTags": [
+          "technology"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [
+        "plant_items"
+      ],
+      "minimumItems": 4,
+      "eligibleCount": 5
+    },
+    {
+      "id": "round_non_flags",
+      "label": "Round Non-Flags",
+      "selector": {
+        "requiredTags": [
+          "round"
+        ],
+        "excludesTags": [
+          "flag"
+        ],
+        "kinds": [
+          "emoji",
+          "symbol"
+        ]
+      },
+      "opposites": [
+        "pointed"
+      ],
+      "minimumItems": 4,
+      "eligibleCount": 15
+    },
+    {
+      "id": "insects",
+      "label": "Insects",
+      "selector": {
+        "requiredTags": [
+          "insect"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [
+        "mammals"
+      ],
+      "minimumItems": 4,
+      "eligibleCount": 4
+    }
+  ]
+}

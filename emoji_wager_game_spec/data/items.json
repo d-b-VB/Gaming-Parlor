@@ -1,0 +1,5690 @@
+{
+  "schemaVersion": "0.4.1",
+  "description": "Flat item/tag catalog for the emoji wager sorting game. Tags are descriptive and cross-cutting, not taxonomic. Colors are atomic fields; exact palette and no-color categories are derived by selectors.",
+  "items": [
+    {
+      "id": "emoji:airplane",
+      "glyph": "✈️",
+      "name": "airplane",
+      "source": "emoji",
+      "tags": [
+        "flying",
+        "transport",
+        "vehicle",
+        "white",
+        "wings"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:ant",
+      "glyph": "🐜",
+      "name": "ant",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "arthropod",
+        "black",
+        "colony",
+        "insect",
+        "invertebrate",
+        "land"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:apple",
+      "glyph": "🍎",
+      "name": "red apple",
+      "source": "emoji",
+      "tags": [
+        "food",
+        "fruit",
+        "plant",
+        "red",
+        "round"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:atom",
+      "glyph": "⚛️",
+      "name": "atom symbol",
+      "source": "emoji",
+      "tags": [
+        "physics",
+        "round",
+        "science",
+        "technology"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:banana",
+      "glyph": "🍌",
+      "name": "banana",
+      "source": "emoji",
+      "tags": [
+        "food",
+        "fruit",
+        "long",
+        "plant",
+        "tropical",
+        "yellow"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:bat",
+      "glyph": "🦇",
+      "name": "bat",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "black",
+        "flying",
+        "mammal",
+        "night",
+        "vertebrate",
+        "wings"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:bear",
+      "glyph": "🐻",
+      "name": "bear",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "brown",
+        "forest",
+        "land",
+        "mammal",
+        "predator",
+        "vertebrate"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:bee",
+      "glyph": "🐝",
+      "name": "bee",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "arthropod",
+        "black",
+        "flying",
+        "insect",
+        "invertebrate",
+        "pollinator",
+        "wings",
+        "yellow"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:beer",
+      "glyph": "🍺",
+      "name": "beer",
+      "source": "emoji",
+      "tags": [
+        "alcohol",
+        "cold",
+        "drink",
+        "yellow"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:bicycle",
+      "glyph": "🚲",
+      "name": "bicycle",
+      "source": "emoji",
+      "tags": [
+        "land",
+        "road",
+        "transport",
+        "two",
+        "vehicle"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:book",
+      "glyph": "📘",
+      "name": "blue book",
+      "source": "emoji",
+      "tags": [
+        "blue",
+        "knowledge",
+        "paper",
+        "rectangle"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:bread",
+      "glyph": "🍞",
+      "name": "bread",
+      "source": "emoji",
+      "tags": [
+        "baked",
+        "brown",
+        "carbohydrate",
+        "food"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:broccoli",
+      "glyph": "🥦",
+      "name": "broccoli",
+      "source": "emoji",
+      "tags": [
+        "food",
+        "green",
+        "plant",
+        "vegetable"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:butterfly",
+      "glyph": "🦋",
+      "name": "butterfly",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "arthropod",
+        "colorful",
+        "flying",
+        "insect",
+        "invertebrate",
+        "wings"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:car",
+      "glyph": "🚗",
+      "name": "car",
+      "source": "emoji",
+      "tags": [
+        "land",
+        "red",
+        "road",
+        "transport",
+        "vehicle"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:carrot",
+      "glyph": "🥕",
+      "name": "carrot",
+      "source": "emoji",
+      "tags": [
+        "food",
+        "orange",
+        "plant",
+        "root",
+        "vegetable"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:cat",
+      "glyph": "🐱",
+      "name": "cat",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "land",
+        "mammal",
+        "pet",
+        "vertebrate"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:cheese",
+      "glyph": "🧀",
+      "name": "cheese",
+      "source": "emoji",
+      "tags": [
+        "dairy",
+        "food",
+        "savory",
+        "yellow"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:cherries",
+      "glyph": "🍒",
+      "name": "cherries",
+      "source": "emoji",
+      "tags": [
+        "food",
+        "fruit",
+        "pair",
+        "plant",
+        "red",
+        "round"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:cherry_blossom",
+      "glyph": "🌸",
+      "name": "cherry blossom",
+      "source": "emoji",
+      "tags": [
+        "flower",
+        "pink",
+        "plant",
+        "spring"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:chicken",
+      "glyph": "🐔",
+      "name": "chicken",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "bird",
+        "farm",
+        "land",
+        "vertebrate",
+        "wings"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:clock",
+      "glyph": "⏰",
+      "name": "alarm clock",
+      "source": "emoji",
+      "tags": [
+        "alarm",
+        "metal",
+        "round",
+        "time"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:cloud",
+      "glyph": "☁️",
+      "name": "cloud",
+      "source": "emoji",
+      "tags": [
+        "sky",
+        "water",
+        "weather",
+        "white"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:cocktail",
+      "glyph": "🍸",
+      "name": "cocktail",
+      "source": "emoji",
+      "tags": [
+        "alcohol",
+        "cold",
+        "drink",
+        "glass"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:coffee",
+      "glyph": "☕",
+      "name": "hot beverage",
+      "source": "emoji",
+      "tags": [
+        "brown",
+        "caffeinated",
+        "drink",
+        "hot"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:corn",
+      "glyph": "🌽",
+      "name": "corn",
+      "source": "emoji",
+      "tags": [
+        "food",
+        "plant",
+        "vegetable",
+        "yellow"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:cow",
+      "glyph": "🐮",
+      "name": "cow",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "black",
+        "farm",
+        "land",
+        "mammal",
+        "vertebrate",
+        "white"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:crab",
+      "glyph": "🦀",
+      "name": "crab",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "arthropod",
+        "crustacean",
+        "invertebrate",
+        "land",
+        "red",
+        "sea",
+        "sideways"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:crocodile",
+      "glyph": "🐊",
+      "name": "crocodile",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "dangerous",
+        "green",
+        "land",
+        "predator",
+        "reptile",
+        "vertebrate",
+        "water"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:deer",
+      "glyph": "🦌",
+      "name": "deer",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "brown",
+        "forest",
+        "land",
+        "mammal",
+        "vertebrate"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:dna",
+      "glyph": "🧬",
+      "name": "DNA",
+      "source": "emoji",
+      "tags": [
+        "biology",
+        "genetics",
+        "science",
+        "twisted"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:dog",
+      "glyph": "🐶",
+      "name": "dog",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "brown",
+        "land",
+        "mammal",
+        "pet",
+        "vertebrate"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:dolphin",
+      "glyph": "🐬",
+      "name": "dolphin",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "gray",
+        "mammal",
+        "sea",
+        "swimming",
+        "vertebrate",
+        "water"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:eagle",
+      "glyph": "🦅",
+      "name": "eagle",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "bird",
+        "brown",
+        "flying",
+        "predator",
+        "vertebrate",
+        "wings"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:earth",
+      "glyph": "🌍",
+      "name": "globe showing Europe-Africa",
+      "source": "emoji",
+      "tags": [
+        "blue",
+        "green",
+        "land",
+        "planet",
+        "round",
+        "sea",
+        "space"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:egg",
+      "glyph": "🥚",
+      "name": "egg",
+      "source": "emoji",
+      "tags": [
+        "animal_product",
+        "food",
+        "oval",
+        "white"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:elephant",
+      "glyph": "🐘",
+      "name": "elephant",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "gray",
+        "land",
+        "large",
+        "mammal",
+        "tropical",
+        "vertebrate"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:fire",
+      "glyph": "🔥",
+      "name": "fire",
+      "source": "emoji",
+      "tags": [
+        "dangerous",
+        "energy",
+        "hot",
+        "orange",
+        "red"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:fish",
+      "glyph": "🐟",
+      "name": "fish",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "sea",
+        "swimming",
+        "vertebrate",
+        "water"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:flamingo",
+      "glyph": "🦩",
+      "name": "flamingo",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "bird",
+        "flying",
+        "pink",
+        "tropical",
+        "vertebrate",
+        "water",
+        "wings"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:fox",
+      "glyph": "🦊",
+      "name": "fox",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "forest",
+        "land",
+        "mammal",
+        "orange",
+        "predator",
+        "vertebrate"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:frog",
+      "glyph": "🐸",
+      "name": "frog",
+      "source": "emoji",
+      "tags": [
+        "amphibian",
+        "animal",
+        "green",
+        "jumping",
+        "land",
+        "vertebrate",
+        "water"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:game_controller",
+      "glyph": "🎮",
+      "name": "game controller",
+      "source": "emoji",
+      "tags": [
+        "black",
+        "game",
+        "technology",
+        "two"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:gear",
+      "glyph": "⚙️",
+      "name": "gear",
+      "source": "emoji",
+      "tags": [
+        "metal",
+        "round",
+        "technology",
+        "tool",
+        "work"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:giraffe",
+      "glyph": "🦒",
+      "name": "giraffe",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "land",
+        "mammal",
+        "spotted",
+        "tall",
+        "tropical",
+        "vertebrate",
+        "yellow"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:goat",
+      "glyph": "🐐",
+      "name": "goat",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "farm",
+        "land",
+        "mammal",
+        "mountainous",
+        "vertebrate"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:grapes",
+      "glyph": "🍇",
+      "name": "grapes",
+      "source": "emoji",
+      "tags": [
+        "food",
+        "fruit",
+        "plant",
+        "purple",
+        "round"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:hammer",
+      "glyph": "🔨",
+      "name": "hammer",
+      "source": "emoji",
+      "tags": [
+        "construction",
+        "metal",
+        "tool",
+        "wood",
+        "work"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:hibiscus",
+      "glyph": "🌺",
+      "name": "hibiscus",
+      "source": "emoji",
+      "tags": [
+        "flower",
+        "plant",
+        "red",
+        "tropical"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:horse",
+      "glyph": "🐴",
+      "name": "horse",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "brown",
+        "farm",
+        "fast",
+        "land",
+        "mammal",
+        "vertebrate"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:hourglass",
+      "glyph": "⌛",
+      "name": "hourglass",
+      "source": "emoji",
+      "tags": [
+        "glass",
+        "sand",
+        "time",
+        "two"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:ice",
+      "glyph": "🧊",
+      "name": "ice cube",
+      "source": "emoji",
+      "tags": [
+        "blue",
+        "cold",
+        "square",
+        "water"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:key",
+      "glyph": "🔑",
+      "name": "key",
+      "source": "emoji",
+      "tags": [
+        "metal",
+        "security",
+        "tool",
+        "yellow"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:lady_beetle",
+      "glyph": "🐞",
+      "name": "lady beetle",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "arthropod",
+        "black",
+        "insect",
+        "invertebrate",
+        "land",
+        "red",
+        "spotted"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:leafy_green",
+      "glyph": "🥬",
+      "name": "leafy green",
+      "source": "emoji",
+      "tags": [
+        "food",
+        "green",
+        "leaf",
+        "plant",
+        "vegetable"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:lemon",
+      "glyph": "🍋",
+      "name": "lemon",
+      "source": "emoji",
+      "tags": [
+        "food",
+        "fruit",
+        "plant",
+        "sour",
+        "yellow"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:lightning",
+      "glyph": "⚡",
+      "name": "lightning",
+      "source": "emoji",
+      "tags": [
+        "dangerous",
+        "energy",
+        "fast",
+        "weather",
+        "yellow"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:lion",
+      "glyph": "🦁",
+      "name": "lion",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "land",
+        "mammal",
+        "predator",
+        "tropical",
+        "vertebrate",
+        "yellow"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:lizard",
+      "glyph": "🦎",
+      "name": "lizard",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "green",
+        "land",
+        "reptile",
+        "vertebrate"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:lobster",
+      "glyph": "🦞",
+      "name": "lobster",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "arthropod",
+        "crustacean",
+        "invertebrate",
+        "red",
+        "sea"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:lock",
+      "glyph": "🔒",
+      "name": "lock",
+      "source": "emoji",
+      "tags": [
+        "closed",
+        "metal",
+        "security",
+        "tool"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:meat",
+      "glyph": "🥩",
+      "name": "cut of meat",
+      "source": "emoji",
+      "tags": [
+        "animal_product",
+        "food",
+        "red",
+        "savory"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:microscope",
+      "glyph": "🔬",
+      "name": "microscope",
+      "source": "emoji",
+      "tags": [
+        "glass",
+        "laboratory",
+        "science",
+        "technology",
+        "tool"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:milk",
+      "glyph": "🥛",
+      "name": "milk",
+      "source": "emoji",
+      "tags": [
+        "cold",
+        "dairy",
+        "drink",
+        "white"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:monkey",
+      "glyph": "🐒",
+      "name": "monkey",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "brown",
+        "climbing",
+        "land",
+        "mammal",
+        "tropical",
+        "vertebrate"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:moon",
+      "glyph": "🌙",
+      "name": "crescent moon",
+      "source": "emoji",
+      "tags": [
+        "crescent",
+        "night",
+        "space",
+        "yellow"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:mouse",
+      "glyph": "🐭",
+      "name": "mouse",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "gray",
+        "land",
+        "mammal",
+        "small",
+        "vertebrate"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:mushroom",
+      "glyph": "🍄",
+      "name": "mushroom",
+      "source": "emoji",
+      "tags": [
+        "food",
+        "forest",
+        "fungus",
+        "red",
+        "white"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:musical_note",
+      "glyph": "🎵",
+      "name": "musical note",
+      "source": "emoji",
+      "tags": [
+        "black",
+        "music",
+        "sound"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:octopus",
+      "glyph": "🐙",
+      "name": "octopus",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "eight",
+        "invertebrate",
+        "mollusk",
+        "red",
+        "sea",
+        "swimming",
+        "water"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:owl",
+      "glyph": "🦉",
+      "name": "owl",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "bird",
+        "brown",
+        "flying",
+        "night",
+        "vertebrate",
+        "wings"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:paintbrush",
+      "glyph": "🖌️",
+      "name": "paintbrush",
+      "source": "emoji",
+      "tags": [
+        "art",
+        "colorful",
+        "tool",
+        "wood"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:parrot",
+      "glyph": "🦜",
+      "name": "parrot",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "bird",
+        "colorful",
+        "flying",
+        "tropical",
+        "vertebrate",
+        "wings"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:peach",
+      "glyph": "🍑",
+      "name": "peach",
+      "source": "emoji",
+      "tags": [
+        "food",
+        "fruit",
+        "orange",
+        "plant",
+        "round",
+        "sweet"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:peacock",
+      "glyph": "🦚",
+      "name": "peacock",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "bird",
+        "colorful",
+        "land",
+        "vertebrate",
+        "wings"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:pencil",
+      "glyph": "✏️",
+      "name": "pencil",
+      "source": "emoji",
+      "tags": [
+        "long",
+        "tool",
+        "wood",
+        "writing",
+        "yellow"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:penguin",
+      "glyph": "🐧",
+      "name": "penguin",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "bird",
+        "black",
+        "cold",
+        "flightless",
+        "land",
+        "polar",
+        "sea",
+        "swimming",
+        "vertebrate",
+        "white"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:pig",
+      "glyph": "🐷",
+      "name": "pig",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "farm",
+        "land",
+        "mammal",
+        "pink",
+        "vertebrate"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:pineapple",
+      "glyph": "🍍",
+      "name": "pineapple",
+      "source": "emoji",
+      "tags": [
+        "food",
+        "fruit",
+        "plant",
+        "spiky",
+        "tropical",
+        "yellow"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:polar_bear",
+      "glyph": "🐻‍❄️",
+      "name": "polar bear",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "cold",
+        "land",
+        "mammal",
+        "polar",
+        "predator",
+        "sea",
+        "vertebrate",
+        "white"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:rabbit",
+      "glyph": "🐰",
+      "name": "rabbit",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "jumping",
+        "land",
+        "mammal",
+        "small",
+        "vertebrate",
+        "white"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:rainbow",
+      "glyph": "🌈",
+      "name": "rainbow",
+      "source": "emoji",
+      "tags": [
+        "arc",
+        "colorful",
+        "sky",
+        "weather"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:rocket",
+      "glyph": "🚀",
+      "name": "rocket",
+      "source": "emoji",
+      "tags": [
+        "fast",
+        "flying",
+        "space",
+        "technology",
+        "vehicle"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:rose",
+      "glyph": "🌹",
+      "name": "rose",
+      "source": "emoji",
+      "tags": [
+        "flower",
+        "fragrant",
+        "plant",
+        "red",
+        "thorny"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:saw",
+      "glyph": "🪚",
+      "name": "saw",
+      "source": "emoji",
+      "tags": [
+        "construction",
+        "metal",
+        "tool",
+        "wood",
+        "work"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:scales",
+      "glyph": "⚖️",
+      "name": "balance scale",
+      "source": "emoji",
+      "tags": [
+        "balance",
+        "law",
+        "metal",
+        "two"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:scorpion",
+      "glyph": "🦂",
+      "name": "scorpion",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "arachnid",
+        "arthropod",
+        "dangerous",
+        "desert",
+        "eight",
+        "invertebrate",
+        "land"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:seal",
+      "glyph": "🦭",
+      "name": "seal",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "cold",
+        "gray",
+        "land",
+        "mammal",
+        "polar",
+        "sea",
+        "swimming",
+        "vertebrate"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:shark",
+      "glyph": "🦈",
+      "name": "shark",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "gray",
+        "predator",
+        "sea",
+        "swimming",
+        "vertebrate",
+        "water"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:sheep",
+      "glyph": "🐑",
+      "name": "sheep",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "farm",
+        "land",
+        "mammal",
+        "vertebrate",
+        "white",
+        "wool"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:ship",
+      "glyph": "🚢",
+      "name": "ship",
+      "source": "emoji",
+      "tags": [
+        "large",
+        "sea",
+        "transport",
+        "vehicle",
+        "water"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:shrimp",
+      "glyph": "🦐",
+      "name": "shrimp",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "arthropod",
+        "crustacean",
+        "invertebrate",
+        "pink",
+        "sea"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:snail",
+      "glyph": "🐌",
+      "name": "snail",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "invertebrate",
+        "land",
+        "mollusk",
+        "shell",
+        "slow"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:snake",
+      "glyph": "🐍",
+      "name": "snake",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "dangerous",
+        "green",
+        "land",
+        "long",
+        "reptile",
+        "vertebrate"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:snowflake",
+      "glyph": "❄️",
+      "name": "snowflake",
+      "source": "emoji",
+      "tags": [
+        "cold",
+        "six",
+        "water",
+        "weather",
+        "white",
+        "winter"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:spider",
+      "glyph": "🕷️",
+      "name": "spider",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "arachnid",
+        "arthropod",
+        "black",
+        "eight",
+        "invertebrate",
+        "land"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:star",
+      "glyph": "⭐",
+      "name": "star",
+      "source": "emoji",
+      "tags": [
+        "five",
+        "pointed",
+        "space",
+        "yellow"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:strawberry",
+      "glyph": "🍓",
+      "name": "strawberry",
+      "source": "emoji",
+      "tags": [
+        "food",
+        "fruit",
+        "plant",
+        "red",
+        "sweet"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:sun",
+      "glyph": "☀️",
+      "name": "sun",
+      "source": "emoji",
+      "tags": [
+        "day",
+        "hot",
+        "round",
+        "space",
+        "weather",
+        "yellow"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:sunflower",
+      "glyph": "🌻",
+      "name": "sunflower",
+      "source": "emoji",
+      "tags": [
+        "flower",
+        "plant",
+        "summer",
+        "yellow"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:tea",
+      "glyph": "🍵",
+      "name": "tea",
+      "source": "emoji",
+      "tags": [
+        "caffeinated",
+        "drink",
+        "green",
+        "hot"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:test_tube",
+      "glyph": "🧪",
+      "name": "test tube",
+      "source": "emoji",
+      "tags": [
+        "glass",
+        "laboratory",
+        "liquid",
+        "science",
+        "tool"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:tiger",
+      "glyph": "🐯",
+      "name": "tiger",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "land",
+        "mammal",
+        "orange",
+        "predator",
+        "striped",
+        "tropical",
+        "vertebrate"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:tomato",
+      "glyph": "🍅",
+      "name": "tomato",
+      "source": "emoji",
+      "tags": [
+        "food",
+        "fruit",
+        "plant",
+        "red"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:train",
+      "glyph": "🚆",
+      "name": "train",
+      "source": "emoji",
+      "tags": [
+        "land",
+        "long",
+        "rail",
+        "transport",
+        "vehicle"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:tulip",
+      "glyph": "🌷",
+      "name": "tulip",
+      "source": "emoji",
+      "tags": [
+        "flower",
+        "pink",
+        "plant",
+        "spring"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:turtle",
+      "glyph": "🐢",
+      "name": "turtle",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "green",
+        "land",
+        "reptile",
+        "shell",
+        "slow",
+        "vertebrate",
+        "water"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:water_glass",
+      "glyph": "🥤",
+      "name": "cup with straw",
+      "source": "emoji",
+      "tags": [
+        "cold",
+        "drink",
+        "glass",
+        "plastic"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:watermelon",
+      "glyph": "🍉",
+      "name": "watermelon",
+      "source": "emoji",
+      "tags": [
+        "food",
+        "fruit",
+        "green",
+        "plant",
+        "red",
+        "round",
+        "summer"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:whale",
+      "glyph": "🐋",
+      "name": "whale",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "blue",
+        "large",
+        "mammal",
+        "sea",
+        "swimming",
+        "vertebrate"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:wine",
+      "glyph": "🍷",
+      "name": "wine",
+      "source": "emoji",
+      "tags": [
+        "alcohol",
+        "drink",
+        "red"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:worm",
+      "glyph": "🪱",
+      "name": "worm",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "invertebrate",
+        "land",
+        "long",
+        "pink"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:wrench",
+      "glyph": "🔧",
+      "name": "wrench",
+      "source": "emoji",
+      "tags": [
+        "metal",
+        "repair",
+        "tool",
+        "work"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:zebra",
+      "glyph": "🦓",
+      "name": "zebra",
+      "source": "emoji",
+      "tags": [
+        "animal",
+        "black",
+        "land",
+        "mammal",
+        "striped",
+        "tropical",
+        "vertebrate",
+        "white"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "flag:antarctica",
+      "glyph": "🇦🇶",
+      "name": "Antarctica",
+      "source": "flag",
+      "tags": [
+        "2_colors",
+        "Antarctic",
+        "blue",
+        "cold",
+        "contains_blue",
+        "contains_white",
+        "emblem",
+        "exact_blue_white",
+        "flag",
+        "flag_design",
+        "ice",
+        "landmass",
+        "polar",
+        "Southern_Hemisphere",
+        "white"
+      ],
+      "kind": "flag",
+      "colors": [
+        "blue",
+        "white"
+      ]
+    },
+    {
+      "id": "flag:argentina",
+      "glyph": "🇦🇷",
+      "name": "Argentina",
+      "source": "flag",
+      "tags": [
+        "3_colors",
+        "Atlantic",
+        "blue",
+        "contains_blue",
+        "contains_white",
+        "contains_yellow",
+        "flag",
+        "flag_design",
+        "horizontal_stripes",
+        "large_state",
+        "South_America",
+        "Southern_Hemisphere",
+        "subpolar",
+        "sun",
+        "temperate",
+        "white",
+        "yellow"
+      ],
+      "kind": "flag",
+      "colors": [
+        "blue",
+        "white",
+        "yellow"
+      ]
+    },
+    {
+      "id": "flag:australia",
+      "glyph": "🇦🇺",
+      "name": "Australia",
+      "source": "flag",
+      "tags": [
+        "3_colors",
+        "blue",
+        "canton",
+        "contains_blue",
+        "contains_red",
+        "contains_white",
+        "desert",
+        "flag",
+        "flag_design",
+        "Indian_Ocean",
+        "large_state",
+        "Oceania",
+        "Pacific",
+        "red",
+        "Southern_Hemisphere",
+        "stars",
+        "temperate",
+        "tropical",
+        "union_jack_family",
+        "white"
+      ],
+      "kind": "flag",
+      "colors": [
+        "blue",
+        "red",
+        "white"
+      ]
+    },
+    {
+      "id": "flag:bolivia",
+      "glyph": "🇧🇴",
+      "name": "Bolivia",
+      "source": "flag",
+      "tags": [
+        "3_colors",
+        "Andes",
+        "contains_green",
+        "contains_red",
+        "contains_yellow",
+        "flag",
+        "flag_design",
+        "green",
+        "horizontal_stripes",
+        "landlocked",
+        "red",
+        "South_America",
+        "Southern_Hemisphere",
+        "tricolor",
+        "tropical",
+        "yellow"
+      ],
+      "kind": "flag",
+      "colors": [
+        "red",
+        "yellow",
+        "green"
+      ]
+    },
+    {
+      "id": "flag:brazil",
+      "glyph": "🇧🇷",
+      "name": "Brazil",
+      "source": "flag",
+      "tags": [
+        "4_colors",
+        "Atlantic",
+        "blue",
+        "circle",
+        "contains_blue",
+        "contains_green",
+        "contains_white",
+        "contains_yellow",
+        "diamond",
+        "equatorial",
+        "flag",
+        "flag_design",
+        "green",
+        "large_state",
+        "rainforest",
+        "South_America",
+        "stars",
+        "tropical",
+        "white",
+        "yellow"
+      ],
+      "kind": "flag",
+      "colors": [
+        "green",
+        "yellow",
+        "blue",
+        "white"
+      ]
+    },
+    {
+      "id": "flag:canada",
+      "glyph": "🇨🇦",
+      "name": "Canada",
+      "source": "flag",
+      "tags": [
+        "2_colors",
+        "cold",
+        "contains_red",
+        "contains_white",
+        "exact_red_white",
+        "flag",
+        "flag_design",
+        "forest",
+        "large_state",
+        "leaf",
+        "North_America",
+        "Northern_Hemisphere",
+        "polar",
+        "red",
+        "subpolar",
+        "vertical_bands",
+        "white"
+      ],
+      "kind": "flag",
+      "colors": [
+        "red",
+        "white"
+      ]
+    },
+    {
+      "id": "flag:chile",
+      "glyph": "🇨🇱",
+      "name": "Chile",
+      "source": "flag",
+      "tags": [
+        "3_colors",
+        "blue",
+        "canton",
+        "contains_blue",
+        "contains_red",
+        "contains_white",
+        "desert",
+        "exact_red_white_blue",
+        "flag",
+        "flag_design",
+        "Pacific",
+        "red",
+        "South_America",
+        "Southern_Hemisphere",
+        "star",
+        "subpolar",
+        "temperate",
+        "white"
+      ],
+      "kind": "flag",
+      "colors": [
+        "red",
+        "white",
+        "blue"
+      ]
+    },
+    {
+      "id": "flag:cuba",
+      "glyph": "🇨🇺",
+      "name": "Cuba",
+      "source": "flag",
+      "tags": [
+        "3_colors",
+        "blue",
+        "Caribbean",
+        "contains_blue",
+        "contains_red",
+        "contains_white",
+        "exact_red_white_blue",
+        "flag",
+        "flag_design",
+        "island",
+        "North_America",
+        "Northern_Hemisphere",
+        "red",
+        "star",
+        "stripes",
+        "triangle",
+        "tropical",
+        "white"
+      ],
+      "kind": "flag",
+      "colors": [
+        "blue",
+        "white",
+        "red"
+      ]
+    },
+    {
+      "id": "flag:democratic_republic_congo",
+      "glyph": "🇨🇩",
+      "name": "Democratic Republic of the Congo",
+      "source": "flag",
+      "tags": [
+        "3_colors",
+        "Africa",
+        "blue",
+        "contains_blue",
+        "contains_red",
+        "contains_yellow",
+        "diagonal_band",
+        "equatorial",
+        "flag",
+        "flag_design",
+        "rainforest",
+        "red",
+        "river",
+        "star",
+        "tropical",
+        "yellow"
+      ],
+      "kind": "flag",
+      "colors": [
+        "blue",
+        "yellow",
+        "red"
+      ]
+    },
+    {
+      "id": "flag:ecuador",
+      "glyph": "🇪🇨",
+      "name": "Ecuador",
+      "source": "flag",
+      "tags": [
+        "3_colors",
+        "Andes",
+        "blue",
+        "contains_blue",
+        "contains_red",
+        "contains_yellow",
+        "equatorial",
+        "flag",
+        "flag_design",
+        "horizontal_stripes",
+        "Pacific",
+        "red",
+        "South_America",
+        "tricolor",
+        "tropical",
+        "yellow"
+      ],
+      "kind": "flag",
+      "colors": [
+        "yellow",
+        "blue",
+        "red"
+      ]
+    },
+    {
+      "id": "flag:egypt",
+      "glyph": "🇪🇬",
+      "name": "Egypt",
+      "source": "flag",
+      "tags": [
+        "4_colors",
+        "Africa",
+        "black",
+        "contains_black",
+        "contains_gold",
+        "contains_red",
+        "contains_white",
+        "desert",
+        "emblem",
+        "flag",
+        "flag_design",
+        "gold",
+        "horizontal_stripes",
+        "Mediterranean",
+        "Northern_Hemisphere",
+        "red",
+        "Red_Sea",
+        "river",
+        "tricolor",
+        "white"
+      ],
+      "kind": "flag",
+      "colors": [
+        "red",
+        "white",
+        "black",
+        "gold"
+      ]
+    },
+    {
+      "id": "flag:finland",
+      "glyph": "🇫🇮",
+      "name": "Finland",
+      "source": "flag",
+      "tags": [
+        "2_colors",
+        "blue",
+        "cold",
+        "contains_blue",
+        "contains_white",
+        "cross",
+        "Europe",
+        "exact_blue_white",
+        "flag",
+        "flag_design",
+        "forest",
+        "lake",
+        "nordic_cross",
+        "Northern_Hemisphere",
+        "polar",
+        "Scandinavia",
+        "subpolar",
+        "white"
+      ],
+      "kind": "flag",
+      "colors": [
+        "blue",
+        "white"
+      ]
+    },
+    {
+      "id": "flag:greece",
+      "glyph": "🇬🇷",
+      "name": "Greece",
+      "source": "flag",
+      "tags": [
+        "2_colors",
+        "blue",
+        "contains_blue",
+        "contains_white",
+        "cross",
+        "Europe",
+        "exact_blue_white",
+        "flag",
+        "flag_design",
+        "island",
+        "Mediterranean",
+        "Northern_Hemisphere",
+        "stripes",
+        "temperate",
+        "white"
+      ],
+      "kind": "flag",
+      "colors": [
+        "blue",
+        "white"
+      ]
+    },
+    {
+      "id": "flag:greenland",
+      "glyph": "🇬🇱",
+      "name": "Greenland",
+      "source": "flag",
+      "tags": [
+        "2_colors",
+        "Arctic",
+        "circle",
+        "cold",
+        "contains_red",
+        "contains_white",
+        "exact_red_white",
+        "flag",
+        "flag_design",
+        "horizontal_bands",
+        "ice",
+        "island",
+        "North_America",
+        "Northern_Hemisphere",
+        "polar",
+        "red",
+        "white"
+      ],
+      "kind": "flag",
+      "colors": [
+        "red",
+        "white"
+      ]
+    },
+    {
+      "id": "flag:iceland",
+      "glyph": "🇮🇸",
+      "name": "Iceland",
+      "source": "flag",
+      "tags": [
+        "3_colors",
+        "blue",
+        "cold",
+        "contains_blue",
+        "contains_red",
+        "contains_white",
+        "cross",
+        "Europe",
+        "exact_red_white_blue",
+        "flag",
+        "flag_design",
+        "island",
+        "nordic_cross",
+        "North_Atlantic",
+        "Northern_Hemisphere",
+        "red",
+        "subpolar",
+        "volcanic",
+        "white"
+      ],
+      "kind": "flag",
+      "colors": [
+        "blue",
+        "red",
+        "white"
+      ]
+    },
+    {
+      "id": "flag:india",
+      "glyph": "🇮🇳",
+      "name": "India",
+      "source": "flag",
+      "tags": [
+        "4_colors",
+        "Asia",
+        "blue",
+        "circle",
+        "contains_blue",
+        "contains_green",
+        "contains_orange",
+        "contains_white",
+        "flag",
+        "flag_design",
+        "green",
+        "horizontal_stripes",
+        "Indian_Ocean",
+        "large_state",
+        "Northern_Hemisphere",
+        "orange",
+        "tropical",
+        "white"
+      ],
+      "kind": "flag",
+      "colors": [
+        "orange",
+        "white",
+        "green",
+        "blue"
+      ]
+    },
+    {
+      "id": "flag:indonesia",
+      "glyph": "🇮🇩",
+      "name": "Indonesia",
+      "source": "flag",
+      "tags": [
+        "2_colors",
+        "archipelago",
+        "Asia",
+        "contains_red",
+        "contains_white",
+        "equatorial",
+        "exact_red_white",
+        "flag",
+        "flag_design",
+        "horizontal_bands",
+        "Indian_Ocean",
+        "island",
+        "Pacific",
+        "red",
+        "tropical",
+        "white"
+      ],
+      "kind": "flag",
+      "colors": [
+        "red",
+        "white"
+      ]
+    },
+    {
+      "id": "flag:ireland",
+      "glyph": "🇮🇪",
+      "name": "Ireland",
+      "source": "flag",
+      "tags": [
+        "3_colors",
+        "contains_green",
+        "contains_orange",
+        "contains_white",
+        "Europe",
+        "flag",
+        "flag_design",
+        "green",
+        "island",
+        "North_Atlantic",
+        "Northern_Hemisphere",
+        "orange",
+        "temperate",
+        "tricolor",
+        "vertical_stripes",
+        "white"
+      ],
+      "kind": "flag",
+      "colors": [
+        "green",
+        "white",
+        "orange"
+      ]
+    },
+    {
+      "id": "flag:italy",
+      "glyph": "🇮🇹",
+      "name": "Italy",
+      "source": "flag",
+      "tags": [
+        "3_colors",
+        "contains_green",
+        "contains_red",
+        "contains_white",
+        "Europe",
+        "flag",
+        "flag_design",
+        "green",
+        "Mediterranean",
+        "Northern_Hemisphere",
+        "peninsula",
+        "red",
+        "temperate",
+        "tricolor",
+        "vertical_stripes",
+        "white"
+      ],
+      "kind": "flag",
+      "colors": [
+        "green",
+        "white",
+        "red"
+      ]
+    },
+    {
+      "id": "flag:japan",
+      "glyph": "🇯🇵",
+      "name": "Japan",
+      "source": "flag",
+      "tags": [
+        "2_colors",
+        "archipelago",
+        "Asia",
+        "circle",
+        "contains_red",
+        "contains_white",
+        "exact_red_white",
+        "flag",
+        "flag_design",
+        "island",
+        "Northern_Hemisphere",
+        "Pacific",
+        "red",
+        "temperate",
+        "white"
+      ],
+      "kind": "flag",
+      "colors": [
+        "red",
+        "white"
+      ]
+    },
+    {
+      "id": "flag:kenya",
+      "glyph": "🇰🇪",
+      "name": "Kenya",
+      "source": "flag",
+      "tags": [
+        "4_colors",
+        "Africa",
+        "black",
+        "contains_black",
+        "contains_green",
+        "contains_red",
+        "contains_white",
+        "equatorial",
+        "flag",
+        "flag_design",
+        "green",
+        "horizontal_stripes",
+        "Indian_Ocean",
+        "red",
+        "savanna",
+        "shield",
+        "tropical",
+        "white"
+      ],
+      "kind": "flag",
+      "colors": [
+        "black",
+        "red",
+        "green",
+        "white"
+      ]
+    },
+    {
+      "id": "flag:madagascar",
+      "glyph": "🇲🇬",
+      "name": "Madagascar",
+      "source": "flag",
+      "tags": [
+        "3_colors",
+        "Africa",
+        "contains_green",
+        "contains_red",
+        "contains_white",
+        "flag",
+        "flag_design",
+        "green",
+        "horizontal_bands",
+        "Indian_Ocean",
+        "island",
+        "red",
+        "Southern_Hemisphere",
+        "tropical",
+        "vertical_band",
+        "white"
+      ],
+      "kind": "flag",
+      "colors": [
+        "white",
+        "red",
+        "green"
+      ]
+    },
+    {
+      "id": "flag:mexico",
+      "glyph": "🇲🇽",
+      "name": "Mexico",
+      "source": "flag",
+      "tags": [
+        "4_colors",
+        "Atlantic",
+        "brown",
+        "contains_green",
+        "contains_red",
+        "contains_white",
+        "desert",
+        "emblem",
+        "flag",
+        "flag_design",
+        "green",
+        "North_America",
+        "Northern_Hemisphere",
+        "Pacific",
+        "red",
+        "tricolor",
+        "vertical_stripes",
+        "white"
+      ],
+      "kind": "flag",
+      "colors": [
+        "green",
+        "white",
+        "red",
+        "brown"
+      ]
+    },
+    {
+      "id": "flag:mongolia",
+      "glyph": "🇲🇳",
+      "name": "Mongolia",
+      "source": "flag",
+      "tags": [
+        "Asia",
+        "continental",
+        "flag",
+        "landlocked",
+        "Northern_Hemisphere",
+        "steppe",
+        "temperate"
+      ],
+      "kind": "flag",
+      "colors": []
+    },
+    {
+      "id": "flag:morocco",
+      "glyph": "🇲🇦",
+      "name": "Morocco",
+      "source": "flag",
+      "tags": [
+        "2_colors",
+        "Africa",
+        "Atlantic",
+        "contains_green",
+        "contains_red",
+        "desert",
+        "exact_red_green",
+        "flag",
+        "flag_design",
+        "green",
+        "Mediterranean",
+        "Northern_Hemisphere",
+        "red",
+        "star"
+      ],
+      "kind": "flag",
+      "colors": [
+        "red",
+        "green"
+      ]
+    },
+    {
+      "id": "flag:nepal",
+      "glyph": "🇳🇵",
+      "name": "Nepal",
+      "source": "flag",
+      "tags": [
+        "3_colors",
+        "Asia",
+        "blue",
+        "contains_blue",
+        "contains_red",
+        "contains_white",
+        "exact_red_white_blue",
+        "flag",
+        "flag_design",
+        "Himalayan",
+        "landlocked",
+        "moon",
+        "non_rectangular",
+        "Northern_Hemisphere",
+        "red",
+        "sun",
+        "temperate",
+        "white"
+      ],
+      "kind": "flag",
+      "colors": [
+        "red",
+        "blue",
+        "white"
+      ]
+    },
+    {
+      "id": "flag:new_zealand",
+      "glyph": "🇳🇿",
+      "name": "New Zealand",
+      "source": "flag",
+      "tags": [
+        "3_colors",
+        "blue",
+        "canton",
+        "contains_blue",
+        "contains_red",
+        "contains_white",
+        "exact_red_white_blue",
+        "flag",
+        "flag_design",
+        "island",
+        "Oceania",
+        "Pacific",
+        "red",
+        "Southern_Hemisphere",
+        "stars",
+        "temperate",
+        "union_jack_family",
+        "white"
+      ],
+      "kind": "flag",
+      "colors": [
+        "blue",
+        "red",
+        "white"
+      ]
+    },
+    {
+      "id": "flag:norway",
+      "glyph": "🇳🇴",
+      "name": "Norway",
+      "source": "flag",
+      "tags": [
+        "3_colors",
+        "blue",
+        "cold",
+        "contains_blue",
+        "contains_red",
+        "contains_white",
+        "cross",
+        "Europe",
+        "exact_red_white_blue",
+        "fjord",
+        "flag",
+        "flag_design",
+        "nordic_cross",
+        "Northern_Hemisphere",
+        "polar",
+        "red",
+        "Scandinavia",
+        "subpolar",
+        "white"
+      ],
+      "kind": "flag",
+      "colors": [
+        "red",
+        "white",
+        "blue"
+      ]
+    },
+    {
+      "id": "flag:paraguay",
+      "glyph": "🇵🇾",
+      "name": "Paraguay",
+      "source": "flag",
+      "tags": [
+        "flag",
+        "landlocked",
+        "river",
+        "South_America",
+        "Southern_Hemisphere",
+        "subtropical"
+      ],
+      "kind": "flag",
+      "colors": []
+    },
+    {
+      "id": "flag:philippines",
+      "glyph": "🇵🇭",
+      "name": "Philippines",
+      "source": "flag",
+      "tags": [
+        "archipelago",
+        "Asia",
+        "flag",
+        "island",
+        "Northern_Hemisphere",
+        "Pacific",
+        "tropical"
+      ],
+      "kind": "flag",
+      "colors": []
+    },
+    {
+      "id": "flag:rwanda",
+      "glyph": "🇷🇼",
+      "name": "Rwanda",
+      "source": "flag",
+      "tags": [
+        "Africa",
+        "flag",
+        "landlocked",
+        "Southern_Hemisphere",
+        "tropical"
+      ],
+      "kind": "flag",
+      "colors": []
+    },
+    {
+      "id": "flag:singapore",
+      "glyph": "🇸🇬",
+      "name": "Singapore",
+      "source": "flag",
+      "tags": [
+        "2_colors",
+        "Asia",
+        "city_state",
+        "contains_red",
+        "contains_white",
+        "crescent",
+        "exact_red_white",
+        "flag",
+        "flag_design",
+        "island",
+        "Northern_Hemisphere",
+        "red",
+        "stars",
+        "tropical",
+        "white"
+      ],
+      "kind": "flag",
+      "colors": [
+        "red",
+        "white"
+      ]
+    },
+    {
+      "id": "flag:south_africa",
+      "glyph": "🇿🇦",
+      "name": "South Africa",
+      "source": "flag",
+      "tags": [
+        "6_colors",
+        "Africa",
+        "Atlantic",
+        "black",
+        "blue",
+        "contains_black",
+        "contains_blue",
+        "contains_green",
+        "contains_red",
+        "contains_white",
+        "contains_yellow",
+        "desert",
+        "flag",
+        "flag_design",
+        "green",
+        "Indian_Ocean",
+        "red",
+        "Southern_Hemisphere",
+        "temperate",
+        "white",
+        "y_shape",
+        "yellow"
+      ],
+      "kind": "flag",
+      "colors": [
+        "red",
+        "blue",
+        "green",
+        "yellow",
+        "black",
+        "white"
+      ]
+    },
+    {
+      "id": "flag:sri_lanka",
+      "glyph": "🇱🇰",
+      "name": "Sri Lanka",
+      "source": "flag",
+      "tags": [
+        "Asia",
+        "flag",
+        "Indian_Ocean",
+        "island",
+        "Northern_Hemisphere",
+        "tropical"
+      ],
+      "kind": "flag",
+      "colors": []
+    },
+    {
+      "id": "flag:sweden",
+      "glyph": "🇸🇪",
+      "name": "Sweden",
+      "source": "flag",
+      "tags": [
+        "cold",
+        "Europe",
+        "flag",
+        "forest",
+        "Northern_Hemisphere",
+        "polar",
+        "Scandinavia",
+        "subpolar"
+      ],
+      "kind": "flag",
+      "colors": []
+    },
+    {
+      "id": "flag:switzerland",
+      "glyph": "🇨🇭",
+      "name": "Switzerland",
+      "source": "flag",
+      "tags": [
+        "2_colors",
+        "Alps",
+        "contains_red",
+        "contains_white",
+        "cross",
+        "Europe",
+        "exact_red_white",
+        "flag",
+        "flag_design",
+        "landlocked",
+        "Northern_Hemisphere",
+        "red",
+        "temperate",
+        "white"
+      ],
+      "kind": "flag",
+      "colors": [
+        "red",
+        "white"
+      ]
+    },
+    {
+      "id": "flag:thailand",
+      "glyph": "🇹🇭",
+      "name": "Thailand",
+      "source": "flag",
+      "tags": [
+        "Asia",
+        "flag",
+        "mainland",
+        "Northern_Hemisphere",
+        "tropical"
+      ],
+      "kind": "flag",
+      "colors": []
+    },
+    {
+      "id": "flag:uganda",
+      "glyph": "🇺🇬",
+      "name": "Uganda",
+      "source": "flag",
+      "tags": [
+        "Africa",
+        "equatorial",
+        "flag",
+        "lake",
+        "landlocked",
+        "Northern_Hemisphere",
+        "tropical"
+      ],
+      "kind": "flag",
+      "colors": []
+    },
+    {
+      "id": "flag:united_kingdom",
+      "glyph": "🇬🇧",
+      "name": "United Kingdom",
+      "source": "flag",
+      "tags": [
+        "3_colors",
+        "blue",
+        "contains_blue",
+        "contains_red",
+        "contains_white",
+        "cross",
+        "diagonal_cross",
+        "Europe",
+        "exact_red_white_blue",
+        "flag",
+        "flag_design",
+        "island",
+        "North_Atlantic",
+        "Northern_Hemisphere",
+        "red",
+        "temperate",
+        "union_jack_family",
+        "white"
+      ],
+      "kind": "flag",
+      "colors": [
+        "red",
+        "white",
+        "blue"
+      ]
+    },
+    {
+      "id": "flag:united_states",
+      "glyph": "🇺🇸",
+      "name": "United States",
+      "source": "flag",
+      "tags": [
+        "3_colors",
+        "Atlantic",
+        "blue",
+        "canton",
+        "contains_blue",
+        "contains_red",
+        "contains_white",
+        "exact_red_white_blue",
+        "flag",
+        "flag_design",
+        "large_state",
+        "North_America",
+        "Northern_Hemisphere",
+        "Pacific",
+        "polar",
+        "red",
+        "stars",
+        "stripes",
+        "subpolar",
+        "temperate",
+        "tropical",
+        "white"
+      ],
+      "kind": "flag",
+      "colors": [
+        "red",
+        "white",
+        "blue"
+      ]
+    },
+    {
+      "id": "flag:zambia",
+      "glyph": "🇿🇲",
+      "name": "Zambia",
+      "source": "flag",
+      "tags": [
+        "Africa",
+        "flag",
+        "landlocked",
+        "savanna",
+        "Southern_Hemisphere",
+        "tropical"
+      ],
+      "kind": "flag",
+      "colors": []
+    },
+    {
+      "id": "symbol:check",
+      "glyph": "✓",
+      "name": "check mark",
+      "source": "symbol",
+      "tags": [
+        "angled",
+        "correct",
+        "green",
+        "status",
+        "success"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:club_suit",
+      "glyph": "♣",
+      "name": "club suit",
+      "source": "symbol",
+      "tags": [
+        "black",
+        "card_suit",
+        "club",
+        "round",
+        "shape",
+        "three"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:cross",
+      "glyph": "✕",
+      "name": "cross mark",
+      "source": "symbol",
+      "tags": [
+        "cross",
+        "failure",
+        "four",
+        "red",
+        "status",
+        "wrong"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:diamond_suit",
+      "glyph": "♦",
+      "name": "diamond suit",
+      "source": "symbol",
+      "tags": [
+        "card_suit",
+        "diamond",
+        "four",
+        "pointed",
+        "red",
+        "shape"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:divide",
+      "glyph": "÷",
+      "name": "division sign",
+      "source": "symbol",
+      "tags": [
+        "division",
+        "math",
+        "operator",
+        "three"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:down_arrow",
+      "glyph": "↓",
+      "name": "down arrow",
+      "source": "symbol",
+      "tags": [
+        "arrow",
+        "direction",
+        "down",
+        "pointed"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:equals",
+      "glyph": "=",
+      "name": "equals sign",
+      "source": "symbol",
+      "tags": [
+        "equality",
+        "horizontal",
+        "math",
+        "operator",
+        "two"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:female",
+      "glyph": "♀",
+      "name": "female symbol",
+      "source": "symbol",
+      "tags": [
+        "circle",
+        "cross",
+        "down",
+        "female",
+        "gender"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:filled_circle",
+      "glyph": "●",
+      "name": "filled circle",
+      "source": "symbol",
+      "tags": [
+        "black",
+        "circle",
+        "filled",
+        "round",
+        "shape"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:filled_diamond",
+      "glyph": "◆",
+      "name": "filled diamond",
+      "source": "symbol",
+      "tags": [
+        "black",
+        "diamond",
+        "filled",
+        "four",
+        "pointed",
+        "shape"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:filled_square",
+      "glyph": "■",
+      "name": "filled square",
+      "source": "symbol",
+      "tags": [
+        "black",
+        "filled",
+        "four",
+        "shape",
+        "square"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:filled_triangle",
+      "glyph": "▲",
+      "name": "filled triangle",
+      "source": "symbol",
+      "tags": [
+        "black",
+        "filled",
+        "pointed",
+        "shape",
+        "three",
+        "triangle",
+        "up"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:greater_equal",
+      "glyph": "≥",
+      "name": "greater than or equal",
+      "source": "symbol",
+      "tags": [
+        "inequality",
+        "math",
+        "operator",
+        "right"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:heart_suit",
+      "glyph": "♥",
+      "name": "heart suit",
+      "source": "symbol",
+      "tags": [
+        "card_suit",
+        "heart",
+        "love",
+        "pointed",
+        "red",
+        "shape"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:infinity",
+      "glyph": "∞",
+      "name": "infinity",
+      "source": "symbol",
+      "tags": [
+        "horizontal",
+        "loop",
+        "math",
+        "shape",
+        "two"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:left_arrow",
+      "glyph": "←",
+      "name": "left arrow",
+      "source": "symbol",
+      "tags": [
+        "arrow",
+        "direction",
+        "left",
+        "pointed"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:less_equal",
+      "glyph": "≤",
+      "name": "less than or equal",
+      "source": "symbol",
+      "tags": [
+        "inequality",
+        "left",
+        "math",
+        "operator"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:male",
+      "glyph": "♂",
+      "name": "male symbol",
+      "source": "symbol",
+      "tags": [
+        "arrow",
+        "circle",
+        "gender",
+        "male",
+        "right",
+        "up"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:minus",
+      "glyph": "−",
+      "name": "minus sign",
+      "source": "symbol",
+      "tags": [
+        "horizontal",
+        "math",
+        "operator",
+        "subtraction"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:moon_symbol",
+      "glyph": "☾",
+      "name": "moon symbol",
+      "source": "symbol",
+      "tags": [
+        "cold",
+        "crescent",
+        "night",
+        "weather"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:multiply",
+      "glyph": "×",
+      "name": "multiplication sign",
+      "source": "symbol",
+      "tags": [
+        "cross",
+        "four",
+        "math",
+        "multiplication",
+        "operator"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:not_equal",
+      "glyph": "≠",
+      "name": "not equal sign",
+      "source": "symbol",
+      "tags": [
+        "diagonal",
+        "inequality",
+        "math",
+        "operator",
+        "two"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:outline_circle",
+      "glyph": "○",
+      "name": "outline circle",
+      "source": "symbol",
+      "tags": [
+        "circle",
+        "outline",
+        "round",
+        "shape",
+        "white"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:outline_diamond",
+      "glyph": "◇",
+      "name": "outline diamond",
+      "source": "symbol",
+      "tags": [
+        "diamond",
+        "four",
+        "outline",
+        "pointed",
+        "shape",
+        "white"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:outline_square",
+      "glyph": "□",
+      "name": "outline square",
+      "source": "symbol",
+      "tags": [
+        "four",
+        "outline",
+        "shape",
+        "square",
+        "white"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:outline_triangle",
+      "glyph": "△",
+      "name": "outline triangle",
+      "source": "symbol",
+      "tags": [
+        "outline",
+        "pointed",
+        "shape",
+        "three",
+        "triangle",
+        "up",
+        "white"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:plus",
+      "glyph": "＋",
+      "name": "plus sign",
+      "source": "symbol",
+      "tags": [
+        "addition",
+        "cross",
+        "four",
+        "math",
+        "operator"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:right_arrow",
+      "glyph": "→",
+      "name": "right arrow",
+      "source": "symbol",
+      "tags": [
+        "arrow",
+        "direction",
+        "pointed",
+        "right"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:skull",
+      "glyph": "☠",
+      "name": "skull and crossbones",
+      "source": "symbol",
+      "tags": [
+        "black",
+        "bone",
+        "cross",
+        "danger",
+        "death"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:spade_suit",
+      "glyph": "♠",
+      "name": "spade suit",
+      "source": "symbol",
+      "tags": [
+        "black",
+        "card_suit",
+        "pointed",
+        "shape",
+        "spade"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:star_filled",
+      "glyph": "★",
+      "name": "filled star",
+      "source": "symbol",
+      "tags": [
+        "black",
+        "filled",
+        "five",
+        "pointed",
+        "shape",
+        "star"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:star_outline",
+      "glyph": "☆",
+      "name": "outline star",
+      "source": "symbol",
+      "tags": [
+        "five",
+        "outline",
+        "pointed",
+        "shape",
+        "star",
+        "white"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:sun_symbol",
+      "glyph": "☼",
+      "name": "sun symbol",
+      "source": "symbol",
+      "tags": [
+        "day",
+        "hot",
+        "rays",
+        "round",
+        "weather"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:up_arrow",
+      "glyph": "↑",
+      "name": "up arrow",
+      "source": "symbol",
+      "tags": [
+        "arrow",
+        "direction",
+        "pointed",
+        "up"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:warning",
+      "glyph": "⚠",
+      "name": "warning sign",
+      "source": "symbol",
+      "tags": [
+        "danger",
+        "pointed",
+        "status",
+        "three",
+        "triangle",
+        "yellow"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:yin_yang",
+      "glyph": "☯",
+      "name": "yin yang",
+      "source": "symbol",
+      "tags": [
+        "balance",
+        "black",
+        "circle",
+        "two",
+        "white"
+      ],
+      "kind": "symbol",
+      "colors": []
+    },
+    {
+      "id": "symbol:heart",
+      "glyph": "♥",
+      "name": "Heart suit",
+      "kind": "symbol",
+      "tags": [
+        "card_suit",
+        "game_resource",
+        "heart_suit",
+        "hearts",
+        "life",
+        "outline",
+        "red",
+        "suit"
+      ],
+      "colors": [
+        "red"
+      ]
+    },
+    {
+      "id": "symbol:diamond",
+      "glyph": "♦",
+      "name": "Diamond suit",
+      "kind": "symbol",
+      "tags": [
+        "card_suit",
+        "currency",
+        "diamond_suit",
+        "diamonds",
+        "game_resource",
+        "outline",
+        "red",
+        "suit"
+      ],
+      "colors": [
+        "red"
+      ]
+    },
+    {
+      "id": "symbol:club",
+      "glyph": "♣",
+      "name": "Club suit",
+      "kind": "symbol",
+      "tags": [
+        "black",
+        "card_suit",
+        "club_suit",
+        "clubs",
+        "game_resource",
+        "outline",
+        "suit",
+        "wager"
+      ],
+      "colors": [
+        "black"
+      ]
+    },
+    {
+      "id": "symbol:spade",
+      "glyph": "♠",
+      "name": "Spade suit",
+      "kind": "symbol",
+      "tags": [
+        "black",
+        "card_suit",
+        "game_resource",
+        "outline",
+        "spade_suit",
+        "spades",
+        "suit",
+        "work"
+      ],
+      "colors": [
+        "black"
+      ]
+    },
+    {
+      "id": "symbol:cross_mark",
+      "glyph": "✕",
+      "name": "Cross mark",
+      "kind": "symbol",
+      "tags": [
+        "failure",
+        "red_association",
+        "status",
+        "wrong",
+        "x_shape"
+      ],
+      "colors": []
+    },
+    {
+      "id": "symbol:circle",
+      "glyph": "○",
+      "name": "Circle",
+      "kind": "symbol",
+      "tags": [
+        "circle",
+        "outline",
+        "round",
+        "shape"
+      ],
+      "colors": []
+    },
+    {
+      "id": "symbol:square",
+      "glyph": "□",
+      "name": "Square",
+      "kind": "symbol",
+      "tags": [
+        "four_sided",
+        "outline",
+        "shape",
+        "square"
+      ],
+      "colors": []
+    },
+    {
+      "id": "symbol:triangle",
+      "glyph": "△",
+      "name": "Triangle",
+      "kind": "symbol",
+      "tags": [
+        "outline",
+        "shape",
+        "three_sided",
+        "triangle"
+      ],
+      "colors": []
+    },
+    {
+      "id": "symbol:star",
+      "glyph": "★",
+      "name": "Star",
+      "kind": "symbol",
+      "tags": [
+        "celestial_association",
+        "filled",
+        "shape",
+        "star"
+      ],
+      "colors": []
+    },
+    {
+      "id": "symbol:times",
+      "glyph": "×",
+      "name": "Multiplication sign",
+      "kind": "symbol",
+      "tags": [
+        "math",
+        "multiplication",
+        "operator",
+        "x_shape"
+      ],
+      "colors": []
+    }
+  ],
+  "tagIndex": {
+    "2_colors": [
+      "flag:antarctica",
+      "flag:canada",
+      "flag:finland",
+      "flag:greece",
+      "flag:greenland",
+      "flag:indonesia",
+      "flag:japan",
+      "flag:morocco",
+      "flag:singapore",
+      "flag:switzerland"
+    ],
+    "3_colors": [
+      "flag:argentina",
+      "flag:australia",
+      "flag:bolivia",
+      "flag:chile",
+      "flag:cuba",
+      "flag:democratic_republic_congo",
+      "flag:ecuador",
+      "flag:iceland",
+      "flag:ireland",
+      "flag:italy",
+      "flag:madagascar",
+      "flag:nepal",
+      "flag:new_zealand",
+      "flag:norway",
+      "flag:united_kingdom",
+      "flag:united_states"
+    ],
+    "4_colors": [
+      "flag:brazil",
+      "flag:egypt",
+      "flag:india",
+      "flag:kenya",
+      "flag:mexico"
+    ],
+    "6_colors": [
+      "flag:south_africa"
+    ],
+    "Africa": [
+      "flag:democratic_republic_congo",
+      "flag:egypt",
+      "flag:kenya",
+      "flag:madagascar",
+      "flag:morocco",
+      "flag:rwanda",
+      "flag:south_africa",
+      "flag:uganda",
+      "flag:zambia"
+    ],
+    "Alps": [
+      "flag:switzerland"
+    ],
+    "Andes": [
+      "flag:bolivia",
+      "flag:ecuador"
+    ],
+    "Antarctic": [
+      "flag:antarctica"
+    ],
+    "Arctic": [
+      "flag:greenland"
+    ],
+    "Asia": [
+      "flag:india",
+      "flag:indonesia",
+      "flag:japan",
+      "flag:mongolia",
+      "flag:nepal",
+      "flag:philippines",
+      "flag:singapore",
+      "flag:sri_lanka",
+      "flag:thailand"
+    ],
+    "Atlantic": [
+      "flag:argentina",
+      "flag:brazil",
+      "flag:mexico",
+      "flag:morocco",
+      "flag:south_africa",
+      "flag:united_states"
+    ],
+    "Caribbean": [
+      "flag:cuba"
+    ],
+    "Europe": [
+      "flag:finland",
+      "flag:greece",
+      "flag:iceland",
+      "flag:ireland",
+      "flag:italy",
+      "flag:norway",
+      "flag:sweden",
+      "flag:switzerland",
+      "flag:united_kingdom"
+    ],
+    "Himalayan": [
+      "flag:nepal"
+    ],
+    "Indian_Ocean": [
+      "flag:australia",
+      "flag:india",
+      "flag:indonesia",
+      "flag:kenya",
+      "flag:madagascar",
+      "flag:south_africa",
+      "flag:sri_lanka"
+    ],
+    "Mediterranean": [
+      "flag:egypt",
+      "flag:greece",
+      "flag:italy",
+      "flag:morocco"
+    ],
+    "North_America": [
+      "flag:canada",
+      "flag:cuba",
+      "flag:greenland",
+      "flag:mexico",
+      "flag:united_states"
+    ],
+    "North_Atlantic": [
+      "flag:iceland",
+      "flag:ireland",
+      "flag:united_kingdom"
+    ],
+    "Northern_Hemisphere": [
+      "flag:canada",
+      "flag:cuba",
+      "flag:egypt",
+      "flag:finland",
+      "flag:greece",
+      "flag:greenland",
+      "flag:iceland",
+      "flag:india",
+      "flag:ireland",
+      "flag:italy",
+      "flag:japan",
+      "flag:mexico",
+      "flag:mongolia",
+      "flag:morocco",
+      "flag:nepal",
+      "flag:norway",
+      "flag:philippines",
+      "flag:singapore",
+      "flag:sri_lanka",
+      "flag:sweden",
+      "flag:switzerland",
+      "flag:thailand",
+      "flag:uganda",
+      "flag:united_kingdom",
+      "flag:united_states"
+    ],
+    "Oceania": [
+      "flag:australia",
+      "flag:new_zealand"
+    ],
+    "Pacific": [
+      "flag:australia",
+      "flag:chile",
+      "flag:ecuador",
+      "flag:indonesia",
+      "flag:japan",
+      "flag:mexico",
+      "flag:new_zealand",
+      "flag:philippines",
+      "flag:united_states"
+    ],
+    "Red_Sea": [
+      "flag:egypt"
+    ],
+    "Scandinavia": [
+      "flag:finland",
+      "flag:norway",
+      "flag:sweden"
+    ],
+    "South_America": [
+      "flag:argentina",
+      "flag:bolivia",
+      "flag:brazil",
+      "flag:chile",
+      "flag:ecuador",
+      "flag:paraguay"
+    ],
+    "Southern_Hemisphere": [
+      "flag:antarctica",
+      "flag:argentina",
+      "flag:australia",
+      "flag:bolivia",
+      "flag:chile",
+      "flag:madagascar",
+      "flag:new_zealand",
+      "flag:paraguay",
+      "flag:rwanda",
+      "flag:south_africa",
+      "flag:zambia"
+    ],
+    "addition": [
+      "symbol:plus"
+    ],
+    "alarm": [
+      "emoji:clock"
+    ],
+    "alcohol": [
+      "emoji:beer",
+      "emoji:cocktail",
+      "emoji:wine"
+    ],
+    "amphibian": [
+      "emoji:frog"
+    ],
+    "angled": [
+      "symbol:check"
+    ],
+    "animal": [
+      "emoji:ant",
+      "emoji:bat",
+      "emoji:bear",
+      "emoji:bee",
+      "emoji:butterfly",
+      "emoji:cat",
+      "emoji:chicken",
+      "emoji:cow",
+      "emoji:crab",
+      "emoji:crocodile",
+      "emoji:deer",
+      "emoji:dog",
+      "emoji:dolphin",
+      "emoji:eagle",
+      "emoji:elephant",
+      "emoji:fish",
+      "emoji:flamingo",
+      "emoji:fox",
+      "emoji:frog",
+      "emoji:giraffe",
+      "emoji:goat",
+      "emoji:horse",
+      "emoji:lady_beetle",
+      "emoji:lion",
+      "emoji:lizard",
+      "emoji:lobster",
+      "emoji:monkey",
+      "emoji:mouse",
+      "emoji:octopus",
+      "emoji:owl",
+      "emoji:parrot",
+      "emoji:peacock",
+      "emoji:penguin",
+      "emoji:pig",
+      "emoji:polar_bear",
+      "emoji:rabbit",
+      "emoji:scorpion",
+      "emoji:seal",
+      "emoji:shark",
+      "emoji:sheep",
+      "emoji:shrimp",
+      "emoji:snail",
+      "emoji:snake",
+      "emoji:spider",
+      "emoji:tiger",
+      "emoji:turtle",
+      "emoji:whale",
+      "emoji:worm",
+      "emoji:zebra"
+    ],
+    "animal_product": [
+      "emoji:egg",
+      "emoji:meat"
+    ],
+    "arachnid": [
+      "emoji:scorpion",
+      "emoji:spider"
+    ],
+    "arc": [
+      "emoji:rainbow"
+    ],
+    "archipelago": [
+      "flag:indonesia",
+      "flag:japan",
+      "flag:philippines"
+    ],
+    "arrow": [
+      "symbol:down_arrow",
+      "symbol:left_arrow",
+      "symbol:male",
+      "symbol:right_arrow",
+      "symbol:up_arrow"
+    ],
+    "art": [
+      "emoji:paintbrush"
+    ],
+    "arthropod": [
+      "emoji:ant",
+      "emoji:bee",
+      "emoji:butterfly",
+      "emoji:crab",
+      "emoji:lady_beetle",
+      "emoji:lobster",
+      "emoji:scorpion",
+      "emoji:shrimp",
+      "emoji:spider"
+    ],
+    "baked": [
+      "emoji:bread"
+    ],
+    "balance": [
+      "emoji:scales",
+      "symbol:yin_yang"
+    ],
+    "biology": [
+      "emoji:dna"
+    ],
+    "bird": [
+      "emoji:chicken",
+      "emoji:eagle",
+      "emoji:flamingo",
+      "emoji:owl",
+      "emoji:parrot",
+      "emoji:peacock",
+      "emoji:penguin"
+    ],
+    "black": [
+      "emoji:ant",
+      "emoji:bat",
+      "emoji:bee",
+      "emoji:cow",
+      "emoji:game_controller",
+      "emoji:lady_beetle",
+      "emoji:musical_note",
+      "emoji:penguin",
+      "emoji:spider",
+      "emoji:zebra",
+      "flag:egypt",
+      "flag:kenya",
+      "flag:south_africa",
+      "symbol:club",
+      "symbol:club_suit",
+      "symbol:filled_circle",
+      "symbol:filled_diamond",
+      "symbol:filled_square",
+      "symbol:filled_triangle",
+      "symbol:skull",
+      "symbol:spade",
+      "symbol:spade_suit",
+      "symbol:star_filled",
+      "symbol:yin_yang"
+    ],
+    "blue": [
+      "emoji:book",
+      "emoji:earth",
+      "emoji:ice",
+      "emoji:whale",
+      "flag:antarctica",
+      "flag:argentina",
+      "flag:australia",
+      "flag:brazil",
+      "flag:chile",
+      "flag:cuba",
+      "flag:democratic_republic_congo",
+      "flag:ecuador",
+      "flag:finland",
+      "flag:greece",
+      "flag:iceland",
+      "flag:india",
+      "flag:nepal",
+      "flag:new_zealand",
+      "flag:norway",
+      "flag:south_africa",
+      "flag:united_kingdom",
+      "flag:united_states"
+    ],
+    "bone": [
+      "symbol:skull"
+    ],
+    "brown": [
+      "emoji:bear",
+      "emoji:bread",
+      "emoji:coffee",
+      "emoji:deer",
+      "emoji:dog",
+      "emoji:eagle",
+      "emoji:horse",
+      "emoji:monkey",
+      "emoji:owl",
+      "flag:mexico"
+    ],
+    "caffeinated": [
+      "emoji:coffee",
+      "emoji:tea"
+    ],
+    "canton": [
+      "flag:australia",
+      "flag:chile",
+      "flag:new_zealand",
+      "flag:united_states"
+    ],
+    "carbohydrate": [
+      "emoji:bread"
+    ],
+    "card_suit": [
+      "symbol:club",
+      "symbol:club_suit",
+      "symbol:diamond",
+      "symbol:diamond_suit",
+      "symbol:heart",
+      "symbol:heart_suit",
+      "symbol:spade",
+      "symbol:spade_suit"
+    ],
+    "celestial_association": [
+      "symbol:star"
+    ],
+    "circle": [
+      "flag:brazil",
+      "flag:greenland",
+      "flag:india",
+      "flag:japan",
+      "symbol:circle",
+      "symbol:female",
+      "symbol:filled_circle",
+      "symbol:male",
+      "symbol:outline_circle",
+      "symbol:yin_yang"
+    ],
+    "city_state": [
+      "flag:singapore"
+    ],
+    "climbing": [
+      "emoji:monkey"
+    ],
+    "closed": [
+      "emoji:lock"
+    ],
+    "club": [
+      "symbol:club_suit"
+    ],
+    "club_suit": [
+      "symbol:club"
+    ],
+    "clubs": [
+      "symbol:club"
+    ],
+    "cold": [
+      "emoji:beer",
+      "emoji:cocktail",
+      "emoji:ice",
+      "emoji:milk",
+      "emoji:penguin",
+      "emoji:polar_bear",
+      "emoji:seal",
+      "emoji:snowflake",
+      "emoji:water_glass",
+      "flag:antarctica",
+      "flag:canada",
+      "flag:finland",
+      "flag:greenland",
+      "flag:iceland",
+      "flag:norway",
+      "flag:sweden",
+      "symbol:moon_symbol"
+    ],
+    "colony": [
+      "emoji:ant"
+    ],
+    "colorful": [
+      "emoji:butterfly",
+      "emoji:paintbrush",
+      "emoji:parrot",
+      "emoji:peacock",
+      "emoji:rainbow"
+    ],
+    "construction": [
+      "emoji:hammer",
+      "emoji:saw"
+    ],
+    "contains_black": [
+      "flag:egypt",
+      "flag:kenya",
+      "flag:south_africa"
+    ],
+    "contains_blue": [
+      "flag:antarctica",
+      "flag:argentina",
+      "flag:australia",
+      "flag:brazil",
+      "flag:chile",
+      "flag:cuba",
+      "flag:democratic_republic_congo",
+      "flag:ecuador",
+      "flag:finland",
+      "flag:greece",
+      "flag:iceland",
+      "flag:india",
+      "flag:nepal",
+      "flag:new_zealand",
+      "flag:norway",
+      "flag:south_africa",
+      "flag:united_kingdom",
+      "flag:united_states"
+    ],
+    "contains_gold": [
+      "flag:egypt"
+    ],
+    "contains_green": [
+      "flag:bolivia",
+      "flag:brazil",
+      "flag:india",
+      "flag:ireland",
+      "flag:italy",
+      "flag:kenya",
+      "flag:madagascar",
+      "flag:mexico",
+      "flag:morocco",
+      "flag:south_africa"
+    ],
+    "contains_orange": [
+      "flag:india",
+      "flag:ireland"
+    ],
+    "contains_red": [
+      "flag:australia",
+      "flag:bolivia",
+      "flag:canada",
+      "flag:chile",
+      "flag:cuba",
+      "flag:democratic_republic_congo",
+      "flag:ecuador",
+      "flag:egypt",
+      "flag:greenland",
+      "flag:iceland",
+      "flag:indonesia",
+      "flag:italy",
+      "flag:japan",
+      "flag:kenya",
+      "flag:madagascar",
+      "flag:mexico",
+      "flag:morocco",
+      "flag:nepal",
+      "flag:new_zealand",
+      "flag:norway",
+      "flag:singapore",
+      "flag:south_africa",
+      "flag:switzerland",
+      "flag:united_kingdom",
+      "flag:united_states"
+    ],
+    "contains_white": [
+      "flag:antarctica",
+      "flag:argentina",
+      "flag:australia",
+      "flag:brazil",
+      "flag:canada",
+      "flag:chile",
+      "flag:cuba",
+      "flag:egypt",
+      "flag:finland",
+      "flag:greece",
+      "flag:greenland",
+      "flag:iceland",
+      "flag:india",
+      "flag:indonesia",
+      "flag:ireland",
+      "flag:italy",
+      "flag:japan",
+      "flag:kenya",
+      "flag:madagascar",
+      "flag:mexico",
+      "flag:nepal",
+      "flag:new_zealand",
+      "flag:norway",
+      "flag:singapore",
+      "flag:south_africa",
+      "flag:switzerland",
+      "flag:united_kingdom",
+      "flag:united_states"
+    ],
+    "contains_yellow": [
+      "flag:argentina",
+      "flag:bolivia",
+      "flag:brazil",
+      "flag:democratic_republic_congo",
+      "flag:ecuador",
+      "flag:south_africa"
+    ],
+    "continental": [
+      "flag:mongolia"
+    ],
+    "correct": [
+      "symbol:check"
+    ],
+    "crescent": [
+      "emoji:moon",
+      "flag:singapore",
+      "symbol:moon_symbol"
+    ],
+    "cross": [
+      "flag:finland",
+      "flag:greece",
+      "flag:iceland",
+      "flag:norway",
+      "flag:switzerland",
+      "flag:united_kingdom",
+      "symbol:cross",
+      "symbol:female",
+      "symbol:multiply",
+      "symbol:plus",
+      "symbol:skull"
+    ],
+    "crustacean": [
+      "emoji:crab",
+      "emoji:lobster",
+      "emoji:shrimp"
+    ],
+    "currency": [
+      "symbol:diamond"
+    ],
+    "dairy": [
+      "emoji:cheese",
+      "emoji:milk"
+    ],
+    "danger": [
+      "symbol:skull",
+      "symbol:warning"
+    ],
+    "dangerous": [
+      "emoji:crocodile",
+      "emoji:fire",
+      "emoji:lightning",
+      "emoji:scorpion",
+      "emoji:snake"
+    ],
+    "day": [
+      "emoji:sun",
+      "symbol:sun_symbol"
+    ],
+    "death": [
+      "symbol:skull"
+    ],
+    "desert": [
+      "emoji:scorpion",
+      "flag:australia",
+      "flag:chile",
+      "flag:egypt",
+      "flag:mexico",
+      "flag:morocco",
+      "flag:south_africa"
+    ],
+    "diagonal": [
+      "symbol:not_equal"
+    ],
+    "diagonal_band": [
+      "flag:democratic_republic_congo"
+    ],
+    "diagonal_cross": [
+      "flag:united_kingdom"
+    ],
+    "diamond": [
+      "flag:brazil",
+      "symbol:diamond_suit",
+      "symbol:filled_diamond",
+      "symbol:outline_diamond"
+    ],
+    "diamond_suit": [
+      "symbol:diamond"
+    ],
+    "diamonds": [
+      "symbol:diamond"
+    ],
+    "direction": [
+      "symbol:down_arrow",
+      "symbol:left_arrow",
+      "symbol:right_arrow",
+      "symbol:up_arrow"
+    ],
+    "division": [
+      "symbol:divide"
+    ],
+    "down": [
+      "symbol:down_arrow",
+      "symbol:female"
+    ],
+    "drink": [
+      "emoji:beer",
+      "emoji:cocktail",
+      "emoji:coffee",
+      "emoji:milk",
+      "emoji:tea",
+      "emoji:water_glass",
+      "emoji:wine"
+    ],
+    "eight": [
+      "emoji:octopus",
+      "emoji:scorpion",
+      "emoji:spider"
+    ],
+    "emblem": [
+      "flag:antarctica",
+      "flag:egypt",
+      "flag:mexico"
+    ],
+    "energy": [
+      "emoji:fire",
+      "emoji:lightning"
+    ],
+    "equality": [
+      "symbol:equals"
+    ],
+    "equatorial": [
+      "flag:brazil",
+      "flag:democratic_republic_congo",
+      "flag:ecuador",
+      "flag:indonesia",
+      "flag:kenya",
+      "flag:uganda"
+    ],
+    "exact_blue_white": [
+      "flag:antarctica",
+      "flag:finland",
+      "flag:greece"
+    ],
+    "exact_red_green": [
+      "flag:morocco"
+    ],
+    "exact_red_white": [
+      "flag:canada",
+      "flag:greenland",
+      "flag:indonesia",
+      "flag:japan",
+      "flag:singapore",
+      "flag:switzerland"
+    ],
+    "exact_red_white_blue": [
+      "flag:chile",
+      "flag:cuba",
+      "flag:iceland",
+      "flag:nepal",
+      "flag:new_zealand",
+      "flag:norway",
+      "flag:united_kingdom",
+      "flag:united_states"
+    ],
+    "failure": [
+      "symbol:cross",
+      "symbol:cross_mark"
+    ],
+    "farm": [
+      "emoji:chicken",
+      "emoji:cow",
+      "emoji:goat",
+      "emoji:horse",
+      "emoji:pig",
+      "emoji:sheep"
+    ],
+    "fast": [
+      "emoji:horse",
+      "emoji:lightning",
+      "emoji:rocket"
+    ],
+    "female": [
+      "symbol:female"
+    ],
+    "filled": [
+      "symbol:filled_circle",
+      "symbol:filled_diamond",
+      "symbol:filled_square",
+      "symbol:filled_triangle",
+      "symbol:star",
+      "symbol:star_filled"
+    ],
+    "five": [
+      "emoji:star",
+      "symbol:star_filled",
+      "symbol:star_outline"
+    ],
+    "fjord": [
+      "flag:norway"
+    ],
+    "flag": [
+      "flag:antarctica",
+      "flag:argentina",
+      "flag:australia",
+      "flag:bolivia",
+      "flag:brazil",
+      "flag:canada",
+      "flag:chile",
+      "flag:cuba",
+      "flag:democratic_republic_congo",
+      "flag:ecuador",
+      "flag:egypt",
+      "flag:finland",
+      "flag:greece",
+      "flag:greenland",
+      "flag:iceland",
+      "flag:india",
+      "flag:indonesia",
+      "flag:ireland",
+      "flag:italy",
+      "flag:japan",
+      "flag:kenya",
+      "flag:madagascar",
+      "flag:mexico",
+      "flag:mongolia",
+      "flag:morocco",
+      "flag:nepal",
+      "flag:new_zealand",
+      "flag:norway",
+      "flag:paraguay",
+      "flag:philippines",
+      "flag:rwanda",
+      "flag:singapore",
+      "flag:south_africa",
+      "flag:sri_lanka",
+      "flag:sweden",
+      "flag:switzerland",
+      "flag:thailand",
+      "flag:uganda",
+      "flag:united_kingdom",
+      "flag:united_states",
+      "flag:zambia"
+    ],
+    "flag_design": [
+      "flag:antarctica",
+      "flag:argentina",
+      "flag:australia",
+      "flag:bolivia",
+      "flag:brazil",
+      "flag:canada",
+      "flag:chile",
+      "flag:cuba",
+      "flag:democratic_republic_congo",
+      "flag:ecuador",
+      "flag:egypt",
+      "flag:finland",
+      "flag:greece",
+      "flag:greenland",
+      "flag:iceland",
+      "flag:india",
+      "flag:indonesia",
+      "flag:ireland",
+      "flag:italy",
+      "flag:japan",
+      "flag:kenya",
+      "flag:madagascar",
+      "flag:mexico",
+      "flag:morocco",
+      "flag:nepal",
+      "flag:new_zealand",
+      "flag:norway",
+      "flag:singapore",
+      "flag:south_africa",
+      "flag:switzerland",
+      "flag:united_kingdom",
+      "flag:united_states"
+    ],
+    "flightless": [
+      "emoji:penguin"
+    ],
+    "flower": [
+      "emoji:cherry_blossom",
+      "emoji:hibiscus",
+      "emoji:rose",
+      "emoji:sunflower",
+      "emoji:tulip"
+    ],
+    "flying": [
+      "emoji:airplane",
+      "emoji:bat",
+      "emoji:bee",
+      "emoji:butterfly",
+      "emoji:eagle",
+      "emoji:flamingo",
+      "emoji:owl",
+      "emoji:parrot",
+      "emoji:rocket"
+    ],
+    "food": [
+      "emoji:apple",
+      "emoji:banana",
+      "emoji:bread",
+      "emoji:broccoli",
+      "emoji:carrot",
+      "emoji:cheese",
+      "emoji:cherries",
+      "emoji:corn",
+      "emoji:egg",
+      "emoji:grapes",
+      "emoji:leafy_green",
+      "emoji:lemon",
+      "emoji:meat",
+      "emoji:mushroom",
+      "emoji:peach",
+      "emoji:pineapple",
+      "emoji:strawberry",
+      "emoji:tomato",
+      "emoji:watermelon"
+    ],
+    "forest": [
+      "emoji:bear",
+      "emoji:deer",
+      "emoji:fox",
+      "emoji:mushroom",
+      "flag:canada",
+      "flag:finland",
+      "flag:sweden"
+    ],
+    "four": [
+      "symbol:cross",
+      "symbol:diamond_suit",
+      "symbol:filled_diamond",
+      "symbol:filled_square",
+      "symbol:multiply",
+      "symbol:outline_diamond",
+      "symbol:outline_square",
+      "symbol:plus"
+    ],
+    "four_sided": [
+      "symbol:square"
+    ],
+    "fragrant": [
+      "emoji:rose"
+    ],
+    "fruit": [
+      "emoji:apple",
+      "emoji:banana",
+      "emoji:cherries",
+      "emoji:grapes",
+      "emoji:lemon",
+      "emoji:peach",
+      "emoji:pineapple",
+      "emoji:strawberry",
+      "emoji:tomato",
+      "emoji:watermelon"
+    ],
+    "fungus": [
+      "emoji:mushroom"
+    ],
+    "game": [
+      "emoji:game_controller"
+    ],
+    "game_resource": [
+      "symbol:club",
+      "symbol:diamond",
+      "symbol:heart",
+      "symbol:spade"
+    ],
+    "gender": [
+      "symbol:female",
+      "symbol:male"
+    ],
+    "genetics": [
+      "emoji:dna"
+    ],
+    "glass": [
+      "emoji:cocktail",
+      "emoji:hourglass",
+      "emoji:microscope",
+      "emoji:test_tube",
+      "emoji:water_glass"
+    ],
+    "gold": [
+      "flag:egypt"
+    ],
+    "gray": [
+      "emoji:dolphin",
+      "emoji:elephant",
+      "emoji:mouse",
+      "emoji:seal",
+      "emoji:shark"
+    ],
+    "green": [
+      "emoji:broccoli",
+      "emoji:crocodile",
+      "emoji:earth",
+      "emoji:frog",
+      "emoji:leafy_green",
+      "emoji:lizard",
+      "emoji:snake",
+      "emoji:tea",
+      "emoji:turtle",
+      "emoji:watermelon",
+      "flag:bolivia",
+      "flag:brazil",
+      "flag:india",
+      "flag:ireland",
+      "flag:italy",
+      "flag:kenya",
+      "flag:madagascar",
+      "flag:mexico",
+      "flag:morocco",
+      "flag:south_africa",
+      "symbol:check"
+    ],
+    "heart": [
+      "symbol:heart_suit"
+    ],
+    "heart_suit": [
+      "symbol:heart"
+    ],
+    "hearts": [
+      "symbol:heart"
+    ],
+    "horizontal": [
+      "symbol:equals",
+      "symbol:infinity",
+      "symbol:minus"
+    ],
+    "horizontal_bands": [
+      "flag:greenland",
+      "flag:indonesia",
+      "flag:madagascar"
+    ],
+    "horizontal_stripes": [
+      "flag:argentina",
+      "flag:bolivia",
+      "flag:ecuador",
+      "flag:egypt",
+      "flag:india",
+      "flag:kenya"
+    ],
+    "hot": [
+      "emoji:coffee",
+      "emoji:fire",
+      "emoji:sun",
+      "emoji:tea",
+      "symbol:sun_symbol"
+    ],
+    "ice": [
+      "flag:antarctica",
+      "flag:greenland"
+    ],
+    "inequality": [
+      "symbol:greater_equal",
+      "symbol:less_equal",
+      "symbol:not_equal"
+    ],
+    "insect": [
+      "emoji:ant",
+      "emoji:bee",
+      "emoji:butterfly",
+      "emoji:lady_beetle"
+    ],
+    "invertebrate": [
+      "emoji:ant",
+      "emoji:bee",
+      "emoji:butterfly",
+      "emoji:crab",
+      "emoji:lady_beetle",
+      "emoji:lobster",
+      "emoji:octopus",
+      "emoji:scorpion",
+      "emoji:shrimp",
+      "emoji:snail",
+      "emoji:spider",
+      "emoji:worm"
+    ],
+    "island": [
+      "flag:cuba",
+      "flag:greece",
+      "flag:greenland",
+      "flag:iceland",
+      "flag:indonesia",
+      "flag:ireland",
+      "flag:japan",
+      "flag:madagascar",
+      "flag:new_zealand",
+      "flag:philippines",
+      "flag:singapore",
+      "flag:sri_lanka",
+      "flag:united_kingdom"
+    ],
+    "jumping": [
+      "emoji:frog",
+      "emoji:rabbit"
+    ],
+    "knowledge": [
+      "emoji:book"
+    ],
+    "laboratory": [
+      "emoji:microscope",
+      "emoji:test_tube"
+    ],
+    "lake": [
+      "flag:finland",
+      "flag:uganda"
+    ],
+    "land": [
+      "emoji:ant",
+      "emoji:bear",
+      "emoji:bicycle",
+      "emoji:car",
+      "emoji:cat",
+      "emoji:chicken",
+      "emoji:cow",
+      "emoji:crab",
+      "emoji:crocodile",
+      "emoji:deer",
+      "emoji:dog",
+      "emoji:earth",
+      "emoji:elephant",
+      "emoji:fox",
+      "emoji:frog",
+      "emoji:giraffe",
+      "emoji:goat",
+      "emoji:horse",
+      "emoji:lady_beetle",
+      "emoji:lion",
+      "emoji:lizard",
+      "emoji:monkey",
+      "emoji:mouse",
+      "emoji:peacock",
+      "emoji:penguin",
+      "emoji:pig",
+      "emoji:polar_bear",
+      "emoji:rabbit",
+      "emoji:scorpion",
+      "emoji:seal",
+      "emoji:sheep",
+      "emoji:snail",
+      "emoji:snake",
+      "emoji:spider",
+      "emoji:tiger",
+      "emoji:train",
+      "emoji:turtle",
+      "emoji:worm",
+      "emoji:zebra"
+    ],
+    "landlocked": [
+      "flag:bolivia",
+      "flag:mongolia",
+      "flag:nepal",
+      "flag:paraguay",
+      "flag:rwanda",
+      "flag:switzerland",
+      "flag:uganda",
+      "flag:zambia"
+    ],
+    "landmass": [
+      "flag:antarctica"
+    ],
+    "large": [
+      "emoji:elephant",
+      "emoji:ship",
+      "emoji:whale"
+    ],
+    "large_state": [
+      "flag:argentina",
+      "flag:australia",
+      "flag:brazil",
+      "flag:canada",
+      "flag:india",
+      "flag:united_states"
+    ],
+    "law": [
+      "emoji:scales"
+    ],
+    "leaf": [
+      "emoji:leafy_green",
+      "flag:canada"
+    ],
+    "left": [
+      "symbol:left_arrow",
+      "symbol:less_equal"
+    ],
+    "life": [
+      "symbol:heart"
+    ],
+    "liquid": [
+      "emoji:test_tube"
+    ],
+    "long": [
+      "emoji:banana",
+      "emoji:pencil",
+      "emoji:snake",
+      "emoji:train",
+      "emoji:worm"
+    ],
+    "loop": [
+      "symbol:infinity"
+    ],
+    "love": [
+      "symbol:heart_suit"
+    ],
+    "mainland": [
+      "flag:thailand"
+    ],
+    "male": [
+      "symbol:male"
+    ],
+    "mammal": [
+      "emoji:bat",
+      "emoji:bear",
+      "emoji:cat",
+      "emoji:cow",
+      "emoji:deer",
+      "emoji:dog",
+      "emoji:dolphin",
+      "emoji:elephant",
+      "emoji:fox",
+      "emoji:giraffe",
+      "emoji:goat",
+      "emoji:horse",
+      "emoji:lion",
+      "emoji:monkey",
+      "emoji:mouse",
+      "emoji:pig",
+      "emoji:polar_bear",
+      "emoji:rabbit",
+      "emoji:seal",
+      "emoji:sheep",
+      "emoji:tiger",
+      "emoji:whale",
+      "emoji:zebra"
+    ],
+    "math": [
+      "symbol:divide",
+      "symbol:equals",
+      "symbol:greater_equal",
+      "symbol:infinity",
+      "symbol:less_equal",
+      "symbol:minus",
+      "symbol:multiply",
+      "symbol:not_equal",
+      "symbol:plus",
+      "symbol:times"
+    ],
+    "metal": [
+      "emoji:clock",
+      "emoji:gear",
+      "emoji:hammer",
+      "emoji:key",
+      "emoji:lock",
+      "emoji:saw",
+      "emoji:scales",
+      "emoji:wrench"
+    ],
+    "mollusk": [
+      "emoji:octopus",
+      "emoji:snail"
+    ],
+    "moon": [
+      "flag:nepal"
+    ],
+    "mountainous": [
+      "emoji:goat"
+    ],
+    "multiplication": [
+      "symbol:multiply",
+      "symbol:times"
+    ],
+    "music": [
+      "emoji:musical_note"
+    ],
+    "night": [
+      "emoji:bat",
+      "emoji:moon",
+      "emoji:owl",
+      "symbol:moon_symbol"
+    ],
+    "non_rectangular": [
+      "flag:nepal"
+    ],
+    "nordic_cross": [
+      "flag:finland",
+      "flag:iceland",
+      "flag:norway"
+    ],
+    "operator": [
+      "symbol:divide",
+      "symbol:equals",
+      "symbol:greater_equal",
+      "symbol:less_equal",
+      "symbol:minus",
+      "symbol:multiply",
+      "symbol:not_equal",
+      "symbol:plus",
+      "symbol:times"
+    ],
+    "orange": [
+      "emoji:carrot",
+      "emoji:fire",
+      "emoji:fox",
+      "emoji:peach",
+      "emoji:tiger",
+      "flag:india",
+      "flag:ireland"
+    ],
+    "outline": [
+      "symbol:circle",
+      "symbol:club",
+      "symbol:diamond",
+      "symbol:heart",
+      "symbol:outline_circle",
+      "symbol:outline_diamond",
+      "symbol:outline_square",
+      "symbol:outline_triangle",
+      "symbol:spade",
+      "symbol:square",
+      "symbol:star_outline",
+      "symbol:triangle"
+    ],
+    "oval": [
+      "emoji:egg"
+    ],
+    "pair": [
+      "emoji:cherries"
+    ],
+    "paper": [
+      "emoji:book"
+    ],
+    "peninsula": [
+      "flag:italy"
+    ],
+    "pet": [
+      "emoji:cat",
+      "emoji:dog"
+    ],
+    "physics": [
+      "emoji:atom"
+    ],
+    "pink": [
+      "emoji:cherry_blossom",
+      "emoji:flamingo",
+      "emoji:pig",
+      "emoji:shrimp",
+      "emoji:tulip",
+      "emoji:worm"
+    ],
+    "planet": [
+      "emoji:earth"
+    ],
+    "plant": [
+      "emoji:apple",
+      "emoji:banana",
+      "emoji:broccoli",
+      "emoji:carrot",
+      "emoji:cherries",
+      "emoji:cherry_blossom",
+      "emoji:corn",
+      "emoji:grapes",
+      "emoji:hibiscus",
+      "emoji:leafy_green",
+      "emoji:lemon",
+      "emoji:peach",
+      "emoji:pineapple",
+      "emoji:rose",
+      "emoji:strawberry",
+      "emoji:sunflower",
+      "emoji:tomato",
+      "emoji:tulip",
+      "emoji:watermelon"
+    ],
+    "plastic": [
+      "emoji:water_glass"
+    ],
+    "pointed": [
+      "emoji:star",
+      "symbol:diamond_suit",
+      "symbol:down_arrow",
+      "symbol:filled_diamond",
+      "symbol:filled_triangle",
+      "symbol:heart_suit",
+      "symbol:left_arrow",
+      "symbol:outline_diamond",
+      "symbol:outline_triangle",
+      "symbol:right_arrow",
+      "symbol:spade_suit",
+      "symbol:star_filled",
+      "symbol:star_outline",
+      "symbol:up_arrow",
+      "symbol:warning"
+    ],
+    "polar": [
+      "emoji:penguin",
+      "emoji:polar_bear",
+      "emoji:seal",
+      "flag:antarctica",
+      "flag:canada",
+      "flag:finland",
+      "flag:greenland",
+      "flag:norway",
+      "flag:sweden",
+      "flag:united_states"
+    ],
+    "pollinator": [
+      "emoji:bee"
+    ],
+    "predator": [
+      "emoji:bear",
+      "emoji:crocodile",
+      "emoji:eagle",
+      "emoji:fox",
+      "emoji:lion",
+      "emoji:polar_bear",
+      "emoji:shark",
+      "emoji:tiger"
+    ],
+    "purple": [
+      "emoji:grapes"
+    ],
+    "rail": [
+      "emoji:train"
+    ],
+    "rainforest": [
+      "flag:brazil",
+      "flag:democratic_republic_congo"
+    ],
+    "rays": [
+      "symbol:sun_symbol"
+    ],
+    "rectangle": [
+      "emoji:book"
+    ],
+    "red": [
+      "emoji:apple",
+      "emoji:car",
+      "emoji:cherries",
+      "emoji:crab",
+      "emoji:fire",
+      "emoji:hibiscus",
+      "emoji:lady_beetle",
+      "emoji:lobster",
+      "emoji:meat",
+      "emoji:mushroom",
+      "emoji:octopus",
+      "emoji:rose",
+      "emoji:strawberry",
+      "emoji:tomato",
+      "emoji:watermelon",
+      "emoji:wine",
+      "flag:australia",
+      "flag:bolivia",
+      "flag:canada",
+      "flag:chile",
+      "flag:cuba",
+      "flag:democratic_republic_congo",
+      "flag:ecuador",
+      "flag:egypt",
+      "flag:greenland",
+      "flag:iceland",
+      "flag:indonesia",
+      "flag:italy",
+      "flag:japan",
+      "flag:kenya",
+      "flag:madagascar",
+      "flag:mexico",
+      "flag:morocco",
+      "flag:nepal",
+      "flag:new_zealand",
+      "flag:norway",
+      "flag:singapore",
+      "flag:south_africa",
+      "flag:switzerland",
+      "flag:united_kingdom",
+      "flag:united_states",
+      "symbol:cross",
+      "symbol:diamond",
+      "symbol:diamond_suit",
+      "symbol:heart",
+      "symbol:heart_suit"
+    ],
+    "red_association": [
+      "symbol:cross_mark"
+    ],
+    "repair": [
+      "emoji:wrench"
+    ],
+    "reptile": [
+      "emoji:crocodile",
+      "emoji:lizard",
+      "emoji:snake",
+      "emoji:turtle"
+    ],
+    "right": [
+      "symbol:greater_equal",
+      "symbol:male",
+      "symbol:right_arrow"
+    ],
+    "river": [
+      "flag:democratic_republic_congo",
+      "flag:egypt",
+      "flag:paraguay"
+    ],
+    "road": [
+      "emoji:bicycle",
+      "emoji:car"
+    ],
+    "root": [
+      "emoji:carrot"
+    ],
+    "round": [
+      "emoji:apple",
+      "emoji:atom",
+      "emoji:cherries",
+      "emoji:clock",
+      "emoji:earth",
+      "emoji:gear",
+      "emoji:grapes",
+      "emoji:peach",
+      "emoji:sun",
+      "emoji:watermelon",
+      "symbol:circle",
+      "symbol:club_suit",
+      "symbol:filled_circle",
+      "symbol:outline_circle",
+      "symbol:sun_symbol"
+    ],
+    "sand": [
+      "emoji:hourglass"
+    ],
+    "savanna": [
+      "flag:kenya",
+      "flag:zambia"
+    ],
+    "savory": [
+      "emoji:cheese",
+      "emoji:meat"
+    ],
+    "science": [
+      "emoji:atom",
+      "emoji:dna",
+      "emoji:microscope",
+      "emoji:test_tube"
+    ],
+    "sea": [
+      "emoji:crab",
+      "emoji:dolphin",
+      "emoji:earth",
+      "emoji:fish",
+      "emoji:lobster",
+      "emoji:octopus",
+      "emoji:penguin",
+      "emoji:polar_bear",
+      "emoji:seal",
+      "emoji:shark",
+      "emoji:ship",
+      "emoji:shrimp",
+      "emoji:whale"
+    ],
+    "security": [
+      "emoji:key",
+      "emoji:lock"
+    ],
+    "shape": [
+      "symbol:circle",
+      "symbol:club_suit",
+      "symbol:diamond_suit",
+      "symbol:filled_circle",
+      "symbol:filled_diamond",
+      "symbol:filled_square",
+      "symbol:filled_triangle",
+      "symbol:heart_suit",
+      "symbol:infinity",
+      "symbol:outline_circle",
+      "symbol:outline_diamond",
+      "symbol:outline_square",
+      "symbol:outline_triangle",
+      "symbol:spade_suit",
+      "symbol:square",
+      "symbol:star",
+      "symbol:star_filled",
+      "symbol:star_outline",
+      "symbol:triangle"
+    ],
+    "shell": [
+      "emoji:snail",
+      "emoji:turtle"
+    ],
+    "shield": [
+      "flag:kenya"
+    ],
+    "sideways": [
+      "emoji:crab"
+    ],
+    "six": [
+      "emoji:snowflake"
+    ],
+    "sky": [
+      "emoji:cloud",
+      "emoji:rainbow"
+    ],
+    "slow": [
+      "emoji:snail",
+      "emoji:turtle"
+    ],
+    "small": [
+      "emoji:mouse",
+      "emoji:rabbit"
+    ],
+    "sound": [
+      "emoji:musical_note"
+    ],
+    "sour": [
+      "emoji:lemon"
+    ],
+    "space": [
+      "emoji:earth",
+      "emoji:moon",
+      "emoji:rocket",
+      "emoji:star",
+      "emoji:sun"
+    ],
+    "spade": [
+      "symbol:spade_suit"
+    ],
+    "spade_suit": [
+      "symbol:spade"
+    ],
+    "spades": [
+      "symbol:spade"
+    ],
+    "spiky": [
+      "emoji:pineapple"
+    ],
+    "spotted": [
+      "emoji:giraffe",
+      "emoji:lady_beetle"
+    ],
+    "spring": [
+      "emoji:cherry_blossom",
+      "emoji:tulip"
+    ],
+    "square": [
+      "emoji:ice",
+      "symbol:filled_square",
+      "symbol:outline_square",
+      "symbol:square"
+    ],
+    "star": [
+      "flag:chile",
+      "flag:cuba",
+      "flag:democratic_republic_congo",
+      "flag:morocco",
+      "symbol:star",
+      "symbol:star_filled",
+      "symbol:star_outline"
+    ],
+    "stars": [
+      "flag:australia",
+      "flag:brazil",
+      "flag:new_zealand",
+      "flag:singapore",
+      "flag:united_states"
+    ],
+    "status": [
+      "symbol:check",
+      "symbol:cross",
+      "symbol:cross_mark",
+      "symbol:warning"
+    ],
+    "steppe": [
+      "flag:mongolia"
+    ],
+    "striped": [
+      "emoji:tiger",
+      "emoji:zebra"
+    ],
+    "stripes": [
+      "flag:cuba",
+      "flag:greece",
+      "flag:united_states"
+    ],
+    "subpolar": [
+      "flag:argentina",
+      "flag:canada",
+      "flag:chile",
+      "flag:finland",
+      "flag:iceland",
+      "flag:norway",
+      "flag:sweden",
+      "flag:united_states"
+    ],
+    "subtraction": [
+      "symbol:minus"
+    ],
+    "subtropical": [
+      "flag:paraguay"
+    ],
+    "success": [
+      "symbol:check"
+    ],
+    "suit": [
+      "symbol:club",
+      "symbol:diamond",
+      "symbol:heart",
+      "symbol:spade"
+    ],
+    "summer": [
+      "emoji:sunflower",
+      "emoji:watermelon"
+    ],
+    "sun": [
+      "flag:argentina",
+      "flag:nepal"
+    ],
+    "sweet": [
+      "emoji:peach",
+      "emoji:strawberry"
+    ],
+    "swimming": [
+      "emoji:dolphin",
+      "emoji:fish",
+      "emoji:octopus",
+      "emoji:penguin",
+      "emoji:seal",
+      "emoji:shark",
+      "emoji:whale"
+    ],
+    "tall": [
+      "emoji:giraffe"
+    ],
+    "technology": [
+      "emoji:atom",
+      "emoji:game_controller",
+      "emoji:gear",
+      "emoji:microscope",
+      "emoji:rocket"
+    ],
+    "temperate": [
+      "flag:argentina",
+      "flag:australia",
+      "flag:chile",
+      "flag:greece",
+      "flag:ireland",
+      "flag:italy",
+      "flag:japan",
+      "flag:mongolia",
+      "flag:nepal",
+      "flag:new_zealand",
+      "flag:south_africa",
+      "flag:switzerland",
+      "flag:united_kingdom",
+      "flag:united_states"
+    ],
+    "thorny": [
+      "emoji:rose"
+    ],
+    "three": [
+      "symbol:club_suit",
+      "symbol:divide",
+      "symbol:filled_triangle",
+      "symbol:outline_triangle",
+      "symbol:warning"
+    ],
+    "three_sided": [
+      "symbol:triangle"
+    ],
+    "time": [
+      "emoji:clock",
+      "emoji:hourglass"
+    ],
+    "tool": [
+      "emoji:gear",
+      "emoji:hammer",
+      "emoji:key",
+      "emoji:lock",
+      "emoji:microscope",
+      "emoji:paintbrush",
+      "emoji:pencil",
+      "emoji:saw",
+      "emoji:test_tube",
+      "emoji:wrench"
+    ],
+    "transport": [
+      "emoji:airplane",
+      "emoji:bicycle",
+      "emoji:car",
+      "emoji:ship",
+      "emoji:train"
+    ],
+    "triangle": [
+      "flag:cuba",
+      "symbol:filled_triangle",
+      "symbol:outline_triangle",
+      "symbol:triangle",
+      "symbol:warning"
+    ],
+    "tricolor": [
+      "flag:bolivia",
+      "flag:ecuador",
+      "flag:egypt",
+      "flag:ireland",
+      "flag:italy",
+      "flag:mexico"
+    ],
+    "tropical": [
+      "emoji:banana",
+      "emoji:elephant",
+      "emoji:flamingo",
+      "emoji:giraffe",
+      "emoji:hibiscus",
+      "emoji:lion",
+      "emoji:monkey",
+      "emoji:parrot",
+      "emoji:pineapple",
+      "emoji:tiger",
+      "emoji:zebra",
+      "flag:australia",
+      "flag:bolivia",
+      "flag:brazil",
+      "flag:cuba",
+      "flag:democratic_republic_congo",
+      "flag:ecuador",
+      "flag:india",
+      "flag:indonesia",
+      "flag:kenya",
+      "flag:madagascar",
+      "flag:philippines",
+      "flag:rwanda",
+      "flag:singapore",
+      "flag:sri_lanka",
+      "flag:thailand",
+      "flag:uganda",
+      "flag:united_states",
+      "flag:zambia"
+    ],
+    "twisted": [
+      "emoji:dna"
+    ],
+    "two": [
+      "emoji:bicycle",
+      "emoji:game_controller",
+      "emoji:hourglass",
+      "emoji:scales",
+      "symbol:equals",
+      "symbol:infinity",
+      "symbol:not_equal",
+      "symbol:yin_yang"
+    ],
+    "union_jack_family": [
+      "flag:australia",
+      "flag:new_zealand",
+      "flag:united_kingdom"
+    ],
+    "up": [
+      "symbol:filled_triangle",
+      "symbol:male",
+      "symbol:outline_triangle",
+      "symbol:up_arrow"
+    ],
+    "vegetable": [
+      "emoji:broccoli",
+      "emoji:carrot",
+      "emoji:corn",
+      "emoji:leafy_green"
+    ],
+    "vehicle": [
+      "emoji:airplane",
+      "emoji:bicycle",
+      "emoji:car",
+      "emoji:rocket",
+      "emoji:ship",
+      "emoji:train"
+    ],
+    "vertebrate": [
+      "emoji:bat",
+      "emoji:bear",
+      "emoji:cat",
+      "emoji:chicken",
+      "emoji:cow",
+      "emoji:crocodile",
+      "emoji:deer",
+      "emoji:dog",
+      "emoji:dolphin",
+      "emoji:eagle",
+      "emoji:elephant",
+      "emoji:fish",
+      "emoji:flamingo",
+      "emoji:fox",
+      "emoji:frog",
+      "emoji:giraffe",
+      "emoji:goat",
+      "emoji:horse",
+      "emoji:lion",
+      "emoji:lizard",
+      "emoji:monkey",
+      "emoji:mouse",
+      "emoji:owl",
+      "emoji:parrot",
+      "emoji:peacock",
+      "emoji:penguin",
+      "emoji:pig",
+      "emoji:polar_bear",
+      "emoji:rabbit",
+      "emoji:seal",
+      "emoji:shark",
+      "emoji:sheep",
+      "emoji:snake",
+      "emoji:tiger",
+      "emoji:turtle",
+      "emoji:whale",
+      "emoji:zebra"
+    ],
+    "vertical_band": [
+      "flag:madagascar"
+    ],
+    "vertical_bands": [
+      "flag:canada"
+    ],
+    "vertical_stripes": [
+      "flag:ireland",
+      "flag:italy",
+      "flag:mexico"
+    ],
+    "volcanic": [
+      "flag:iceland"
+    ],
+    "wager": [
+      "symbol:club"
+    ],
+    "water": [
+      "emoji:cloud",
+      "emoji:crocodile",
+      "emoji:dolphin",
+      "emoji:fish",
+      "emoji:flamingo",
+      "emoji:frog",
+      "emoji:ice",
+      "emoji:octopus",
+      "emoji:shark",
+      "emoji:ship",
+      "emoji:snowflake",
+      "emoji:turtle"
+    ],
+    "weather": [
+      "emoji:cloud",
+      "emoji:lightning",
+      "emoji:rainbow",
+      "emoji:snowflake",
+      "emoji:sun",
+      "symbol:moon_symbol",
+      "symbol:sun_symbol"
+    ],
+    "white": [
+      "emoji:airplane",
+      "emoji:cloud",
+      "emoji:cow",
+      "emoji:egg",
+      "emoji:milk",
+      "emoji:mushroom",
+      "emoji:penguin",
+      "emoji:polar_bear",
+      "emoji:rabbit",
+      "emoji:sheep",
+      "emoji:snowflake",
+      "emoji:zebra",
+      "flag:antarctica",
+      "flag:argentina",
+      "flag:australia",
+      "flag:brazil",
+      "flag:canada",
+      "flag:chile",
+      "flag:cuba",
+      "flag:egypt",
+      "flag:finland",
+      "flag:greece",
+      "flag:greenland",
+      "flag:iceland",
+      "flag:india",
+      "flag:indonesia",
+      "flag:ireland",
+      "flag:italy",
+      "flag:japan",
+      "flag:kenya",
+      "flag:madagascar",
+      "flag:mexico",
+      "flag:nepal",
+      "flag:new_zealand",
+      "flag:norway",
+      "flag:singapore",
+      "flag:south_africa",
+      "flag:switzerland",
+      "flag:united_kingdom",
+      "flag:united_states",
+      "symbol:outline_circle",
+      "symbol:outline_diamond",
+      "symbol:outline_square",
+      "symbol:outline_triangle",
+      "symbol:star_outline",
+      "symbol:yin_yang"
+    ],
+    "wings": [
+      "emoji:airplane",
+      "emoji:bat",
+      "emoji:bee",
+      "emoji:butterfly",
+      "emoji:chicken",
+      "emoji:eagle",
+      "emoji:flamingo",
+      "emoji:owl",
+      "emoji:parrot",
+      "emoji:peacock"
+    ],
+    "winter": [
+      "emoji:snowflake"
+    ],
+    "wood": [
+      "emoji:hammer",
+      "emoji:paintbrush",
+      "emoji:pencil",
+      "emoji:saw"
+    ],
+    "wool": [
+      "emoji:sheep"
+    ],
+    "work": [
+      "emoji:gear",
+      "emoji:hammer",
+      "emoji:saw",
+      "emoji:wrench",
+      "symbol:spade"
+    ],
+    "writing": [
+      "emoji:pencil"
+    ],
+    "wrong": [
+      "symbol:cross",
+      "symbol:cross_mark"
+    ],
+    "x_shape": [
+      "symbol:cross_mark",
+      "symbol:times"
+    ],
+    "y_shape": [
+      "flag:south_africa"
+    ],
+    "yellow": [
+      "emoji:banana",
+      "emoji:bee",
+      "emoji:beer",
+      "emoji:cheese",
+      "emoji:corn",
+      "emoji:giraffe",
+      "emoji:key",
+      "emoji:lemon",
+      "emoji:lightning",
+      "emoji:lion",
+      "emoji:moon",
+      "emoji:pencil",
+      "emoji:pineapple",
+      "emoji:star",
+      "emoji:sun",
+      "emoji:sunflower",
+      "flag:argentina",
+      "flag:bolivia",
+      "flag:brazil",
+      "flag:democratic_republic_congo",
+      "flag:ecuador",
+      "flag:south_africa",
+      "symbol:warning"
+    ]
+  }
+}
