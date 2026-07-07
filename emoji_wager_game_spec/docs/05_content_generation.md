@@ -21,6 +21,8 @@ Each item in `data/items.json` has:
 - `tags`: flat descriptive tags.
 - `colors`: atomic colors where relevant.
 
+The content catalog should be large enough to avoid repetitive boards.  The strong prototype target is at least 3x the starter catalog size and at least 2x the starter category count.  The current expanded catalog exceeds this with broad coverage across faces, people, animals, food, buildings, vehicles, household/office objects, sports, clothing, signs, flags, and symbols.
+
 ## Selectors
 
 Groups are built from selectors.  A selector may require tags, exclude tags, require colors, exclude colors, require exact colors, require color count, or limit item kind.

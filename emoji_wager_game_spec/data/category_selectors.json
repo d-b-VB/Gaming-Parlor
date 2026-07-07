@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "0.2.1",
+  "schemaVersion": "0.3.2",
   "description": "Curated group selectors. A group is not necessarily a tag; it may be a selector over tags, colors, kind, and exclusions.",
   "selectors": [
     {
@@ -42,7 +42,7 @@
       "opposites": [
         "flightless"
       ],
-      "eligibleCount": 9,
+      "eligibleCount": 35,
       "minimumItems": 4
     },
     {
@@ -56,7 +56,7 @@
       "opposites": [
         "land"
       ],
-      "eligibleCount": 13,
+      "eligibleCount": 25,
       "minimumItems": 4
     },
     {
@@ -70,7 +70,7 @@
       "opposites": [
         "sea"
       ],
-      "eligibleCount": 39,
+      "eligibleCount": 114,
       "minimumItems": 4
     },
     {
@@ -84,7 +84,7 @@
       "opposites": [
         "animal"
       ],
-      "eligibleCount": 19,
+      "eligibleCount": 65,
       "minimumItems": 4
     },
     {
@@ -98,7 +98,7 @@
       "opposites": [
         "plant"
       ],
-      "eligibleCount": 49,
+      "eligibleCount": 124,
       "minimumItems": 4
     },
     {
@@ -122,7 +122,7 @@
         ]
       },
       "opposites": [],
-      "eligibleCount": 10,
+      "eligibleCount": 20,
       "minimumItems": 4
     },
     {
@@ -134,7 +134,7 @@
         ]
       },
       "opposites": [],
-      "eligibleCount": 4,
+      "eligibleCount": 15,
       "minimumItems": 4
     },
     {
@@ -146,7 +146,7 @@
         ]
       },
       "opposites": [],
-      "eligibleCount": 7,
+      "eligibleCount": 19,
       "minimumItems": 4
     },
     {
@@ -158,7 +158,7 @@
         ]
       },
       "opposites": [],
-      "eligibleCount": 19,
+      "eligibleCount": 98,
       "minimumItems": 4
     },
     {
@@ -186,7 +186,7 @@
       "opposites": [
         "hot"
       ],
-      "eligibleCount": 17,
+      "eligibleCount": 21,
       "minimumItems": 4
     },
     {
@@ -201,7 +201,7 @@
         "equatorial",
         "tropical"
       ],
-      "eligibleCount": 10,
+      "eligibleCount": 14,
       "minimumItems": 4
     },
     {
@@ -284,7 +284,7 @@
         ]
       },
       "opposites": [],
-      "eligibleCount": 18,
+      "eligibleCount": 19,
       "minimumItems": 4
     },
     {
@@ -296,7 +296,7 @@
         ]
       },
       "opposites": [],
-      "eligibleCount": 28,
+      "eligibleCount": 29,
       "minimumItems": 4
     },
     {
@@ -522,7 +522,7 @@
         "tool_items"
       ],
       "minimumItems": 4,
-      "eligibleCount": 19
+      "eligibleCount": 98
     },
     {
       "id": "plant_items",
@@ -537,7 +537,7 @@
         "technology_items"
       ],
       "minimumItems": 4,
-      "eligibleCount": 19
+      "eligibleCount": 65
     },
     {
       "id": "mammals",
@@ -552,7 +552,7 @@
         "arthropod"
       ],
       "minimumItems": 4,
-      "eligibleCount": 23
+      "eligibleCount": 69
     },
     {
       "id": "tool_items",
@@ -567,7 +567,7 @@
         "food_items"
       ],
       "minimumItems": 4,
-      "eligibleCount": 10
+      "eligibleCount": 20
     },
     {
       "id": "math_symbols",
@@ -597,7 +597,7 @@
         "hot"
       ],
       "minimumItems": 4,
-      "eligibleCount": 5
+      "eligibleCount": 44
     },
     {
       "id": "vehicle_items",
@@ -612,7 +612,7 @@
         "plant_items"
       ],
       "minimumItems": 4,
-      "eligibleCount": 6
+      "eligibleCount": 61
     },
     {
       "id": "technology_items",
@@ -627,7 +627,7 @@
         "plant_items"
       ],
       "minimumItems": 4,
-      "eligibleCount": 5
+      "eligibleCount": 42
     },
     {
       "id": "round_non_flags",
@@ -648,7 +648,7 @@
         "pointed"
       ],
       "minimumItems": 4,
-      "eligibleCount": 15
+      "eligibleCount": 128
     },
     {
       "id": "insects",
@@ -663,7 +663,684 @@
         "mammals"
       ],
       "minimumItems": 4,
-      "eligibleCount": 4
+      "eligibleCount": 15
+    },
+    {
+      "id": "faces",
+      "label": "Faces",
+      "selector": {
+        "requiredTags": [
+          "face"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 113,
+      "minimumItems": 4
+    },
+    {
+      "id": "positive_faces",
+      "label": "Positive Faces",
+      "selector": {
+        "requiredTags": [
+          "positive_face"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 35,
+      "minimumItems": 4
+    },
+    {
+      "id": "people",
+      "label": "People",
+      "selector": {
+        "requiredTags": [
+          "person"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 62,
+      "minimumItems": 4
+    },
+    {
+      "id": "body_parts",
+      "label": "Body Parts",
+      "selector": {
+        "requiredTags": [
+          "body"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 55,
+      "minimumItems": 4
+    },
+    {
+      "id": "hands",
+      "label": "Hands",
+      "selector": {
+        "requiredTags": [
+          "hand"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 55,
+      "minimumItems": 4
+    },
+    {
+      "id": "professions",
+      "label": "Professions",
+      "selector": {
+        "requiredTags": [
+          "profession"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 13,
+      "minimumItems": 4
+    },
+    {
+      "id": "birds",
+      "label": "Birds",
+      "selector": {
+        "requiredTags": [
+          "bird"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 21,
+      "minimumItems": 4
+    },
+    {
+      "id": "reptiles",
+      "label": "Reptiles",
+      "selector": {
+        "requiredTags": [
+          "reptile"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 6,
+      "minimumItems": 4
+    },
+    {
+      "id": "sea_animals",
+      "label": "Sea Animals",
+      "selector": {
+        "requiredTags": [
+          "sea",
+          "animal"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 16,
+      "minimumItems": 4
+    },
+    {
+      "id": "fruit",
+      "label": "Fruit",
+      "selector": {
+        "requiredTags": [
+          "fruit"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 18,
+      "minimumItems": 4
+    },
+    {
+      "id": "vegetables",
+      "label": "Vegetables",
+      "selector": {
+        "requiredTags": [
+          "vegetable"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 19,
+      "minimumItems": 4
+    },
+    {
+      "id": "prepared_food",
+      "label": "Prepared Food",
+      "selector": {
+        "requiredTags": [
+          "prepared_food"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 47,
+      "minimumItems": 4
+    },
+    {
+      "id": "desserts",
+      "label": "Desserts",
+      "selector": {
+        "requiredTags": [
+          "dessert"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 16,
+      "minimumItems": 4
+    },
+    {
+      "id": "sweets",
+      "label": "Sweets",
+      "selector": {
+        "requiredTags": [
+          "sweet"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 18,
+      "minimumItems": 4
+    },
+    {
+      "id": "buildings",
+      "label": "Buildings",
+      "selector": {
+        "requiredTags": [
+          "building"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 37,
+      "minimumItems": 4
+    },
+    {
+      "id": "places",
+      "label": "Places",
+      "selector": {
+        "requiredTags": [
+          "place"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 37,
+      "minimumItems": 4
+    },
+    {
+      "id": "land_vehicles",
+      "label": "Land Vehicles",
+      "selector": {
+        "requiredTags": [
+          "land_vehicle"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 38,
+      "minimumItems": 4
+    },
+    {
+      "id": "water_vehicles",
+      "label": "Water Vehicles",
+      "selector": {
+        "requiredTags": [
+          "water_vehicle"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 7,
+      "minimumItems": 4
+    },
+    {
+      "id": "air_vehicles",
+      "label": "Air Vehicles",
+      "selector": {
+        "requiredTags": [
+          "air_vehicle"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 10,
+      "minimumItems": 4
+    },
+    {
+      "id": "transport",
+      "label": "Transport",
+      "selector": {
+        "requiredTags": [
+          "transport"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 61,
+      "minimumItems": 4
+    },
+    {
+      "id": "objects",
+      "label": "Objects",
+      "selector": {
+        "requiredTags": [
+          "object"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 206,
+      "minimumItems": 4
+    },
+    {
+      "id": "household",
+      "label": "Household Objects",
+      "selector": {
+        "requiredTags": [
+          "household"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 28,
+      "minimumItems": 4
+    },
+    {
+      "id": "office",
+      "label": "Office Objects",
+      "selector": {
+        "requiredTags": [
+          "office"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 73,
+      "minimumItems": 4
+    },
+    {
+      "id": "medical",
+      "label": "Medical",
+      "selector": {
+        "requiredTags": [
+          "medical"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 11,
+      "minimumItems": 4
+    },
+    {
+      "id": "money",
+      "label": "Money",
+      "selector": {
+        "requiredTags": [
+          "money"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 10,
+      "minimumItems": 4
+    },
+    {
+      "id": "time",
+      "label": "Time Objects",
+      "selector": {
+        "requiredTags": [
+          "time"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 8,
+      "minimumItems": 4
+    },
+    {
+      "id": "celebration",
+      "label": "Celebration",
+      "selector": {
+        "requiredTags": [
+          "celebration"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 38,
+      "minimumItems": 4
+    },
+    {
+      "id": "sports",
+      "label": "Sports",
+      "selector": {
+        "requiredTags": [
+          "sport"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 49,
+      "minimumItems": 4
+    },
+    {
+      "id": "games",
+      "label": "Games",
+      "selector": {
+        "requiredTags": [
+          "game"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 76,
+      "minimumItems": 4
+    },
+    {
+      "id": "music",
+      "label": "Music",
+      "selector": {
+        "requiredTags": [
+          "music"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 13,
+      "minimumItems": 4
+    },
+    {
+      "id": "instruments",
+      "label": "Instruments",
+      "selector": {
+        "requiredTags": [
+          "instrument"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 12,
+      "minimumItems": 4
+    },
+    {
+      "id": "art",
+      "label": "Art",
+      "selector": {
+        "requiredTags": [
+          "art"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 27,
+      "minimumItems": 4
+    },
+    {
+      "id": "clothing",
+      "label": "Clothing",
+      "selector": {
+        "requiredTags": [
+          "clothing"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 42,
+      "minimumItems": 4
+    },
+    {
+      "id": "wearables",
+      "label": "Wearables",
+      "selector": {
+        "requiredTags": [
+          "wearable"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 42,
+      "minimumItems": 4
+    },
+    {
+      "id": "hearts",
+      "label": "Hearts",
+      "selector": {
+        "requiredTags": [
+          "heart"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 8,
+      "minimumItems": 4
+    },
+    {
+      "id": "signs",
+      "label": "Signs",
+      "selector": {
+        "requiredTags": [
+          "sign"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 75,
+      "minimumItems": 4
+    },
+    {
+      "id": "celestial",
+      "label": "Celestial",
+      "selector": {
+        "requiredTags": [
+          "celestial"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 22,
+      "minimumItems": 4
+    },
+    {
+      "id": "nature",
+      "label": "Nature",
+      "selector": {
+        "requiredTags": [
+          "nature"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 63,
+      "minimumItems": 4
+    },
+    {
+      "id": "negative_faces",
+      "label": "Negative Faces",
+      "selector": {
+        "requiredTags": [
+          "negative_face"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 30,
+      "minimumItems": 4
+    },
+    {
+      "id": "sick_sleepy_faces",
+      "label": "Sick or Sleepy Faces",
+      "selector": {
+        "requiredTags": [
+          "sick_sleepy_face"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 17,
+      "minimumItems": 4
+    },
+    {
+      "id": "costume_faces",
+      "label": "Costume Faces",
+      "selector": {
+        "requiredTags": [
+          "costume_face"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 6,
+      "minimumItems": 4
+    },
+    {
+      "id": "monster_faces",
+      "label": "Monster Faces",
+      "selector": {
+        "requiredTags": [
+          "monster_face"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 12,
+      "minimumItems": 4
+    },
+    {
+      "id": "religion_symbols",
+      "label": "Religion Symbols",
+      "selector": {
+        "requiredTags": [
+          "religion_symbol"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 11,
+      "minimumItems": 4
+    },
+    {
+      "id": "zodiac_symbols",
+      "label": "Zodiac Symbols",
+      "selector": {
+        "requiredTags": [
+          "zodiac"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 13,
+      "minimumItems": 4
+    },
+    {
+      "id": "weapons",
+      "label": "Weapons",
+      "selector": {
+        "requiredTags": [
+          "weapon"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 9,
+      "minimumItems": 4
+    },
+    {
+      "id": "drinkware",
+      "label": "Drinkware",
+      "selector": {
+        "requiredTags": [
+          "drinkware"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 20,
+      "minimumItems": 4
+    },
+    {
+      "id": "furniture",
+      "label": "Furniture",
+      "selector": {
+        "requiredTags": [
+          "furniture"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 8,
+      "minimumItems": 4
+    },
+    {
+      "id": "books",
+      "label": "Books",
+      "selector": {
+        "requiredTags": [
+          "book"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 9,
+      "minimumItems": 4
+    },
+    {
+      "id": "mail",
+      "label": "Mail",
+      "selector": {
+        "requiredTags": [
+          "mail"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 15,
+      "minimumItems": 4
+    },
+    {
+      "id": "paperwork",
+      "label": "Paperwork",
+      "selector": {
+        "requiredTags": [
+          "paperwork"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 16,
+      "minimumItems": 4
+    },
+    {
+      "id": "containers",
+      "label": "Containers",
+      "selector": {
+        "requiredTags": [
+          "container"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 12,
+      "minimumItems": 4
+    },
+    {
+      "id": "human_figures",
+      "label": "Human Figures",
+      "selector": {
+        "requiredTags": [
+          "human"
+        ],
+        "kind": "emoji"
+      },
+      "opposites": [],
+      "eligibleCount": 62,
+      "minimumItems": 4
     }
   ]
 }

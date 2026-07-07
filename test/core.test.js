@@ -7,6 +7,12 @@ const items = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/i
 const selectors = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/category_selectors.json', import.meta.url))).selectors;
 const defaultState = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/default_state.json', import.meta.url)));
 
+test('catalog is expanded enough for strong prototype coverage', () => {
+  assert.ok(items.length >= 603);
+  assert.ok(selectors.length >= 94);
+  assert.ok(items.filter((item) => item.kind === 'emoji').length >= 342);
+});
+
 test('selector matching supports required tags and exact colors', () => {
   assert.equal(matchesSelector({ kind: 'emoji', tags: ['animal', 'arthropod'], colors: [], glyph: '🐜' }, { requiredTags: ['arthropod'] }), true);
   assert.equal(matchesSelector({ kind: 'flag', tags: ['flag'], colors: ['red', 'white'], glyph: '🇯🇵' }, { exactColors: ['white', 'red'] }), true);

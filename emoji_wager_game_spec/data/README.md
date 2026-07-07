@@ -4,6 +4,8 @@
 
 Flat glyph catalog.  Use tags as descriptors, not a hierarchy.
 
+The strong prototype catalog contains over 1,100 glyph records, including faces, people, animals, food, buildings, vehicles, objects, sports, clothing, signs, flags, and symbols.
+
 Important fields:
 
 - `id`: stable identifier.
@@ -18,6 +20,8 @@ Important fields:
 Curated group selectors.  Selectors may use tags, colors, kind, exclusions, exact color sets, or color counts.
 
 The same selectors should feed 2-way, 3-way, and 4-way sort board generation.
+
+The strong prototype selector set contains 99 curated categories.  Categories should remain objective enough that players lose because of memory and speed, not because the category itself is arguable.
 
 ## `default_state.json`
 
