@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "0.2.1",
+  "schemaVersion": "0.2.6",
   "resources": {
     "hearts": 5,
     "maxHearts": 5,
@@ -34,5 +34,22 @@
     }
   },
   "activeClubBet": null,
-  "eventLog": []
+  "eventLog": [],
+  "itemStats": {
+    "sort_2": {
+      "fastestSeconds": null,
+      "longestSeconds": null,
+      "entries": []
+    },
+    "sort_3": {
+      "fastestSeconds": null,
+      "longestSeconds": null,
+      "entries": []
+    },
+    "sort_4": {
+      "fastestSeconds": null,
+      "longestSeconds": null,
+      "entries": []
+    }
+  }
 }

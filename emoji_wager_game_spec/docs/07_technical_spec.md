@@ -16,9 +16,10 @@ Persist all player state to `localStorage`:
 - Other upgrade purchases.
 - Unlocked sorting modes.
 - Game memories per mode.
+- Individual-item timing stats per mode, including fastest item time, longest item time, and recent item timing entries.
 - Event log of completed rounds.
 
-The exact memory structure is an implementation concern, but it must support actual entries, rest entries, percentile-at-run tracking, and probability-style target estimates.
+The exact memory structure is an implementation concern, but it must support actual entries, rest entries, percentile-at-run tracking, probability-style target estimates, and item-level timing pressure events.
 
 The prototype save is local-only.  It should include visible save metadata such as a local save id, app version, schema version, and last-saved timestamp so players can distinguish one browser/device profile from another.  Do not imply account sync unless a later version adds an explicit import/export or backend sync feature.
 
@@ -81,6 +82,7 @@ Use unit tests for pure logic:
 - Board generation uniqueness for 2-way, 3-way, and 4-way sort.
 - Target estimation and percentile-at-run calculation.
 - Memory updates, including rest entries for unplayed unlocked modes.
+- Individual item timing updates, including fastest-item Diamond bonuses and slowest-item Heart losses.
 - Club bet settlement.
 - Spade payout upgrades.
 - Purchases and unlocks.

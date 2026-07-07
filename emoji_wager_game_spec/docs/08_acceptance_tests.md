@@ -37,6 +37,7 @@
 - A correct answer removes that glyph from the queue.
 - A wrong answer sends that glyph to the back of the queue.
 - The timer does not pause for correct or wrong answers unless a pause-break upgrade explicitly applies.
+- Once the queue is down to the final prompt item, both the Heart safety countdown and active Club bet countdown are hidden.
 - A correct streak increments after correct answers.
 - A wrong answer resets the streak to zero.
 - Streak-based animation acceleration changes game feel but not correctness.
@@ -45,6 +46,10 @@
 ## Economy, betting, and memory
 
 - Completion time is recorded as an actual memory entry for the selected mode.
+- Correctly sorted individual items record per-item timing entries for the selected mode.
+- The first individual item timing entry calibrates fastest/longest item stats without awarding Diamonds or removing Hearts.
+- A new slowest individual item time for that mode removes 1 Heart.
+- A new fastest individual item time for that mode awards Diamonds equal to that mode's full-round payout score.
 - The run's percentile against prior memory is recorded or derivable.
 - Target offers are generated from memory estimates or starter defaults.
 - A selected Club bet stores target time, odds, and stake.

@@ -54,6 +54,8 @@ Only enable propositions once the selected mode has enough actual history to jus
 
 Show the Heart safety target separately from the Club bet.  If the selected mode has no actual completed rounds yet, show that the first run has no Heart timer and let the player take as long as needed.  If the active timer passes an established Heart safety target, the Heart display should enter a danger state.
 
+Once the player is down to the final prompt item in the queue, hide both the Heart safety timer and the active Club bet timer.  The player should still see the queue/final prompt, but the last item should feel like a focused finish rather than a visible timer-checking exercise.
+
 ## Feedback
 
 Correct answer:
@@ -62,6 +64,7 @@ Correct answer:
 - Soft success animation.
 - Streak increments.
 - Movement and next-entry animations get faster as streak rises.
+- Show individual-item timing feedback when the item sets a new fastest or new slowest personal item time for that mode, including the Diamond bonus or Heart loss.
 
 Wrong answer:
 

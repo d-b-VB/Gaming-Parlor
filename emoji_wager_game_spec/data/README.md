@@ -21,7 +21,7 @@ Curated group selectors.  Selectors may use tags, colors, kind, exclusions, exac
 
 The same selectors should feed 2-way, 3-way, and 4-way sort board generation.
 
-The strong prototype selector set contains 99 curated categories.  Categories should remain objective enough that players lose because of memory and speed, not because the category itself is arguable.
+The strong prototype selector set contains 100 curated categories.  Categories should remain objective enough that players lose because of memory and speed, not because the category itself is arguable.
 
 ## `default_state.json`
 

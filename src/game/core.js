@@ -66,6 +66,29 @@ export function addRoundMemory(state, modeId, timeSeconds, createdAt) { const ne
 export function createClubBet(modeId, offer, stake) { return { modeId, targetId: offer.id, targetSeconds: offer.timeSeconds, oddsMultiplier: offer.oddsMultiplier, oddsLabel: offer.oddsLabel, stake, cost: stake * CLUB_COST }; }
 export function payoutScore(state, modeId) { return MODES[modeId].baseDiamonds + state.upgrades.spades.global + state.upgrades.spades[modeId]; }
 export function spadeCost(scope, owned) { const base = scope === 'global' ? 25 : scope === 'sort_2' ? 12 : scope === 'sort_3' ? 9 : 6; const growth = scope === 'global' ? 1.6 : 1.5; return Math.ceil(base * growth ** owned); }
+function ensureItemStats(next, modeId) {
+  next.itemStats ??= {};
+  next.itemStats[modeId] ??= { fastestSeconds: null, longestSeconds: null, entries: [] };
+  next.itemStats[modeId].entries ??= [];
+  return next.itemStats[modeId];
+}
+export function settleItemTiming(state, modeId, itemId, timeSeconds, createdAt = new Date().toISOString()) {
+  const next = structuredClone(state);
+  const stats = ensureItemStats(next, modeId);
+  const hasHistory = stats.entries.length > 0;
+  const isNewLongest = hasHistory && timeSeconds > stats.longestSeconds;
+  const isNewFastest = hasHistory && timeSeconds < stats.fastestSeconds;
+  const heartsDelta = isNewLongest ? -1 : 0;
+  const diamondsDelta = isNewFastest ? payoutScore(next, modeId) : 0;
+  stats.fastestSeconds = hasHistory ? Math.min(stats.fastestSeconds, timeSeconds) : timeSeconds;
+  stats.longestSeconds = hasHistory ? Math.max(stats.longestSeconds, timeSeconds) : timeSeconds;
+  stats.entries = [...stats.entries, { itemId, timeSeconds, createdAt, isNewFastest, isNewLongest }].slice(-200);
+  next.resources.hearts = Math.max(0, next.resources.hearts + heartsDelta);
+  next.resources.diamonds += diamondsDelta;
+  const event = { type: 'itemTiming', modeId, itemId, timeSeconds, createdAt, heartsDelta, diamondsDelta, isNewFastest, isNewLongest };
+  next.eventLog = [...next.eventLog, event].slice(-50);
+  return { state: next, event };
+}
 export function buyClubBet(state, bet) { if (bet.stake <= 0) return { ...state, activeClubBet: null }; if (bet.oddsLabel === '1:2' && bet.stake % 2 !== 0) throw new Error('1:2 wagers must be paid in multiples of 2 Clubs'); if (state.resources.diamonds < bet.cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= bet.cost; next.activeClubBet = bet; return next; }
 export function unlockMode(state, modeId) { const mode = MODES[modeId]; if (state.unlockedModes[modeId]) return state; if (state.resources.diamonds < mode.unlockCost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= mode.unlockCost; next.unlockedModes[modeId] = true; return next; }
 export function buySpade(state, scope) { const cost = spadeCost(scope, state.upgrades.spades[scope]); if (state.resources.diamonds < cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= cost; next.upgrades.spades[scope] += 1; return next; }

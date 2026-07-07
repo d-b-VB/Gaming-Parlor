@@ -1,8 +1,8 @@
-import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, percentileAtRun, createClubBet, buyClubBet, unlockMode, buySpade, restoreHeart, settleRound, spadeCost, payoutScore, streakDuration } from './game/core.js?v=0.2.5';
+import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, percentileAtRun, createClubBet, buyClubBet, unlockMode, buySpade, restoreHeart, settleRound, settleItemTiming, spadeCost, payoutScore, streakDuration } from './game/core.js?v=0.2.6';
 
 const root = document.querySelector('#root');
-const APP_VERSION = 'v0.2.5';
-const SAVE_SCHEMA_VERSION = '0.2.5-local';
+const APP_VERSION = 'v0.2.6';
+const SAVE_SCHEMA_VERSION = '0.2.6-local';
 const arrows = { left: '←', right: '→', up: '↑', down: '↓' };
 let items = [];
 let selectors = [];
@@ -21,6 +21,10 @@ let stake = 1;
 let timerId = null;
 let motion = null;
 let lastSummary = null;
+let promptStartedAt = null;
+let itemHeartLosses = 0;
+let itemDiamondBonuses = 0;
+let itemRecordCount = 0;
 
 function fmt(seconds) {
   return `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
@@ -33,6 +37,8 @@ function makeLocalSaveId() {
 }
 function normalizeSave(candidate, defaultState) {
   const next = structuredClone(candidate || defaultState);
+  next.itemStats ??= {};
+  for (const id of Object.keys(MODES)) next.itemStats[id] ??= { fastestSeconds: null, longestSeconds: null, entries: [] };
   next.saveMeta = {
     localSaveId: next.saveMeta?.localSaveId || makeLocalSaveId(),
     schemaVersion: SAVE_SCHEMA_VERSION,
@@ -73,7 +79,8 @@ function heartsHtml() {
 function queueStripHtml() {
   return `<div class="queue-strip" style="--queue-total:${board.queue.length}" aria-label="Full prompt queue">${queue.map((prompt, index) => `<span class="queue-glyph ${index === 0 ? 'next' : ''}">${glyphHtml(prompt.item)}</span>`).join('')}</div>`;
 }
-function barsHtml(safety, activeBet) {
+function barsHtml(safety, activeBet, hideTimers = false) {
+  if (hideTimers) return `<div class="timer-stack"><div class="timer-label muted"><span>Final item</span><span>Timers hidden</span></div>${queueStripHtml()}</div>`;
   const hasHeartLimit = Number.isFinite(safety);
   const heartPct = hasHeartLimit ? Math.max(0, Math.min(100, ((safety - elapsed) / Math.max(1, safety)) * 100)) : 100;
   const betTarget = activeBet?.targetSeconds;
@@ -94,6 +101,10 @@ function startBoard(nextMode = modeId) {
   inRound = false;
   motion = null;
   lastSummary = null;
+  promptStartedAt = null;
+  itemHeartLosses = 0;
+  itemDiamondBonuses = 0;
+  itemRecordCount = 0;
   feedback = 'Board ready. Buy Clubs if you want odds, then start the full-screen round.';
   stopTimer();
   render();
@@ -103,10 +114,13 @@ function ensureTimer() {
   startedAt = Date.now();
   timerId = window.setInterval(() => { elapsed = (Date.now() - startedAt) / 1000; render(); }, 100);
 }
+function resetPromptClock() { promptStartedAt = Date.now(); }
 function startRound() {
   inRound = true;
   lastSummary = null;
   feedback = 'Full-screen round started. Sort every glyph as fast as you can.';
+  ensureTimer();
+  resetPromptClock();
   render();
 }
 function motionPoint(rect) {
@@ -174,6 +188,9 @@ function finishRound() {
     betWinnings: event?.betWinnings ?? 0,
     betTarget: activeBet?.targetSeconds,
     betWon: Boolean(activeBet && final <= activeBet.targetSeconds),
+    itemHeartLosses,
+    itemDiamondBonuses,
+    itemRecordCount,
   };
   feedback = `Round complete in ${final.toFixed(2)}s with ${mistakes} mistake${mistakes === 1 ? '' : 's'}.`;
   startedAt = null;
@@ -188,15 +205,24 @@ async function dispatch(direction) {
   ensureTimer();
   const prompt = queue[0];
   const isCorrect = prompt.direction === direction;
+  const itemSeconds = promptStartedAt ? Math.max(0.01, Number(((Date.now() - promptStartedAt) / 1000).toFixed(2))) : 0;
   motion = { busy: true };
   feedback = isCorrect ? `${prompt.item.name} flying ${arrows[direction]}…` : `${prompt.item.name} rejected ${arrows[direction]} and returning to the queue…`;
   render();
   await animateGlyphTravel(glyphHtml(prompt.item), direction, isCorrect);
   if (isCorrect) {
+    const itemResult = settleItemTiming(state, modeId, prompt.item.id, itemSeconds);
+    state = itemResult.state;
+    save();
+    if (itemResult.event.heartsDelta < 0) itemHeartLosses += Math.abs(itemResult.event.heartsDelta);
+    if (itemResult.event.diamondsDelta > 0) itemDiamondBonuses += itemResult.event.diamondsDelta;
+    if (itemResult.event.isNewFastest || itemResult.event.isNewLongest) itemRecordCount += 1;
     queue.shift();
     streak += 1;
-    feedback = `Correct ${arrows[direction]} — streak ${streak}; glide ${streakDuration(220, streak)}ms.`;
+    const itemNote = itemResult.event.isNewFastest ? ` New fastest item: +♦${itemResult.event.diamondsDelta}.` : itemResult.event.isNewLongest ? ' New slowest item: -♥.' : '';
+    feedback = `Correct ${arrows[direction]} in ${itemSeconds.toFixed(2)}s — streak ${streak}; glide ${streakDuration(220, streak)}ms.${itemNote}`;
     motion = null;
+    resetPromptClock();
     if (queue.length === 0) finishRound(); else render();
   } else {
     queue = [...queue.slice(1), prompt];
@@ -204,6 +230,7 @@ async function dispatch(direction) {
     mistakes += 1;
     feedback = `Wrong ${arrows[direction]} — ${prompt.item.name} slunk back to the end of the queue.`;
     motion = null;
+    resetPromptClock();
     render();
   }
 }
@@ -223,9 +250,9 @@ function render() {
   const current = queue[0];
   const progress = board.queue.length - queue.length;
   const sideZone = (direction) => `<button class="zone zone-${direction}" data-dispatch="${direction}"><span class="direction">${arrows[direction]}</span><span class="groups vertical-groups">${groupByDirection(direction).map((group) => `<span class="glyph-group" title="${group.label}">${group.items.map((item) => glyphHtml(item)).join('')}</span>`).join('')}</span></button>`;
-  const boardHtml = `<div class="play-hud"><div class="status-row"><span>⏱ ${elapsed.toFixed(1)}s</span><span>${heartsHtml()}</span><span>Queue ${queue.length}/${board.queue.length}</span><span>Streak ${streak}</span></div>${barsHtml(safety, state.activeClubBet)}</div>
+  const boardHtml = `<div class="play-hud"><div class="status-row"><span>⏱ ${elapsed.toFixed(1)}s</span><span>${heartsHtml()}</span><span>Queue ${queue.length}/${board.queue.length}</span><span>Streak ${streak}</span><span>Item ♦${itemDiamondBonuses} / ♥-${itemHeartLosses}</span></div>${barsHtml(safety, state.activeClubBet, inRound && queue.length === 1)}</div>
       <div class="sort-board framed-board mode-${mode.directions.length}">${mode.directions.map(sideZone).join('')}<div class="center-card ${motion ? 'busy' : ''}"><span class="prompt ${motion ? 'ghost-prompt' : ''}">${current ? glyphHtml(current.item) : '🏁'}</span><span>${current ? `${progress}/${board.queue.length} sorted` : 'Round finished'}</span></div></div><p class="feedback" role="status">${feedback}</p>`;
-  const summaryHtml = lastSummary ? `<section class="panel post-round"><h2>Round summary</h2><div class="summary-grid"><span>Mode</span><strong>${lastSummary.modeName}</strong><span>Time</span><strong>${lastSummary.timeSeconds.toFixed(2)}s</strong><span>Percentile score</span><strong>${Math.round(lastSummary.percentile * 100)}%</strong><span>Mistakes</span><strong>${lastSummary.mistakes}</strong><span>Diamond payout</span><strong>♦ ${lastSummary.diamondsDelta}</strong><span>Heart change</span><strong>${lastSummary.heartsDelta}</strong><span>Bet result</span><strong>${lastSummary.betTarget ? `${lastSummary.betWon ? 'Won' : 'Lost'} vs ${fmt(lastSummary.betTarget)} (${lastSummary.betWinnings ? `♦ ${lastSummary.betWinnings}` : 'no payout'})` : 'No bet'}</strong></div><button id="continue-lobby" class="primary-action">Continue</button></section>` : '';
+  const summaryHtml = lastSummary ? `<section class="panel post-round"><h2>Round summary</h2><div class="summary-grid"><span>Mode</span><strong>${lastSummary.modeName}</strong><span>Time</span><strong>${lastSummary.timeSeconds.toFixed(2)}s</strong><span>Percentile score</span><strong>${Math.round(lastSummary.percentile * 100)}%</strong><span>Mistakes</span><strong>${lastSummary.mistakes}</strong><span>Diamond payout</span><strong>♦ ${lastSummary.diamondsDelta}</strong><span>Item speed bonus</span><strong>♦ ${lastSummary.itemDiamondBonuses}</strong><span>Heart change</span><strong>${lastSummary.heartsDelta} round / -${lastSummary.itemHeartLosses} item</strong><span>Item records</span><strong>${lastSummary.itemRecordCount}</strong><span>Bet result</span><strong>${lastSummary.betTarget ? `${lastSummary.betWon ? 'Won' : 'Lost'} vs ${fmt(lastSummary.betTarget)} (${lastSummary.betWinnings ? `♦ ${lastSummary.betWinnings}` : 'no payout'})` : 'No bet'}</strong></div><button id="continue-lobby" class="primary-action">Continue</button></section>` : '';
   root.innerHTML = inRound ? `
     <main class="play-shell">
       <div class="play-top"><span>Emoji Wager Sort ${APP_VERSION}</span><span>${mode.name}</span></div>

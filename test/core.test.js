@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { generateBoard, matchesSelector, estimateTargets, heartSafety, createClubBet, buyClubBet, settleRound, unlockMode, buySpade, spadeCost, payoutScore, streakDuration } from '../src/game/core.js';
+import { generateBoard, matchesSelector, estimateTargets, heartSafety, createClubBet, buyClubBet, settleRound, settleItemTiming, unlockMode, buySpade, spadeCost, payoutScore, streakDuration } from '../src/game/core.js';
 
 const items = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/items.json', import.meta.url))).items;
 const selectors = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/category_selectors.json', import.meta.url))).selectors;
@@ -31,6 +31,23 @@ test('flag geography categories are categorical and non-subjective', () => {
   assert.equal(byId['flag:rwanda'].tags.includes('equatorial'), false);
   assert.equal(byId['flag:singapore'].tags.includes('equatorial'), false);
 });
+
+test('expanded tags keep biological and object categories literal', () => {
+  const byGlyph = Object.fromEntries(items.map((item) => [item.glyph, item]));
+  for (const glyph of ['🪱', '🐌', '🦂', '🕷️']) {
+    assert.equal(byGlyph[glyph].tags.includes('insect'), false);
+  }
+  assert.equal(byGlyph['🦤'].tags.includes('flying'), false);
+  assert.equal(byGlyph['🐧'].tags.includes('flying'), false);
+  assert.equal(byGlyph['🦴'].tags.includes('hand'), false);
+  assert.equal(byGlyph['🦿'].tags.includes('hand'), false);
+  assert.equal(byGlyph['🫀'].tags.includes('hand'), false);
+  assert.equal(byGlyph['🫶'].tags.includes('hand'), true);
+  assert.equal(byGlyph['🍳'].tags.includes('human'), false);
+  assert.equal(byGlyph['💼'].tags.includes('human'), false);
+  assert.equal(byGlyph['🧶'].tags.includes('game'), false);
+});
+
 
 
 test('board generation creates valid unique boards for each mode', () => {
@@ -100,6 +117,21 @@ test('first round has no presumed Heart timer or loss', () => {
   const next = settleRound(state, 'sort_2', 999, 0, 'first-round', 'test');
   assert.equal(next.resources.hearts, state.resources.hearts);
   assert.equal(next.gameMemory.sort_2.entries.at(-1).timeSeconds, 999);
+});
+
+test('item timing records fastest and longest pressure events', () => {
+  let state = structuredClone(defaultState);
+  let result = settleItemTiming(state, 'sort_2', 'emoji:test', 2, 't1');
+  state = result.state;
+  assert.equal(result.event.isNewFastest, false);
+  assert.equal(result.event.isNewLongest, false);
+  result = settleItemTiming(state, 'sort_2', 'emoji:test2', 3, 't2');
+  state = result.state;
+  assert.equal(result.event.isNewLongest, true);
+  assert.equal(result.event.heartsDelta, -1);
+  result = settleItemTiming(state, 'sort_2', 'emoji:test3', 1, 't3');
+  assert.equal(result.event.isNewFastest, true);
+  assert.equal(result.event.diamondsDelta, payoutScore(state, 'sort_2'));
 });
 
 test('spade costs and streak animation scale upward and downward respectively', () => {

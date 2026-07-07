@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "0.5.2",
+  "schemaVersion": "0.5.3",
   "description": "Flat item/tag catalog for the emoji wager sorting game. Tags are descriptive and cross-cutting, not taxonomic. Colors are atomic fields; exact palette and no-color categories are derived by selectors.",
   "items": [
     {
@@ -326,6 +326,7 @@
         "animal",
         "bird",
         "farm",
+        "flightless",
         "land",
         "vertebrate",
         "wings"
@@ -1374,7 +1375,6 @@
         "dangerous",
         "desert",
         "eight",
-        "insect",
         "invertebrate",
         "land"
       ],
@@ -1472,7 +1472,6 @@
       "source": "emoji",
       "tags": [
         "animal",
-        "insect",
         "invertebrate",
         "land",
         "mollusk",
@@ -1773,7 +1772,6 @@
       "source": "emoji",
       "tags": [
         "animal",
-        "insect",
         "invertebrate",
         "land",
         "long",
@@ -3931,44 +3929,6 @@
       "colors": []
     },
     {
-      "id": "emoji:",
-      "glyph": "️",
-      "name": "",
-      "source": "unicode_emoji_expansion",
-      "tags": [
-        "bird",
-        "celestial",
-        "cold",
-        "expression",
-        "face",
-        "flying",
-        "furniture",
-        "household",
-        "insect",
-        "mail",
-        "mammal",
-        "math",
-        "medical",
-        "monster_face",
-        "negative_face",
-        "office",
-        "paperwork",
-        "plant",
-        "polar",
-        "positive_face",
-        "religion_symbol",
-        "round",
-        "science",
-        "technology",
-        "time",
-        "tool",
-        "vegetable",
-        "weapon"
-      ],
-      "kind": "emoji",
-      "colors": []
-    },
-    {
       "id": "emoji:kissing_face_with_closed_eyes",
       "glyph": "😚",
       "name": "kissing face with closed eyes",
@@ -4331,23 +4291,6 @@
         "face",
         "negative_face",
         "round"
-      ],
-      "kind": "emoji",
-      "colors": []
-    },
-    {
-      "id": "emoji:_2",
-      "glyph": "‍",
-      "name": "",
-      "source": "unicode_emoji_expansion",
-      "tags": [
-        "cold",
-        "expression",
-        "face",
-        "mammal",
-        "polar",
-        "round",
-        "sick_sleepy_face"
       ],
       "kind": "emoji",
       "colors": []
@@ -5733,7 +5676,6 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "body",
-        "hand",
         "person_related"
       ],
       "kind": "emoji",
@@ -5746,7 +5688,6 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "body",
-        "hand",
         "person_related"
       ],
       "kind": "emoji",
@@ -5759,7 +5700,6 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "body",
-        "hand",
         "person_related"
       ],
       "kind": "emoji",
@@ -5772,7 +5712,6 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "body",
-        "hand",
         "person_related"
       ],
       "kind": "emoji",
@@ -5785,7 +5724,6 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "body",
-        "hand",
         "person_related"
       ],
       "kind": "emoji",
@@ -5798,7 +5736,6 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "body",
-        "hand",
         "person_related"
       ],
       "kind": "emoji",
@@ -5811,7 +5748,6 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "body",
-        "hand",
         "person_related"
       ],
       "kind": "emoji",
@@ -5824,7 +5760,6 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "body",
-        "hand",
         "person_related"
       ],
       "kind": "emoji",
@@ -5837,7 +5772,6 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "body",
-        "hand",
         "person_related"
       ],
       "kind": "emoji",
@@ -5850,7 +5784,6 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "body",
-        "hand",
         "person_related"
       ],
       "kind": "emoji",
@@ -5863,7 +5796,6 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "body",
-        "hand",
         "person_related"
       ],
       "kind": "emoji",
@@ -5876,7 +5808,6 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "body",
-        "hand",
         "person_related"
       ],
       "kind": "emoji",
@@ -5889,7 +5820,6 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "body",
-        "hand",
         "person_related"
       ],
       "kind": "emoji",
@@ -5902,9 +5832,7 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "body",
-        "hand",
-        "person_related",
-        "prepared_food"
+        "person_related"
       ],
       "kind": "emoji",
       "colors": []
@@ -5916,7 +5844,6 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "body",
-        "hand",
         "person_related"
       ],
       "kind": "emoji",
@@ -5929,7 +5856,6 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "body",
-        "hand",
         "person_related"
       ],
       "kind": "emoji",
@@ -5942,7 +5868,6 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "body",
-        "hand",
         "person_related"
       ],
       "kind": "emoji",
@@ -5955,7 +5880,6 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "body",
-        "hand",
         "person_related"
       ],
       "kind": "emoji",
@@ -5968,7 +5892,6 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "body",
-        "hand",
         "person_related"
       ],
       "kind": "emoji",
@@ -6616,12 +6539,7 @@
       "glyph": "⚕",
       "name": "staff of aesculapius",
       "source": "unicode_emoji_expansion",
-      "tags": [
-        "human",
-        "person",
-        "person_related",
-        "profession"
-      ],
+      "tags": [],
       "kind": "emoji",
       "colors": []
     },
@@ -6630,12 +6548,7 @@
       "glyph": "🎓",
       "name": "graduation cap",
       "source": "unicode_emoji_expansion",
-      "tags": [
-        "human",
-        "person",
-        "person_related",
-        "profession"
-      ],
+      "tags": [],
       "kind": "emoji",
       "colors": []
     },
@@ -6644,12 +6557,7 @@
       "glyph": "🏫",
       "name": "school",
       "source": "unicode_emoji_expansion",
-      "tags": [
-        "human",
-        "person",
-        "person_related",
-        "profession"
-      ],
+      "tags": [],
       "kind": "emoji",
       "colors": []
     },
@@ -6658,12 +6566,7 @@
       "glyph": "⚖",
       "name": "scales",
       "source": "unicode_emoji_expansion",
-      "tags": [
-        "human",
-        "person",
-        "person_related",
-        "profession"
-      ],
+      "tags": [],
       "kind": "emoji",
       "colors": []
     },
@@ -6672,12 +6575,7 @@
       "glyph": "🌾",
       "name": "ear of rice",
       "source": "unicode_emoji_expansion",
-      "tags": [
-        "human",
-        "person",
-        "person_related",
-        "profession"
-      ],
+      "tags": [],
       "kind": "emoji",
       "colors": []
     },
@@ -6687,11 +6585,7 @@
       "name": "cooking",
       "source": "unicode_emoji_expansion",
       "tags": [
-        "human",
-        "person",
-        "person_related",
-        "prepared_food",
-        "profession"
+        "prepared_food"
       ],
       "kind": "emoji",
       "colors": []
@@ -6701,12 +6595,7 @@
       "glyph": "🏭",
       "name": "factory",
       "source": "unicode_emoji_expansion",
-      "tags": [
-        "human",
-        "person",
-        "person_related",
-        "profession"
-      ],
+      "tags": [],
       "kind": "emoji",
       "colors": []
     },
@@ -6716,10 +6605,8 @@
       "name": "briefcase",
       "source": "unicode_emoji_expansion",
       "tags": [
-        "human",
-        "person",
-        "person_related",
-        "profession"
+        "object",
+        "office"
       ],
       "kind": "emoji",
       "colors": []
@@ -6744,12 +6631,7 @@
       "glyph": "🎤",
       "name": "microphone",
       "source": "unicode_emoji_expansion",
-      "tags": [
-        "human",
-        "person",
-        "person_related",
-        "profession"
-      ],
+      "tags": [],
       "kind": "emoji",
       "colors": []
     },
@@ -6758,12 +6640,7 @@
       "glyph": "🎨",
       "name": "artist palette",
       "source": "unicode_emoji_expansion",
-      "tags": [
-        "human",
-        "person",
-        "person_related",
-        "profession"
-      ],
+      "tags": [],
       "kind": "emoji",
       "colors": []
     },
@@ -6772,12 +6649,7 @@
       "glyph": "✈",
       "name": "airplane",
       "source": "unicode_emoji_expansion",
-      "tags": [
-        "human",
-        "person",
-        "person_related",
-        "profession"
-      ],
+      "tags": [],
       "kind": "emoji",
       "colors": []
     },
@@ -6786,12 +6658,7 @@
       "glyph": "🚒",
       "name": "fire engine",
       "source": "unicode_emoji_expansion",
-      "tags": [
-        "human",
-        "person",
-        "person_related",
-        "profession"
-      ],
+      "tags": [],
       "kind": "emoji",
       "colors": []
     },
@@ -7562,7 +7429,7 @@
       "tags": [
         "animal",
         "bird",
-        "flying",
+        "flightless",
         "land"
       ],
       "kind": "emoji",
@@ -7576,7 +7443,7 @@
       "tags": [
         "animal",
         "bird",
-        "flying",
+        "flightless",
         "land"
       ],
       "kind": "emoji",
@@ -7590,7 +7457,7 @@
       "tags": [
         "animal",
         "bird",
-        "flying",
+        "flightless",
         "land"
       ],
       "kind": "emoji",
@@ -14061,7 +13928,6 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "art",
-        "celebration",
         "game"
       ],
       "kind": "emoji",
@@ -14152,7 +14018,6 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "art",
-        "celebration",
         "game"
       ],
       "kind": "emoji",
@@ -14178,7 +14043,6 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "art",
-        "celebration",
         "game"
       ],
       "kind": "emoji",
@@ -14204,7 +14068,6 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "art",
-        "celebration",
         "game"
       ],
       "kind": "emoji",
@@ -14217,7 +14080,6 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "art",
-        "celebration",
         "game"
       ],
       "kind": "emoji",
@@ -14230,7 +14092,6 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "art",
-        "celebration",
         "game"
       ],
       "kind": "emoji",
@@ -14243,7 +14104,6 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "art",
-        "celebration",
         "game"
       ],
       "kind": "emoji",
@@ -14256,8 +14116,7 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "art",
-        "celebration",
-        "game"
+        "craft"
       ],
       "kind": "emoji",
       "colors": []
@@ -14269,8 +14128,7 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "art",
-        "celebration",
-        "game"
+        "craft"
       ],
       "kind": "emoji",
       "colors": []
@@ -14282,8 +14140,7 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "art",
-        "celebration",
-        "game"
+        "craft"
       ],
       "kind": "emoji",
       "colors": []
@@ -14295,8 +14152,7 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "art",
-        "celebration",
-        "game"
+        "craft"
       ],
       "kind": "emoji",
       "colors": []
@@ -15908,6 +15764,230 @@
       ],
       "kind": "emoji",
       "colors": []
+    },
+    {
+      "id": "emoji:health_worker",
+      "glyph": "🧑‍⚕️",
+      "name": "health worker",
+      "source": "unicode_emoji_expansion",
+      "tags": [
+        "human",
+        "person",
+        "person_related",
+        "profession"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:student",
+      "glyph": "🧑‍🎓",
+      "name": "student",
+      "source": "unicode_emoji_expansion",
+      "tags": [
+        "human",
+        "person",
+        "person_related",
+        "profession"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:teacher",
+      "glyph": "🧑‍🏫",
+      "name": "teacher",
+      "source": "unicode_emoji_expansion",
+      "tags": [
+        "human",
+        "person",
+        "person_related",
+        "profession"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:judge",
+      "glyph": "🧑‍⚖️",
+      "name": "judge",
+      "source": "unicode_emoji_expansion",
+      "tags": [
+        "human",
+        "person",
+        "person_related",
+        "profession"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:farmer",
+      "glyph": "🧑‍🌾",
+      "name": "farmer",
+      "source": "unicode_emoji_expansion",
+      "tags": [
+        "human",
+        "person",
+        "person_related",
+        "profession"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:cook",
+      "glyph": "🧑‍🍳",
+      "name": "cook",
+      "source": "unicode_emoji_expansion",
+      "tags": [
+        "human",
+        "person",
+        "person_related",
+        "profession"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:mechanic",
+      "glyph": "🧑‍🔧",
+      "name": "mechanic",
+      "source": "unicode_emoji_expansion",
+      "tags": [
+        "human",
+        "person",
+        "person_related",
+        "profession"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:factory_worker",
+      "glyph": "🧑‍🏭",
+      "name": "factory worker",
+      "source": "unicode_emoji_expansion",
+      "tags": [
+        "human",
+        "person",
+        "person_related",
+        "profession"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:office_worker",
+      "glyph": "🧑‍💼",
+      "name": "office worker",
+      "source": "unicode_emoji_expansion",
+      "tags": [
+        "human",
+        "person",
+        "person_related",
+        "profession"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:scientist",
+      "glyph": "🧑‍🔬",
+      "name": "scientist",
+      "source": "unicode_emoji_expansion",
+      "tags": [
+        "human",
+        "person",
+        "person_related",
+        "profession"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:technologist",
+      "glyph": "🧑‍💻",
+      "name": "technologist",
+      "source": "unicode_emoji_expansion",
+      "tags": [
+        "human",
+        "person",
+        "person_related",
+        "profession"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:singer",
+      "glyph": "🧑‍🎤",
+      "name": "singer",
+      "source": "unicode_emoji_expansion",
+      "tags": [
+        "human",
+        "person",
+        "person_related",
+        "profession"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:artist",
+      "glyph": "🧑‍🎨",
+      "name": "artist",
+      "source": "unicode_emoji_expansion",
+      "tags": [
+        "human",
+        "person",
+        "person_related",
+        "profession"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:pilot",
+      "glyph": "🧑‍✈️",
+      "name": "pilot",
+      "source": "unicode_emoji_expansion",
+      "tags": [
+        "human",
+        "person",
+        "person_related",
+        "profession"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:astronaut",
+      "glyph": "🧑‍🚀",
+      "name": "astronaut",
+      "source": "unicode_emoji_expansion",
+      "tags": [
+        "human",
+        "person",
+        "person_related",
+        "profession"
+      ],
+      "kind": "emoji",
+      "colors": []
+    },
+    {
+      "id": "emoji:firefighter",
+      "glyph": "🧑‍🚒",
+      "name": "firefighter",
+      "source": "unicode_emoji_expansion",
+      "tags": [
+        "human",
+        "person",
+        "person_related",
+        "profession"
+      ],
+      "kind": "emoji",
+      "colors": []
     }
   ],
   "tagIndex": {
@@ -16338,7 +16418,6 @@
       "emoji:dna"
     ],
     "bird": [
-      "emoji:",
       "emoji:baby_chick",
       "emoji:bat",
       "emoji:bird",
@@ -16557,46 +16636,34 @@
     ],
     "celebration": [
       "emoji:admission_tickets",
-      "emoji:ball_of_yarn",
       "emoji:balloon",
       "emoji:black_chess_pawn",
       "emoji:carp_streamer",
       "emoji:christmas_tree",
       "emoji:confetti_ball",
       "emoji:first_place_medal",
-      "emoji:flower_playing_cards",
-      "emoji:game_die",
       "emoji:izakaya_lantern",
       "emoji:jack_o_lantern",
       "emoji:japanese_dolls",
-      "emoji:jigsaw_puzzle_piece",
-      "emoji:knot",
       "emoji:magic_wand",
-      "emoji:mahjong_tile_red_dragon",
       "emoji:military_medal",
       "emoji:mirror_ball",
       "emoji:party_popper",
-      "emoji:performing_arts",
       "emoji:pinata",
       "emoji:pine_decoration",
-      "emoji:playing_card_black_joker",
       "emoji:red_gift_envelope",
       "emoji:reminder_ribbon",
       "emoji:ribbon",
       "emoji:second_place_medal",
-      "emoji:sewing_needle",
       "emoji:sparkles",
-      "emoji:spool_of_thread",
       "emoji:sports_medal",
       "emoji:tanabata_tree",
       "emoji:third_place_medal",
-      "emoji:ticket",
       "emoji:trophy",
       "emoji:wind_chime",
       "emoji:wrapped_present"
     ],
     "celestial": [
-      "emoji:",
       "emoji:black_sun_with_rays",
       "emoji:comet",
       "emoji:first_quarter_moon_symbol",
@@ -16697,8 +16764,6 @@
       "symbol:club"
     ],
     "cold": [
-      "emoji:",
-      "emoji:_2",
       "emoji:bear",
       "emoji:beer",
       "emoji:cocktail",
@@ -16879,6 +16944,12 @@
       "emoji:face_with_party_horn_and_party_hat",
       "emoji:nerd_face",
       "emoji:smiling_face_with_sunglasses"
+    ],
+    "craft": [
+      "emoji:ball_of_yarn",
+      "emoji:knot",
+      "emoji:sewing_needle",
+      "emoji:spool_of_thread"
     ],
     "crescent": [
       "emoji:moon",
@@ -17084,8 +17155,6 @@
       "flag:united_states"
     ],
     "expression": [
-      "emoji:",
-      "emoji:_2",
       "emoji:alien_monster",
       "emoji:angry_face",
       "emoji:anguished_face",
@@ -17199,8 +17268,6 @@
       "emoji:zipper_mouth_face"
     ],
     "face": [
-      "emoji:",
-      "emoji:_2",
       "emoji:alien_monster",
       "emoji:angry_face",
       "emoji:anguished_face",
@@ -17427,7 +17494,11 @@
       "flag:united_states"
     ],
     "flightless": [
-      "emoji:penguin"
+      "emoji:chicken",
+      "emoji:dodo",
+      "emoji:penguin",
+      "emoji:rooster",
+      "emoji:turkey"
     ],
     "flower": [
       "emoji:cherry_blossom",
@@ -17437,7 +17508,6 @@
       "emoji:tulip"
     ],
     "flying": [
-      "emoji:",
       "emoji:aerial_tramway",
       "emoji:airplane",
       "emoji:airplane_arriving",
@@ -17447,7 +17517,6 @@
       "emoji:bee",
       "emoji:bird",
       "emoji:butterfly",
-      "emoji:dodo",
       "emoji:dove_of_peace",
       "emoji:duck",
       "emoji:eagle",
@@ -17465,12 +17534,10 @@
       "emoji:parrot",
       "emoji:peacock",
       "emoji:rocket",
-      "emoji:rooster",
       "emoji:satellite",
       "emoji:seat",
       "emoji:suspension_railway",
       "emoji:swan",
-      "emoji:turkey",
       "emoji:wing"
     ],
     "food": [
@@ -17622,7 +17689,6 @@
       "emoji:mushroom"
     ],
     "furniture": [
-      "emoji:",
       "emoji:bed",
       "emoji:chair",
       "emoji:couch_and_lamp",
@@ -17635,7 +17701,6 @@
       "emoji:admission_tickets",
       "emoji:american_football",
       "emoji:badminton_racquet_and_shuttlecock",
-      "emoji:ball_of_yarn",
       "emoji:baseball",
       "emoji:basketball_and_hoop",
       "emoji:bicyclist",
@@ -17666,7 +17731,6 @@
       "emoji:jack_o_lantern",
       "emoji:jigsaw_puzzle_piece",
       "emoji:kite",
-      "emoji:knot",
       "emoji:lacrosse_stick_and_ball",
       "emoji:mahjong_tile_red_dragon",
       "emoji:martial_arts_uniform",
@@ -17685,7 +17749,6 @@
       "emoji:rugby_football",
       "emoji:running_shirt_with_sash",
       "emoji:second_place_medal",
-      "emoji:sewing_needle",
       "emoji:ski_and_ski_boot",
       "emoji:skier",
       "emoji:sled",
@@ -17693,7 +17756,6 @@
       "emoji:soccer_ball",
       "emoji:softball",
       "emoji:sparkles",
-      "emoji:spool_of_thread",
       "emoji:sports_medal",
       "emoji:surfer",
       "emoji:swimmer",
@@ -17763,19 +17825,9 @@
       "symbol:check"
     ],
     "hand": [
-      "emoji:anatomical_heart",
-      "emoji:biting_lip",
-      "emoji:bone",
-      "emoji:brain",
       "emoji:call_me_hand",
       "emoji:clapping_hands_sign",
-      "emoji:ear",
-      "emoji:ear_with_hearing_aid",
-      "emoji:eye",
-      "emoji:eyes",
       "emoji:fisted_hand_sign",
-      "emoji:flexed_biceps",
-      "emoji:foot",
       "emoji:hand_with_index_and_middle_fingers_crossed",
       "emoji:hand_with_index_finger_and_thumb_crossed",
       "emoji:handshake",
@@ -17783,13 +17835,7 @@
       "emoji:i_love_you_hand_sign",
       "emoji:index_pointing_at_the_viewer",
       "emoji:left_facing_fist",
-      "emoji:leg",
-      "emoji:lungs",
-      "emoji:mechanical_arm",
-      "emoji:mechanical_leg",
-      "emoji:mouth",
       "emoji:nail_polish",
-      "emoji:nose",
       "emoji:ok_hand_sign",
       "emoji:open_hands_sign",
       "emoji:palms_up_together",
@@ -17804,12 +17850,9 @@
       "emoji:raised_hand_with_part_between_middle_and_ring_fingers",
       "emoji:reversed_hand_with_middle_finger_extended",
       "emoji:right_facing_fist",
-      "emoji:selfie",
       "emoji:sign_of_the_horns",
       "emoji:thumbs_down_sign",
       "emoji:thumbs_up_sign",
-      "emoji:tongue",
-      "emoji:tooth",
       "emoji:victory_hand",
       "emoji:waving_hand_sign",
       "emoji:white_down_pointing_backhand_index",
@@ -17862,7 +17905,6 @@
       "symbol:sun_symbol"
     ],
     "household": [
-      "emoji:",
       "emoji:bar_of_soap",
       "emoji:basket",
       "emoji:bath",
@@ -17893,43 +17935,44 @@
     ],
     "human": [
       "emoji:adult",
-      "emoji:airplane_2",
-      "emoji:artist_palette",
+      "emoji:artist",
+      "emoji:astronaut",
       "emoji:baby",
       "emoji:baby_angel",
       "emoji:bearded_person",
       "emoji:boy",
       "emoji:breast_feeding",
       "emoji:bride_with_veil",
-      "emoji:briefcase",
       "emoji:child",
       "emoji:construction_worker",
-      "emoji:cooking",
+      "emoji:cook",
       "emoji:deaf_person",
-      "emoji:ear_of_rice",
       "emoji:elf",
       "emoji:face_palm",
       "emoji:face_with_no_good_gesture",
       "emoji:face_with_ok_gesture",
-      "emoji:factory",
+      "emoji:factory_worker",
       "emoji:fairy",
+      "emoji:farmer",
       "emoji:father_christmas",
-      "emoji:fire_engine",
+      "emoji:firefighter",
       "emoji:genie",
       "emoji:girl",
-      "emoji:graduation_cap",
       "emoji:guardsman",
       "emoji:happy_person_raising_one_hand",
+      "emoji:health_worker",
       "emoji:information_desk_person",
+      "emoji:judge",
       "emoji:mage",
       "emoji:man",
       "emoji:man_in_tuxedo",
       "emoji:man_with_gua_pi_mao",
       "emoji:man_with_turban",
+      "emoji:mechanic",
       "emoji:merperson",
-      "emoji:microphone",
       "emoji:mother_christmas",
       "emoji:ninja",
+      "emoji:office_worker",
       "emoji:older_adult",
       "emoji:older_man",
       "emoji:older_woman",
@@ -17940,17 +17983,20 @@
       "emoji:person_with_headscarf",
       "emoji:person_with_pouting_face",
       "emoji:personal_computer",
+      "emoji:pilot",
       "emoji:police_officer",
       "emoji:pregnant_woman",
       "emoji:prince",
       "emoji:princess",
-      "emoji:scales_2",
-      "emoji:school",
+      "emoji:scientist",
       "emoji:shrug",
+      "emoji:singer",
       "emoji:sleuth_or_spy",
-      "emoji:staff_of_aesculapius",
+      "emoji:student",
       "emoji:superhero",
       "emoji:supervillain",
+      "emoji:teacher",
+      "emoji:technologist",
       "emoji:vampire",
       "emoji:woman",
       "emoji:zombie"
@@ -17965,7 +18011,6 @@
       "symbol:not_equal"
     ],
     "insect": [
-      "emoji:",
       "emoji:ant",
       "emoji:bee",
       "emoji:beetle",
@@ -17976,10 +18021,7 @@
       "emoji:fly",
       "emoji:lady_beetle",
       "emoji:mosquito",
-      "emoji:scorpion",
-      "emoji:snail",
-      "emoji:spider_2",
-      "emoji:worm"
+      "emoji:spider_2"
     ],
     "instrument": [
       "emoji:accordion",
@@ -18252,7 +18294,6 @@
       "symbol:heart_suit"
     ],
     "mail": [
-      "emoji:",
       "emoji:closed_mailbox_with_lowered_flag",
       "emoji:closed_mailbox_with_raised_flag",
       "emoji:e_mail_symbol",
@@ -18275,8 +18316,6 @@
       "symbol:male"
     ],
     "mammal": [
-      "emoji:",
-      "emoji:_2",
       "emoji:bactrian_camel",
       "emoji:badger",
       "emoji:bat",
@@ -18346,7 +18385,6 @@
       "emoji:zebra"
     ],
     "math": [
-      "emoji:",
       "emoji:heavy_division_sign",
       "emoji:heavy_equals_sign",
       "emoji:heavy_minus_sign",
@@ -18364,7 +18402,6 @@
       "symbol:times"
     ],
     "medical": [
-      "emoji:",
       "emoji:adhesive_bandage",
       "emoji:dna",
       "emoji:drop_of_blood",
@@ -18403,7 +18440,6 @@
       "emoji:receipt"
     ],
     "monster_face": [
-      "emoji:",
       "emoji:alien_monster",
       "emoji:clown_face",
       "emoji:extraterrestrial_alien",
@@ -18508,7 +18544,6 @@
       "emoji:wood"
     ],
     "negative_face": [
-      "emoji:",
       "emoji:angry_face",
       "emoji:anguished_face",
       "emoji:astonished_face",
@@ -18582,6 +18617,7 @@
       "emoji:bookmark_tabs",
       "emoji:books",
       "emoji:brick",
+      "emoji:briefcase",
       "emoji:broom",
       "emoji:bucket",
       "emoji:calendar",
@@ -18762,7 +18798,6 @@
       "emoji:wrapped_present"
     ],
     "office": [
-      "emoji:",
       "emoji:abacus",
       "emoji:ballot_box_with_ballot",
       "emoji:bar_chart",
@@ -18772,6 +18807,7 @@
       "emoji:bookmark",
       "emoji:bookmark_tabs",
       "emoji:books",
+      "emoji:briefcase",
       "emoji:calendar",
       "emoji:card_file_box",
       "emoji:card_index",
@@ -18880,7 +18916,6 @@
       "emoji:book"
     ],
     "paperwork": [
-      "emoji:",
       "emoji:ballot_box_with_ballot",
       "emoji:bar_chart",
       "emoji:calendar",
@@ -18902,43 +18937,44 @@
     ],
     "person": [
       "emoji:adult",
-      "emoji:airplane_2",
-      "emoji:artist_palette",
+      "emoji:artist",
+      "emoji:astronaut",
       "emoji:baby",
       "emoji:baby_angel",
       "emoji:bearded_person",
       "emoji:boy",
       "emoji:breast_feeding",
       "emoji:bride_with_veil",
-      "emoji:briefcase",
       "emoji:child",
       "emoji:construction_worker",
-      "emoji:cooking",
+      "emoji:cook",
       "emoji:deaf_person",
-      "emoji:ear_of_rice",
       "emoji:elf",
       "emoji:face_palm",
       "emoji:face_with_no_good_gesture",
       "emoji:face_with_ok_gesture",
-      "emoji:factory",
+      "emoji:factory_worker",
       "emoji:fairy",
+      "emoji:farmer",
       "emoji:father_christmas",
-      "emoji:fire_engine",
+      "emoji:firefighter",
       "emoji:genie",
       "emoji:girl",
-      "emoji:graduation_cap",
       "emoji:guardsman",
       "emoji:happy_person_raising_one_hand",
+      "emoji:health_worker",
       "emoji:information_desk_person",
+      "emoji:judge",
       "emoji:mage",
       "emoji:man",
       "emoji:man_in_tuxedo",
       "emoji:man_with_gua_pi_mao",
       "emoji:man_with_turban",
+      "emoji:mechanic",
       "emoji:merperson",
-      "emoji:microphone",
       "emoji:mother_christmas",
       "emoji:ninja",
+      "emoji:office_worker",
       "emoji:older_adult",
       "emoji:older_man",
       "emoji:older_woman",
@@ -18949,26 +18985,29 @@
       "emoji:person_with_headscarf",
       "emoji:person_with_pouting_face",
       "emoji:personal_computer",
+      "emoji:pilot",
       "emoji:police_officer",
       "emoji:pregnant_woman",
       "emoji:prince",
       "emoji:princess",
-      "emoji:scales_2",
-      "emoji:school",
+      "emoji:scientist",
       "emoji:shrug",
+      "emoji:singer",
       "emoji:sleuth_or_spy",
-      "emoji:staff_of_aesculapius",
+      "emoji:student",
       "emoji:superhero",
       "emoji:supervillain",
+      "emoji:teacher",
+      "emoji:technologist",
       "emoji:vampire",
       "emoji:woman",
       "emoji:zombie"
     ],
     "person_related": [
       "emoji:adult",
-      "emoji:airplane_2",
       "emoji:anatomical_heart",
-      "emoji:artist_palette",
+      "emoji:artist",
+      "emoji:astronaut",
       "emoji:baby",
       "emoji:baby_angel",
       "emoji:bearded_person",
@@ -18978,15 +19017,13 @@
       "emoji:brain",
       "emoji:breast_feeding",
       "emoji:bride_with_veil",
-      "emoji:briefcase",
       "emoji:call_me_hand",
       "emoji:child",
       "emoji:clapping_hands_sign",
       "emoji:construction_worker",
-      "emoji:cooking",
+      "emoji:cook",
       "emoji:deaf_person",
       "emoji:ear",
-      "emoji:ear_of_rice",
       "emoji:ear_with_hearing_aid",
       "emoji:elf",
       "emoji:eye",
@@ -18994,25 +19031,27 @@
       "emoji:face_palm",
       "emoji:face_with_no_good_gesture",
       "emoji:face_with_ok_gesture",
-      "emoji:factory",
+      "emoji:factory_worker",
       "emoji:fairy",
+      "emoji:farmer",
       "emoji:father_christmas",
-      "emoji:fire_engine",
+      "emoji:firefighter",
       "emoji:fisted_hand_sign",
       "emoji:flexed_biceps",
       "emoji:foot",
       "emoji:genie",
       "emoji:girl",
-      "emoji:graduation_cap",
       "emoji:guardsman",
       "emoji:hand_with_index_and_middle_fingers_crossed",
       "emoji:hand_with_index_finger_and_thumb_crossed",
       "emoji:handshake",
       "emoji:happy_person_raising_one_hand",
+      "emoji:health_worker",
       "emoji:heart_hands",
       "emoji:i_love_you_hand_sign",
       "emoji:index_pointing_at_the_viewer",
       "emoji:information_desk_person",
+      "emoji:judge",
       "emoji:left_facing_fist",
       "emoji:leg",
       "emoji:lungs",
@@ -19021,15 +19060,16 @@
       "emoji:man_in_tuxedo",
       "emoji:man_with_gua_pi_mao",
       "emoji:man_with_turban",
+      "emoji:mechanic",
       "emoji:mechanical_arm",
       "emoji:mechanical_leg",
       "emoji:merperson",
-      "emoji:microphone",
       "emoji:mother_christmas",
       "emoji:mouth",
       "emoji:nail_polish",
       "emoji:ninja",
       "emoji:nose",
+      "emoji:office_worker",
       "emoji:ok_hand_sign",
       "emoji:older_adult",
       "emoji:older_man",
@@ -19045,6 +19085,7 @@
       "emoji:person_with_headscarf",
       "emoji:person_with_pouting_face",
       "emoji:personal_computer",
+      "emoji:pilot",
       "emoji:pinched_fingers",
       "emoji:pinching_hand",
       "emoji:police_officer",
@@ -19058,15 +19099,17 @@
       "emoji:raised_hand_with_part_between_middle_and_ring_fingers",
       "emoji:reversed_hand_with_middle_finger_extended",
       "emoji:right_facing_fist",
-      "emoji:scales_2",
-      "emoji:school",
+      "emoji:scientist",
       "emoji:selfie",
       "emoji:shrug",
       "emoji:sign_of_the_horns",
+      "emoji:singer",
       "emoji:sleuth_or_spy",
-      "emoji:staff_of_aesculapius",
+      "emoji:student",
       "emoji:superhero",
       "emoji:supervillain",
+      "emoji:teacher",
+      "emoji:technologist",
       "emoji:thumbs_down_sign",
       "emoji:thumbs_up_sign",
       "emoji:tongue",
@@ -19141,7 +19184,6 @@
       "emoji:earth"
     ],
     "plant": [
-      "emoji:",
       "emoji:apple",
       "emoji:aubergine",
       "emoji:avocado",
@@ -19228,8 +19270,6 @@
       "symbol:warning"
     ],
     "polar": [
-      "emoji:",
-      "emoji:_2",
       "emoji:bear",
       "emoji:penguin",
       "emoji:polar_bear",
@@ -19247,7 +19287,6 @@
       "emoji:bee"
     ],
     "positive_face": [
-      "emoji:",
       "emoji:face_savouring_delicious_food",
       "emoji:face_throwing_a_kiss",
       "emoji:face_with_finger_covering_closed_lips",
@@ -19298,7 +19337,6 @@
       "emoji:bagel",
       "emoji:baguette_bread",
       "emoji:bento_box",
-      "emoji:bone",
       "emoji:bread",
       "emoji:burrito",
       "emoji:butter",
@@ -19343,19 +19381,23 @@
       "emoji:waffle"
     ],
     "profession": [
-      "emoji:airplane_2",
-      "emoji:artist_palette",
-      "emoji:briefcase",
-      "emoji:cooking",
-      "emoji:ear_of_rice",
-      "emoji:factory",
-      "emoji:fire_engine",
-      "emoji:graduation_cap",
-      "emoji:microphone",
+      "emoji:artist",
+      "emoji:astronaut",
+      "emoji:cook",
+      "emoji:factory_worker",
+      "emoji:farmer",
+      "emoji:firefighter",
+      "emoji:health_worker",
+      "emoji:judge",
+      "emoji:mechanic",
+      "emoji:office_worker",
       "emoji:personal_computer",
-      "emoji:scales_2",
-      "emoji:school",
-      "emoji:staff_of_aesculapius"
+      "emoji:pilot",
+      "emoji:scientist",
+      "emoji:singer",
+      "emoji:student",
+      "emoji:teacher",
+      "emoji:technologist"
     ],
     "purple": [
       "emoji:grapes"
@@ -19425,7 +19467,6 @@
       "symbol:cross_mark"
     ],
     "religion_symbol": [
-      "emoji:",
       "emoji:latin_cross",
       "emoji:menorah_with_nine_branches",
       "emoji:om_symbol",
@@ -19467,8 +19508,6 @@
       "emoji:carrot"
     ],
     "round": [
-      "emoji:",
-      "emoji:_2",
       "emoji:alien_monster",
       "emoji:angry_face",
       "emoji:anguished_face",
@@ -19608,7 +19647,6 @@
       "emoji:meat"
     ],
     "science": [
-      "emoji:",
       "emoji:adhesive_bandage",
       "emoji:alembic",
       "emoji:atom",
@@ -19684,7 +19722,6 @@
       "flag:kenya"
     ],
     "sick_sleepy_face": [
-      "emoji:_2",
       "emoji:dizzy_face",
       "emoji:dizzy_symbol",
       "emoji:drooling_face",
@@ -20064,7 +20101,6 @@
       "emoji:giraffe"
     ],
     "technology": [
-      "emoji:",
       "emoji:atom",
       "emoji:battery",
       "emoji:black_telephone",
@@ -20137,7 +20173,6 @@
       "symbol:triangle"
     ],
     "time": [
-      "emoji:",
       "emoji:clock",
       "emoji:compass",
       "emoji:hourglass",
@@ -20147,7 +20182,6 @@
       "emoji:timer_clock"
     ],
     "tool": [
-      "emoji:",
       "emoji:axe",
       "emoji:gear",
       "emoji:gear_2",
@@ -20302,7 +20336,6 @@
       "symbol:up_arrow"
     ],
     "vegetable": [
-      "emoji:",
       "emoji:aubergine",
       "emoji:avocado",
       "emoji:beans",
@@ -20465,7 +20498,6 @@
       "emoji:speedboat"
     ],
     "weapon": [
-      "emoji:",
       "emoji:axe",
       "emoji:bomb",
       "emoji:crossed_swords",

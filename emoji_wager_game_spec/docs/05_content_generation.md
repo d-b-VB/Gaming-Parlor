@@ -10,6 +10,8 @@ A flag can be `flag`, `island`, `Europe`, `subpolar`, `cross`, and have colors `
 
 Country-flag categories must be objective.  Do not use subjective geography categories such as `mountainous`, and avoid broad categories such as `coastal` that apply to most countries.  For flags, `equatorial` should mean the country touches the equator, and `polar` should mean the country or territory touches or lies within a polar circle.
 
+Category tags should be literal rather than associative.  For example, `celebration` means party, holiday, award, or decorative celebration objects such as presents, balloons, confetti, holiday decorations, medals, and trophies.  It should not include crafting supplies, generic art objects, or games merely because they might appear at a party.  Likewise, `insect` should not include worms, snails, spiders, or scorpions; `flying` should not include flightless birds; and `hand` should not include generic body parts such as bones, legs, or anatomical hearts.
+
 ## Items
 
 Each item in `data/items.json` has:

@@ -30,6 +30,15 @@ When the player completes game mode `G` with time `T`:
 3. For every other unlocked game mode, add a `rest` entry equal to that other mode's current worst remembered time.
 4. Trim each mode's memory to the most recent 20 entries.
 
+## Item timing pressure
+
+In addition to whole-round completion time, record the elapsed time for each correctly sorted prompt item.
+
+- The first recorded item time calibrates item timing and should not itself trigger a fastest or slowest reward/penalty.
+- If a later item time is slower than the player's previous longest recorded item time for that mode, immediately lose 1 Heart.
+- If a later item time is faster than the player's previous fastest recorded item time for that mode, immediately award Diamonds equal to that mode's current Spade score / base round payout before Heart penalties.
+- Store recent item timing entries with item id, elapsed seconds, timestamp, and whether the entry created a fastest or longest record.
+
 For a prototype with only one unlocked mode, step 3 has no visible effect until more modes are unlocked.
 
 ## Why rest entries exist
