@@ -46,10 +46,14 @@
 ## Economy, betting, and memory
 
 - Completion time is recorded as an actual memory entry for the selected mode.
+- Mistake count is recorded on actual memory entries for the selected mode.
+- A round with at least 2 more mistakes than the prior median mistake count loses 1 Heart.
+- A round with more mistakes than the prior maximum mistake count loses 1 additional Heart.
 - Correctly sorted individual items record per-item timing entries for the selected mode.
 - The first individual item timing entry calibrates fastest/longest item stats without awarding Diamonds or removing Hearts.
 - A new slowest individual item time for that mode removes 1 Heart.
 - A new fastest individual item time for that mode awards Diamonds equal to that mode's full-round payout score.
+- The center prompt shows item timing countdown clocks for fastest, median, and slowest item records once item history exists.
 - The run's percentile against prior memory is recorded or derivable.
 - Target offers are generated from memory estimates or starter defaults.
 - A selected Club bet stores target time, odds, and stake.
@@ -62,11 +66,13 @@
 - Completing one unlocked mode adds rest entries to other unlocked modes.
 - Buying a global Spade increases future Diamond payouts for all sorting modes.
 - Buying a mode-specific Spade increases future Diamond payouts only for that mode.
+- Buying an animation speed upgrade spends Diamonds and shortens glyph travel animations without changing sorting correctness.
 - Restoring a Heart spends Diamonds and cannot exceed max Hearts.
 - State persists after page reload.
 
 ## UI
 
+- Editing the Club stake input does not rerender the whole screen or jump focus back to the top.
 - The main play UI shows only target glyphs for the active groups in the first prototype.
 - The mode selector shows 2-way, 3-way, and 4-way sort.
 - The shop exposes Heart restore, mode unlocks, and Spade payout upgrades.

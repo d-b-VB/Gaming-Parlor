@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { generateBoard, matchesSelector, estimateTargets, heartSafety, createClubBet, buyClubBet, settleRound, settleItemTiming, unlockMode, buySpade, spadeCost, payoutScore, streakDuration } from '../src/game/core.js';
+import { generateBoard, matchesSelector, estimateTargets, heartSafety, createClubBet, buyClubBet, settleRound, settleItemTiming, itemTimingTargets, mistakePressure, unlockMode, buySpade, buyAnimationSpeed, animationSpeedCost, animationDuration, spadeCost, payoutScore, streakDuration } from '../src/game/core.js';
 
 const items = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/items.json', import.meta.url))).items;
 const selectors = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/category_selectors.json', import.meta.url))).selectors;
@@ -119,6 +119,27 @@ test('first round has no presumed Heart timer or loss', () => {
   assert.equal(next.gameMemory.sort_2.entries.at(-1).timeSeconds, 999);
 });
 
+test('round settlement records mistakes and tolerates missing mode memory', () => {
+  const partial = structuredClone(defaultState);
+  delete partial.gameMemory.sort_2;
+  const next = settleRound(partial, 'sort_2', 12, 1, 'missing-memory', 'test');
+  assert.equal(next.gameMemory.sort_2.entries.at(-1).mistakes, 1);
+  assert.equal(next.eventLog.at(-1).type, 'round');
+});
+
+test('mistake pressure charges hearts above median and max errors', () => {
+  const entries = [0, 1, 1, 2, 2].map((mistakes, index) => ({ entryType: 'actual', timeSeconds: 20 + index, mistakes }));
+  assert.equal(mistakePressure(entries, 2).heartsLost, 0);
+  const pressure = mistakePressure(entries, 3);
+  assert.equal(pressure.medianMistakes, 1);
+  assert.equal(pressure.heartsLost, 2);
+  const state = structuredClone(defaultState);
+  state.gameMemory.sort_2.entries = entries;
+  const next = settleRound(state, 'sort_2', 20, 3, 'mistake-seed', 'test');
+  assert.equal(next.resources.hearts, state.resources.hearts - 2);
+  assert.equal(next.gameMemory.sort_2.entries.at(-1).mistakes, 3);
+});
+
 test('item timing records fastest and longest pressure events', () => {
   let state = structuredClone(defaultState);
   let result = settleItemTiming(state, 'sort_2', 'emoji:test', 2, 't1');
@@ -132,6 +153,22 @@ test('item timing records fastest and longest pressure events', () => {
   result = settleItemTiming(state, 'sort_2', 'emoji:test3', 1, 't3');
   assert.equal(result.event.isNewFastest, true);
   assert.equal(result.event.diamondsDelta, payoutScore(state, 'sort_2'));
+  const targets = itemTimingTargets(result.state, 'sort_2');
+  assert.equal(targets.fastestSeconds, 1);
+  assert.equal(targets.medianSeconds, 2);
+  assert.equal(targets.longestSeconds, 3);
+});
+
+test('animation speed upgrades cost diamonds and shorten travel duration', () => {
+  let state = structuredClone(defaultState);
+  state.resources.diamonds = 100;
+  const cost = animationSpeedCost(0);
+  state = buyAnimationSpeed(state);
+  assert.equal(state.upgrades.animationSpeed, 1);
+  assert.equal(state.resources.diamonds, 100 - cost);
+  assert.ok(animationDuration(1000, state) < 1000);
+  state.upgrades.animationSpeed = 100;
+  assert.equal(animationDuration(1000, state), 450);
 });
 
 test('spade costs and streak animation scale upward and downward respectively', () => {

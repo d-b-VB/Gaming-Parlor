@@ -18,7 +18,7 @@ The full-screen sorting view should include:
 
 - Active directional zones for the selected mode.
 - Visible target glyph groups assigned to each active direction.
-- A center prompt glyph.
+- A center prompt glyph with three stacked item timing countdown clocks behind it after item timing history exists.
 - A queue/progress indicator.
 - Full visible emoji prompt queue under the timer bars.
 - Completion timer.
@@ -65,6 +65,7 @@ Correct answer:
 - Streak increments.
 - Movement and next-entry animations get faster as streak rises.
 - Show individual-item timing feedback when the item sets a new fastest or new slowest personal item time for that mode, including the Diamond bonus or Heart loss.
+- Behind the center prompt, show stacked item clocks for fastest, median, and slowest item timing records so the player can feel the pressure before the slowest-item Heart loss triggers.
 
 Wrong answer:
 
@@ -94,8 +95,9 @@ The first shop can be simple and functional.  It should include:
 - Buy 2-way Spade payout upgrade.
 - Buy 3-way Spade payout upgrade.
 - Buy 4-way Spade payout upgrade.
+- Buy animation speed upgrades that shorten glyph travel animations.
 
-Future upgrade slots may be visible but disabled for animation speed, pause breaks, category choice, and category rearrangement.
+Future upgrade slots may be visible but disabled for pause breaks, category choice, and category rearrangement.
 
 ## Accessibility
 

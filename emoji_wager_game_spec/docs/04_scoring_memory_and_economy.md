@@ -38,8 +38,21 @@ In addition to whole-round completion time, record the elapsed time for each cor
 - If a later item time is slower than the player's previous longest recorded item time for that mode, immediately lose 1 Heart.
 - If a later item time is faster than the player's previous fastest recorded item time for that mode, immediately award Diamonds equal to that mode's current Spade score / base round payout before Heart penalties.
 - Store recent item timing entries with item id, elapsed seconds, timestamp, and whether the entry created a fastest or longest record.
+- Use the per-mode fastest, median, and longest item times as live item countdown references in the play UI.
 
 For a prototype with only one unlocked mode, step 3 has no visible effect until more modes are unlocked.
+
+## Mistake pressure
+
+Record the number of wrong dispatches on every completed round.  Compare each new round against prior actual rounds for that mode:
+
+- If the round has at least 2 more mistakes than the prior median mistake count, lose 1 Heart.
+- If the round has more mistakes than the prior maximum mistake count, lose 1 additional Heart.
+- The first actual round for a mode records mistakes but does not lose Hearts from mistake pressure because there is no prior baseline.
+
+## Animation speed upgrades
+
+Animation speed upgrades are Diamond purchases that make glyph travel/rejection animations shorter.  They should not change board correctness, timer math, payouts, or item timing thresholds; they only reduce animation waiting time between player actions.
 
 ## Why rest entries exist
 
