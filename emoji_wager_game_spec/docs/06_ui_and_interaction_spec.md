@@ -38,7 +38,7 @@ Locked modes should show their Diamond unlock cost.  After purchase, they should
 
 ## Club betting display
 
-Before a round, show five time-to-beat propositions with estimated odds.  Easier/slower targets should pay less; harder/faster targets should pay more:
+Before a round, show five propositions with estimated odds. Each proposition has both a time-to-beat target and a maximum mistake target.  Easier/slower targets should pay less; harder/faster targets should pay more:
 
 ```text
 Conservative  Beat 00:42   1:2
@@ -48,7 +48,7 @@ Fivefold      Beat 00:23   5:1
 Tenfold       Beat 00:19   10:1
 ```
 
-Only enable propositions once the selected mode has enough actual history to justify the estimate.  Locked propositions may be visible with the current and required history counts.  The player selects one available offer and buys as many Clubs as desired with Diamonds.  During the round, show the selected target and whether it is still alive.  After the round, show whether the bet paid out and how many Diamonds were won.
+Only enable propositions once the selected mode has enough actual history to justify the estimate.  Locked propositions may be visible with the current and required history counts.  The player selects one available offer and buys as many Clubs as desired with Diamonds.  During the round, show the selected time target, mistake target, and whether the bet is still alive.  After the round, show whether the bet paid out and how many Diamonds were won.
 
 ## Heart display
 

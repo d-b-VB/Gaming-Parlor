@@ -104,11 +104,51 @@ test('bet propositions use sensible odds and require enough actual history', () 
   const lowTargets = estimateTargets('sort_2', lowHistory);
   assert.deepEqual(lowTargets.map((target) => target.oddsLabel), ['1:2', '1:1', '2:1', '5:1', '10:1']);
   assert.deepEqual(lowTargets.map((target) => target.available), [false, false, false, false, false]);
-  const richHistory = Array.from({ length: 20 }, (_, index) => ({ timeSeconds: 45 - index, entryType: 'actual', createdAt: `t${index}` }));
+  const richHistory = Array.from({ length: 20 }, (_, index) => ({ timeSeconds: 45 - index, mistakes: index % 4, entryType: 'actual', createdAt: `t${index}` }));
   const richTargets = estimateTargets('sort_2', richHistory);
   assert.deepEqual(richTargets.map((target) => target.oddsLabel), ['1:2', '1:1', '2:1', '5:1', '10:1']);
   assert.deepEqual(richTargets.map((target) => target.available), [true, true, true, true, true]);
   assert.ok(richTargets[4].timeSeconds < richTargets[0].timeSeconds);
+});
+
+
+
+test('club bets require both time and mistake targets', () => {
+  let state = structuredClone(defaultState);
+  state.resources.diamonds = 100;
+  state.gameMemory.sort_2.entries = [0, 1, 1, 2, 3, 3, 4, 5].map((mistakes, index) => ({ timeSeconds: 40 - index, mistakes, entryType: 'actual', createdAt: `m${index}` }));
+  const offer = estimateTargets('sort_2', state.gameMemory.sort_2.entries).find((target) => target.id === 'double');
+  assert.equal(offer.mistakeLimit, 1);
+  state = buyClubBet(state, createClubBet('sort_2', offer, 2));
+  let next = settleRound(state, 'sort_2', offer.timeSeconds, 2, 'too-many-mistakes', 'test');
+  assert.equal(next.eventLog.at(-1).betWinnings, 0);
+  state = buyClubBet({ ...structuredClone(defaultState), resources: { hearts: 5, maxHearts: 5, diamonds: 100 }, gameMemory: state.gameMemory }, createClubBet('sort_2', offer, 2));
+  next = settleRound(state, 'sort_2', offer.timeSeconds, 1, 'clean-enough', 'test');
+  assert.ok(next.eventLog.at(-1).betWinnings > 0);
+});
+
+
+
+test('memory keeps long history and bet wins add profit-weighted entries', () => {
+  let state = structuredClone(defaultState);
+  state.resources.diamonds = 10;
+  state.gameMemory.sort_2.entries = Array.from({ length: 25 }, (_, index) => ({ timeSeconds: 60 - index, mistakes: 0, entryType: 'actual', createdAt: `old${index}` }));
+  const offer = { id: 'ten', timeSeconds: 20, mistakeLimit: 0, oddsMultiplier: 10, oddsLabel: '10:1' };
+  state = buyClubBet(state, createClubBet('sort_2', offer, 10));
+  const next = settleRound(state, 'sort_2', 19, 0, 'weighted-win', 'test');
+  assert.equal(next.eventLog.at(-1).betProfit, 100);
+  assert.equal(next.eventLog.at(-1).startingBank, 10);
+  assert.equal(next.eventLog.at(-1).betConfidenceWeight, 10);
+  assert.equal(next.gameMemory.sort_2.entries.length, 36);
+  assert.equal(next.gameMemory.sort_2.entries.filter((entry) => entry.weightedByBet).length, 10);
+});
+
+test('target estimates use recent actual percentile windows rather than all past speeds', () => {
+  const oldSlow = Array.from({ length: 150 }, (_, index) => ({ timeSeconds: 100 + index, mistakes: 4, entryType: 'actual', createdAt: `slow${index}` }));
+  const recentFast = Array.from({ length: 100 }, (_, index) => ({ timeSeconds: 20 + (index % 5), mistakes: index % 2, entryType: 'actual', createdAt: `fast${index}` }));
+  const targets = estimateTargets('sort_2', [...oldSlow, ...recentFast]);
+  assert.ok(targets.find((target) => target.id === 'even').timeSeconds < 30);
+  assert.ok(targets.find((target) => target.id === 'ten').mistakeLimit <= 1);
 });
 
 test('first round has no presumed Heart timer or loss', () => {

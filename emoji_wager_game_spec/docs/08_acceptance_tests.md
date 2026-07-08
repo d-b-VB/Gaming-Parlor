@@ -46,6 +46,7 @@
 ## Economy, betting, and memory
 
 - Completion time is recorded as an actual memory entry for the selected mode.
+- Memory is not capped at 20 entries; the prototype retains long histories up to a high storage safety cap.
 - Mistake count is recorded on actual memory entries for the selected mode.
 - A round with at least 2 more mistakes than the prior median mistake count loses 1 Heart.
 - A round with more mistakes than the prior maximum mistake count loses 1 additional Heart.
@@ -55,11 +56,14 @@
 - A new fastest individual item time for that mode awards Diamonds equal to that mode's full-round payout score.
 - The center prompt shows item timing countdown clocks for fastest, median, and slowest item records once item history exists.
 - The run's percentile against prior memory is recorded or derivable.
-- Target offers are generated from memory estimates or starter defaults.
+- Target offers are generated from recent actual performance percentile estimates or starter defaults.
+- Target estimates use recent actual percentile windows so old data does not prevent the odds from reflecting player improvement.
+- Target offers include a maximum mistake count rounded down toward zero mistakes when fractional.
 - A selected Club bet stores target time, odds, and stake.
 - Buying Clubs for a bet spends Diamonds before the round.
-- Finishing at or below the selected Club target pays Diamonds based on the odds.
-- Finishing above the selected Club target pays no Club winnings.
+- Finishing at or below the selected Club time target and at or below the selected mistake target pays Diamonds based on the odds.
+- Winning Club bets add extra actual memory entries equal to floor(net bet profit / starting bank).
+- Finishing above the selected Club time target or above the selected mistake target pays no Club winnings.
 - A mode with no actual completed rounds has no Heart safety timer, and the first run does not lose Hearts for taking too long.
 - Finishing after the Heart safety threshold loses Hearts.
 - Finishing worse than every actual memory entry for that mode loses 2 Hearts total.

@@ -6,7 +6,7 @@ For sorting, lower time is better.
 
 ## Game memory
 
-Each sorting mode has its own fixed-size memory of recent score entries.  Use 20 entries per mode in the first prototype.
+Each sorting mode keeps a long performance memory.  The prototype may use a high safety cap such as 2,000 entries per mode for localStorage practicality, but gameplay odds should not be designed around a tiny fixed memory such as 20 entries.
 
 Each memory entry should include enough information to support future probability estimates, for example:
 
@@ -17,7 +17,7 @@ Each memory entry should include enough information to support future probabilit
 - `percentileAtRun`, if available after the run is scored against the prior memory.
 - round metadata such as mistakes, seed, selected Club target, and active upgrades when useful.
 
-The exact persisted structure is an implementation concern, but it must support probability-style target estimation rather than a hard-coded 25th percentile Club line.
+The exact persisted structure is an implementation concern, but it must support probability-style target estimation from recent actual performance percentiles rather than a hard-coded 25th percentile Club line or a speed target averaged across all historical data.
 
 Actual entries come from completed rounds.  Rest entries are artificial easing entries applied to unplayed unlocked modes.
 
@@ -28,7 +28,7 @@ When the player completes game mode `G` with time `T`:
 1. Score `T` against `G`'s pre-round memory and record the percentile outcome for the run.
 2. Add an `actual` memory entry with time `T` to game `G`.
 3. For every other unlocked game mode, add a `rest` entry equal to that other mode's current worst remembered time.
-4. Trim each mode's memory to the most recent 20 entries.
+4. Keep long memory history, trimming only to a high storage safety cap if needed.
 
 ## Item timing pressure
 
@@ -129,6 +129,7 @@ spadeScore = modeBaseDiamonds + globalSpades + modeSpecificSpades[mode]
 Clubs are bought as a stake before the round.  A Club bet should include:
 
 - Target time to beat.
+- Maximum mistakes allowed.
 - Odds multiplier.
 - Stake size in Clubs purchased with Diamonds.
 - Diamond cost per Club.
@@ -136,13 +137,13 @@ Clubs are bought as a stake before the round.  A Club bet should include:
 Suggested first-prototype settlement:
 
 ```text
-if completionTime <= selectedTarget:
+if completionTime <= selectedTimeTarget and mistakes <= selectedMistakeTarget:
   diamondWinnings = clubStake + floor(clubStake * oddsMultiplier)
 else:
   diamondWinnings = 0
 ```
 
-The Club purchase cost is paid before the round.  On a winning bet, return the stake plus the odds profit.  For the 1:2 proposition, only accept stakes in multiples of 2; for example, a 4-Club stake returns the 4-Club stake plus 2 Diamonds of profit when it wins.  The odds should increase as the target becomes harder to beat.
+The Club purchase cost is paid before the round.  On a winning bet, return the stake plus the odds profit.  For the 1:2 proposition, only accept stakes in multiples of 2; for example, a 4-Club stake returns the 4-Club stake plus 2 Diamonds of profit when it wins.  The odds should increase as the target becomes harder to beat.  Mistake targets should be estimated from prior actual mistake counts for the same mode.  Easier odds may allow more mistakes, while harder odds should trend toward zero mistakes.  If an estimate lands between two mistake counts, round down toward zero so the player must meet the stricter mistake target.  On a winning bet, compute net bet profit, divide it by the player's starting bank before the stake purchase, round down, and add that many extra actual memory entries for the winning time and mistakes.  This makes high-bankroll, high-odds wins count as stronger evidence of true performance.
 
 ## Purchases and upgrades
 
