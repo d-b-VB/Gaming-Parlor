@@ -1,8 +1,8 @@
-import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, percentileAtRun, createClubBet, buyClubBet, unlockMode, buySpade, restoreHeart, buyAnimationSpeed, animationSpeedCost, animationDuration, settleRound, settleItemTiming, itemTimingTargets, spadeCost, payoutScore, streakDuration } from './game/core.js?v=0.2.10';
+import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, percentileAtRun, createClubBet, buyClubBet, unlockMode, buySpade, restoreHeart, buyAnimationSpeed, animationSpeedCost, animationDuration, settleRound, settleItemTiming, itemTimingTargets, spadeCost, payoutScore, streakDuration } from './game/core.js?v=0.2.11';
 
 const root = document.querySelector('#root');
-const APP_VERSION = 'v0.2.10';
-const SAVE_SCHEMA_VERSION = '0.2.10-local';
+const APP_VERSION = 'v0.2.11';
+const SAVE_SCHEMA_VERSION = '0.2.11-local';
 const arrows = { left: '←', right: '→', up: '↑', down: '↓' };
 let items = [];
 let selectors = [];

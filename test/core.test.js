@@ -143,12 +143,21 @@ test('memory keeps long history and bet wins add profit-weighted entries', () =>
   assert.equal(next.gameMemory.sort_2.entries.filter((entry) => entry.weightedByBet).length, 10);
 });
 
-test('target estimates use recent actual percentile windows rather than all past speeds', () => {
+test('target estimates use recent performance windows rather than all past speeds', () => {
   const oldSlow = Array.from({ length: 150 }, (_, index) => ({ timeSeconds: 100 + index, mistakes: 4, entryType: 'actual', createdAt: `slow${index}` }));
   const recentFast = Array.from({ length: 100 }, (_, index) => ({ timeSeconds: 20 + (index % 5), mistakes: index % 2, entryType: 'actual', createdAt: `fast${index}` }));
   const targets = estimateTargets('sort_2', [...oldSlow, ...recentFast]);
   assert.ok(targets.find((target) => target.id === 'even').timeSeconds < 30);
   assert.ok(targets.find((target) => target.id === 'ten').mistakeLimit <= 1);
+});
+
+
+
+test('rest entries persist in target windows as a counterweight to fast weighted wins', () => {
+  const fastActual = Array.from({ length: 50 }, (_, index) => ({ timeSeconds: 20, mistakes: 0, entryType: 'actual', createdAt: `fast${index}` }));
+  const restEntries = Array.from({ length: 50 }, (_, index) => ({ timeSeconds: 100, mistakes: 0, entryType: 'rest', createdAt: `rest${index}` }));
+  const targets = estimateTargets('sort_2', [...fastActual, ...restEntries]);
+  assert.ok(targets.find((target) => target.id === 'even').timeSeconds > 20);
 });
 
 test('first round has no presumed Heart timer or loss', () => {

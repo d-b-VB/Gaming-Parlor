@@ -17,7 +17,7 @@ Each memory entry should include enough information to support future probabilit
 - `percentileAtRun`, if available after the run is scored against the prior memory.
 - round metadata such as mistakes, seed, selected Club target, and active upgrades when useful.
 
-The exact persisted structure is an implementation concern, but it must support probability-style target estimation from recent actual performance percentiles rather than a hard-coded 25th percentile Club line or a speed target averaged across all historical data.
+The exact persisted structure is an implementation concern, but it must support probability-style target estimation from recent rest-adjusted performance percentiles rather than a hard-coded 25th percentile Club line or a speed target averaged across all historical data.
 
 Actual entries come from completed rounds.  Rest entries are artificial easing entries applied to unplayed unlocked modes.
 
@@ -143,7 +143,7 @@ else:
   diamondWinnings = 0
 ```
 
-The Club purchase cost is paid before the round.  On a winning bet, return the stake plus the odds profit.  For the 1:2 proposition, only accept stakes in multiples of 2; for example, a 4-Club stake returns the 4-Club stake plus 2 Diamonds of profit when it wins.  The odds should increase as the target becomes harder to beat.  Mistake targets should be estimated from prior actual mistake counts for the same mode.  Easier odds may allow more mistakes, while harder odds should trend toward zero mistakes.  If an estimate lands between two mistake counts, round down toward zero so the player must meet the stricter mistake target.  On a winning bet, compute net bet profit, divide it by the player's starting bank before the stake purchase, round down, and add that many extra actual memory entries for the winning time and mistakes.  This makes high-bankroll, high-odds wins count as stronger evidence of true performance.
+The Club purchase cost is paid before the round.  On a winning bet, return the stake plus the odds profit.  For the 1:2 proposition, only accept stakes in multiples of 2; for example, a 4-Club stake returns the 4-Club stake plus 2 Diamonds of profit when it wins.  The odds should increase as the target becomes harder to beat.  Mistake targets should be estimated from prior actual mistake counts for the same mode.  Easier odds may allow more mistakes, while harder odds should trend toward zero mistakes.  If an estimate lands between two mistake counts, round down toward zero so the player must meet the stricter mistake target.  On a winning bet, compute net bet profit, divide it by the player's starting bank before the stake purchase, round down, and add that many extra actual memory entries for the winning time and mistakes.  This makes high-bankroll, high-odds wins count as stronger evidence of true performance.  Rest entries should persist in the target-estimation window as a counterweight to those fast weighted wins, so rotating away from a mode can still cool expectations.
 
 ## Purchases and upgrades
 

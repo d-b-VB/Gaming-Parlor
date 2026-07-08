@@ -56,8 +56,8 @@
 - A new fastest individual item time for that mode awards Diamonds equal to that mode's full-round payout score.
 - The center prompt shows item timing countdown clocks for fastest, median, and slowest item records once item history exists.
 - The run's percentile against prior memory is recorded or derivable.
-- Target offers are generated from recent actual performance percentile estimates or starter defaults.
-- Target estimates use recent actual percentile windows so old data does not prevent the odds from reflecting player improvement.
+- Target offers are generated from recent rest-adjusted performance percentile estimates or starter defaults.
+- Target estimates use recent percentile windows so old data does not prevent the odds from reflecting player improvement.
 - Target offers include a maximum mistake count rounded down toward zero mistakes when fractional.
 - A selected Club bet stores target time, odds, and stake.
 - Buying Clubs for a bet spends Diamonds before the round.
@@ -68,6 +68,7 @@
 - Finishing after the Heart safety threshold loses Hearts.
 - Finishing worse than every actual memory entry for that mode loses 2 Hearts total.
 - Completing one unlocked mode adds rest entries to other unlocked modes.
+- Rest entries persist in target-estimation windows as a counterweight to high-stakes weighted fast entries.
 - Buying a global Spade increases future Diamond payouts for all sorting modes.
 - Buying a mode-specific Spade increases future Diamond payouts only for that mode.
 - Buying an animation speed upgrade spends Diamonds and shortens glyph travel animations without changing sorting correctness.
