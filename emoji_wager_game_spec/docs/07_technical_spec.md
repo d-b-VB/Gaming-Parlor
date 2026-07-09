@@ -77,12 +77,14 @@ src/components/PostRoundSummary.tsx
 Use unit tests for pure logic:
 
 - Selector matching.
+- Cross-cutting overlay selectors, including explicit `itemIds` selectors.
 - Color exact/contains/excludes behavior.
 - Mode config validation.
 - Board generation uniqueness for 2-way, 3-way, and 4-way sort.
 - Target estimation and percentile-at-run calculation.
 - Memory updates, including rest entries for unplayed unlocked modes.
 - Individual item timing updates, including fastest-item Diamond bonuses and slowest-item Heart losses.
+- Per-item median-speed payout upgrades, including bet-history locks and upgrade costs.
 - Club bet settlement.
 - Spade payout upgrades.
 - Purchases and unlocks.

@@ -1,8 +1,8 @@
-import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, percentileAtRun, createClubBet, buyClubBet, unlockMode, buySpade, restoreHeart, buyAnimationSpeed, animationSpeedCost, animationDuration, settleRound, settleItemTiming, itemTimingTargets, spadeCost, payoutScore, streakDuration } from './game/core.js?v=0.2.11';
+import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, percentileAtRun, createClubBet, buyClubBet, unlockMode, buySpade, buyPerItemMedianBonus, restoreHeart, buyAnimationSpeed, animationSpeedCost, animationDuration, settleRound, settleItemTiming, itemTimingTargets, spadeCost, payoutScore, perItemMedianBonusCost, hasModeBetHistory, hasPerItemMedianBonus, streakDuration } from './game/core.js?v=0.2.12';
 
 const root = document.querySelector('#root');
-const APP_VERSION = 'v0.2.11';
-const SAVE_SCHEMA_VERSION = '0.2.11-local';
+const APP_VERSION = 'v0.2.12';
+const SAVE_SCHEMA_VERSION = '0.2.12-local';
 const arrows = { left: '←', right: '→', up: '↑', down: '↓' };
 let items = [];
 let selectors = [];
@@ -47,6 +47,8 @@ function normalizeSave(candidate, defaultState) {
   }
   next.upgrades ??= {};
   next.upgrades.animationSpeed ??= 0;
+  next.upgrades.perItemMedianBonus ??= { sort_2: 0, sort_3: 0, sort_4: 0 };
+  next.modeBetCounts ??= { sort_2: 0, sort_3: 0, sort_4: 0 };
   next.saveMeta = {
     localSaveId: next.saveMeta?.localSaveId || makeLocalSaveId(),
     schemaVersion: SAVE_SCHEMA_VERSION,
@@ -247,7 +249,7 @@ async function dispatch(direction) {
     if (itemResult.event.isNewFastest || itemResult.event.isNewLongest) itemRecordCount += 1;
     queue.shift();
     streak += 1;
-    const itemNote = itemResult.event.isNewFastest ? ` New fastest item: +♦${itemResult.event.diamondsDelta}.` : itemResult.event.isNewLongest ? ' New slowest item: -♥.' : '';
+    const itemNote = `${itemResult.event.isNewFastest ? ` New fastest item: +♦${itemResult.event.diamondsDelta - itemResult.event.medianBonusDelta}.` : itemResult.event.isNewLongest ? ' New slowest item: -♥.' : ''}${itemResult.event.medianBonusDelta ? ' Faster than median: +♦1.' : ''}`;
     feedback = `Correct ${arrows[direction]} in ${itemSeconds.toFixed(2)}s — streak ${streak}; glide ${animationDuration(streakDuration(220, streak), state)}ms.${itemNote}`;
     motion = null;
     resetPromptClock();
@@ -295,7 +297,7 @@ function render() {
       <section class="panel mode-panel"><h2>Modes</h2><div class="mode-grid">${modeList.map((candidate) => `<button data-mode="${candidate.id}" class="${candidate.id === modeId ? 'selected' : ''}"><strong>${candidate.name}</strong><span>♠ score ${modePayout(candidate.id)} · pays ♦${modePayout(candidate.id)}</span><span>${state.unlockedModes[candidate.id] ? 'Select' : `Unlock ♦${candidate.unlockCost}`}</span></button>`).join('')}</div></section>
       <section class="lobby-layout"><section class="panel"><h2>Ready: ${mode.name}</h2><p>${board.queue.length} glyphs queued. Active directions: ${mode.directions.map((direction) => arrows[direction]).join(' ')}</p>${queueStripHtml()}<button id="start-round" class="primary-action">Start full-screen round</button><button id="new-board">New board</button><p class="feedback" role="status">${feedback}</p></section>
       <section class="panel"><h2>Club wager</h2><p class="hint">Harder times pay more. Locked propositions need more actual history in this mode.</p><div class="target-list">${targets.map((offer) => `<button data-target="${offer.id}" class="${offer.id === selectedTarget ? 'selected' : ''}" ${offer.available ? '' : 'disabled'}><strong>${offer.label}</strong><span>Beat ${fmt(offer.timeSeconds)} / ≤${offer.mistakeLimit} errors</span><span>${offer.oddsLabel}</span><small>${offer.available ? 'Available' : `${offer.actualCount}/${offer.minHistory} history`}</small></button>`).join('')}</div><label class="stake-row">Clubs<input id="stake" type="number" min="${selectedTarget === 'half' ? 2 : 1}" step="${selectedTarget === 'half' ? 2 : 1}" value="${stake}"></label><button id="buy-bet" ${targets.find((offer) => offer.id === selectedTarget)?.available && !(selectedTarget === 'half' && stake % 2 !== 0) ? '' : 'disabled'}>Buy bet for ♦${stake}</button></section>
-      <section class="panel shop"><h2>Spade shop</h2><p class="hint">Current ${mode.name} spade score: ${modePayout(modeId)} Diamonds before Heart penalties.</p><button id="restore-heart">Restore Heart ♦5</button><button id="buy-global">+1 Global ♠ ♦${spadeCost('global', state.upgrades.spades.global)}</button><button id="buy-mode">+1 ${mode.name} ♠ ♦${spadeCost(modeId, state.upgrades.spades[modeId])}</button><button id="buy-speed">Faster glyphs Lv.${state.upgrades.animationSpeed} ♦${animationSpeedCost(state.upgrades.animationSpeed)}</button><button disabled>Pause breaks soon</button><button disabled>Choose/rearrange categories soon</button><button id="reset-save">Reset save</button></section></section>
+      <section class="panel shop"><h2>Spade shop</h2><p class="hint">Current ${mode.name} spade score: ${modePayout(modeId)} Diamonds before Heart penalties.</p><button id="restore-heart">Restore Heart ♦5</button><button id="buy-global">+1 Global ♠ ♦${spadeCost('global', state.upgrades.spades.global)}</button><button id="buy-mode">+1 ${mode.name} ♠ ♦${spadeCost(modeId, state.upgrades.spades[modeId])}</button><button id="buy-item-median" ${hasModeBetHistory(state, modeId) && !hasPerItemMedianBonus(state, modeId) ? '' : 'disabled'}>${hasPerItemMedianBonus(state, modeId) ? 'Median item bonus owned' : `+♦1 per faster-than-median item ♦${perItemMedianBonusCost(modeId)}`}</button><small>${hasModeBetHistory(state, modeId) ? 'Unlocked by betting in this mode.' : 'Locked until you buy one Club bet in this mode.'}</small><button id="buy-speed">Faster glyphs Lv.${state.upgrades.animationSpeed} ♦${animationSpeedCost(state.upgrades.animationSpeed)}</button><button disabled>Pause breaks soon</button><button disabled>Choose/rearrange categories soon</button><button id="reset-save">Reset save</button></section></section>
     </main>`;
   root.querySelectorAll('[data-dispatch]').forEach((button) => button.addEventListener('click', () => dispatch(button.dataset.dispatch)));
   root.querySelectorAll('[data-mode]').forEach((button) => button.addEventListener('click', () => { const id = button.dataset.mode; if (state.unlockedModes[id]) startBoard(id); else tryAction(() => unlockMode(state, id)); }));
@@ -305,6 +307,7 @@ function render() {
   root.querySelector('#restore-heart')?.addEventListener('click', () => tryAction(() => restoreHeart(state)));
   root.querySelector('#buy-global')?.addEventListener('click', () => tryAction(() => buySpade(state, 'global')));
   root.querySelector('#buy-mode')?.addEventListener('click', () => tryAction(() => buySpade(state, modeId)));
+  root.querySelector('#buy-item-median')?.addEventListener('click', () => tryAction(() => buyPerItemMedianBonus(state, modeId)));
   root.querySelector('#buy-speed')?.addEventListener('click', () => tryAction(() => buyAnimationSpeed(state)));
   root.querySelector('#start-round')?.addEventListener('click', startRound);
   root.querySelector('#new-board')?.addEventListener('click', () => startBoard());
@@ -313,9 +316,9 @@ function render() {
 }
 window.addEventListener('keydown', (event) => { const map = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down' }; if (map[event.key]) { event.preventDefault(); dispatch(map[event.key]); } });
 try {
-  const [itemsData, selectorsData, stateData] = await Promise.all([json('./emoji_wager_game_spec/data/items.json'), json('./emoji_wager_game_spec/data/category_selectors.json'), json('./emoji_wager_game_spec/data/default_state.json')]);
+  const [itemsData, selectorsData, overlayData, stateData] = await Promise.all([json('./emoji_wager_game_spec/data/items.json'), json('./emoji_wager_game_spec/data/category_selectors.json'), json('./emoji_wager_game_spec/data/cross_cutting_categories.json'), json('./emoji_wager_game_spec/data/default_state.json')]);
   items = itemsData.items;
-  selectors = selectorsData.selectors;
+  selectors = [...selectorsData.selectors, ...overlayData.selectors];
   state = loadSaved(stateData);
   save();
   startBoard('sort_2');

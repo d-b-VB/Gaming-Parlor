@@ -156,6 +156,7 @@ First-prototype purchases:
 - Buy 1 2-way Spade payout upgrade: cost starts at 12 Diamonds and increases by 1.5x per 2-way Spade, rounded up.
 - Buy 1 3-way Spade payout upgrade: cost starts at 9 Diamonds and increases by 1.5x per 3-way Spade, rounded up.
 - Buy 1 4-way Spade payout upgrade: cost starts at 6 Diamonds and increases by 1.5x per 4-way Spade, rounded up.
+- Buy the per-item median-speed payout upgrade after making at least one Club bet in that mode.  It pays +1 Diamond for each item solved faster than that mode's historical median item time.  Its one-time cost equals the total early mode-Spade cost from level 1 through 8 for 2-way sort, level 1 through 12 for 3-way sort, and level 1 through 16 for 4-way sort.
 - Increase max Hearts by 1: cost starts at 20 Diamonds and doubles each time.
 
 Future upgrade families:

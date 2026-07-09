@@ -1,24 +1,41 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { generateBoard, matchesSelector, estimateTargets, heartSafety, createClubBet, buyClubBet, settleRound, settleItemTiming, itemTimingTargets, mistakePressure, unlockMode, buySpade, buyAnimationSpeed, animationSpeedCost, animationDuration, spadeCost, payoutScore, streakDuration } from '../src/game/core.js';
+import { generateBoard, matchesSelector, estimateTargets, heartSafety, createClubBet, buyClubBet, settleRound, settleItemTiming, itemTimingTargets, mistakePressure, unlockMode, buySpade, buyPerItemMedianBonus, buyAnimationSpeed, animationSpeedCost, animationDuration, spadeCost, payoutScore, perItemMedianBonusCost, hasPerItemMedianBonus, streakDuration } from '../src/game/core.js';
 
 const items = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/items.json', import.meta.url))).items;
-const selectors = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/category_selectors.json', import.meta.url))).selectors;
+const baseSelectors = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/category_selectors.json', import.meta.url))).selectors;
+const overlaySelectors = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/cross_cutting_categories.json', import.meta.url))).selectors;
+const selectors = [...baseSelectors, ...overlaySelectors];
 const defaultState = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/default_state.json', import.meta.url)));
 
 test('catalog is expanded enough for strong prototype coverage', () => {
   assert.ok(items.length >= 603);
-  assert.ok(selectors.length >= 94);
+  assert.ok(selectors.length >= 146);
+  assert.ok(overlaySelectors.length >= 50);
   assert.ok(items.filter((item) => item.kind === 'emoji').length >= 342);
 });
 
 test('selector matching supports required tags and exact colors', () => {
   assert.equal(matchesSelector({ kind: 'emoji', tags: ['animal', 'arthropod'], colors: [], glyph: '🐜' }, { requiredTags: ['arthropod'] }), true);
+  assert.equal(matchesSelector({ id: 'emoji:artist_palette', kind: 'emoji', tags: [], colors: [], glyph: '🎨' }, { itemIds: ['emoji:artist_palette'] }), true);
+  assert.equal(matchesSelector({ id: 'emoji:factory', kind: 'emoji', tags: [], colors: [], glyph: '🏭' }, { itemIds: ['emoji:artist_palette'] }), false);
   assert.equal(matchesSelector({ kind: 'flag', tags: ['flag'], colors: ['red', 'white'], glyph: '🇯🇵' }, { exactColors: ['white', 'red'] }), true);
   assert.equal(matchesSelector({ kind: 'flag', tags: ['flag'], colors: ['red', 'white', 'blue'], glyph: '🇺🇸' }, { exactColors: ['white', 'red'] }), false);
   assert.equal(matchesSelector({ kind: 'emoji', tags: ['round'], colors: [], glyph: '⚽' }, { kinds: ['emoji', 'symbol'], requiredTags: ['round'] }), true);
   assert.equal(matchesSelector({ kind: 'flag', tags: ['round'], colors: [], glyph: '🏳️' }, { kinds: ['emoji', 'symbol'], requiredTags: ['round'] }), false);
+});
+
+test('cross-cutting overlay connects formerly isolated obvious items', () => {
+  const byId = Object.fromEntries(items.map((item) => [item.id, item]));
+  const categoriesFor = (id) => selectors.filter((selector) => matchesSelector(byId[id], selector.selector)).map((selector) => selector.id);
+  for (const id of ['emoji:airplane_2', 'emoji:artist_palette', 'emoji:fire_engine', 'emoji:graduation_cap', 'emoji:ear_of_rice', 'symbol:check', 'symbol:cross_mark']) {
+    assert.ok(categoriesFor(id).length >= 2, `${id} should be cross-linked`);
+  }
+  assert.ok(categoriesFor('emoji:graduation_cap').includes('cc_june_graduation'));
+  assert.ok(categoriesFor('emoji:fire_engine').includes('cc_emergency_response'));
+  assert.ok(categoriesFor('emoji:artist_palette').includes('cc_art_studio'));
+  assert.ok(categoriesFor('emoji:corn').includes('cc_farm_to_table'));
 });
 
 test('flag geography categories are categorical and non-subjective', () => {
@@ -206,6 +223,30 @@ test('item timing records fastest and longest pressure events', () => {
   assert.equal(targets.fastestSeconds, 1);
   assert.equal(targets.medianSeconds, 2);
   assert.equal(targets.longestSeconds, 3);
+});
+
+test('per-item median payout costs use early spade totals and require mode betting', () => {
+  assert.equal(perItemMedianBonusCost('sort_2'), 594);
+  assert.equal(perItemMedianBonusCost('sort_3'), 2322);
+  assert.equal(perItemMedianBonusCost('sort_4'), 7876);
+  let state = structuredClone(defaultState);
+  state.resources.diamonds = 10000;
+  assert.throws(() => buyPerItemMedianBonus(state, 'sort_2'), /Make at least one bet/);
+  const offer = { id: 'even', timeSeconds: 40, mistakeLimit: 0, oddsMultiplier: 1, oddsLabel: '1:1' };
+  state = buyClubBet(state, createClubBet('sort_2', offer, 1));
+  state = buyPerItemMedianBonus(state, 'sort_2');
+  assert.equal(hasPerItemMedianBonus(state, 'sort_2'), true);
+  assert.equal(state.resources.diamonds, 10000 - 1 - 594);
+  state.itemStats.sort_2.entries = [
+    { itemId: 'slow', timeSeconds: 3, createdAt: 'a' },
+    { itemId: 'mid', timeSeconds: 2, createdAt: 'b' },
+    { itemId: 'fast', timeSeconds: 1, createdAt: 'c' },
+  ];
+  state.itemStats.sort_2.fastestSeconds = 1;
+  state.itemStats.sort_2.longestSeconds = 3;
+  const result = settleItemTiming(state, 'sort_2', 'bonus', 1.5, 'd');
+  assert.equal(result.event.medianBonusDelta, 1);
+  assert.ok(result.event.diamondsDelta >= 1);
 });
 
 test('animation speed upgrades cost diamonds and shorten travel duration', () => {

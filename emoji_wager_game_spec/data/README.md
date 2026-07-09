@@ -23,6 +23,12 @@ The same selectors should feed 2-way, 3-way, and 4-way sort board generation.
 
 The strong prototype selector set contains 100 curated categories.  Categories should remain objective enough that players lose because of memory and speed, not because the category itself is arguable.
 
+## `cross_cutting_categories.json`
+
+Curated overlay selectors for broad association categories such as months, professions, emergency response, farm-to-table, status symbols, continents, shapes, directions, and color associations.
+
+The overlay uses explicit `itemIds` so large category passes can be reviewed as one compact data change rather than hundreds of individual tag edits in `items.json`.  Runtime loaders should append these overlay selectors to the base selectors before board generation.
+
 ## `default_state.json`
 
 Starter resource, unlock, upgrade, and memory state for local-only prototypes.  2-way sort starts unlocked; 3-way and 4-way sort start locked and must be purchased with Diamonds.

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "0.2.11",
+  "schemaVersion": "0.2.12",
   "resources": {
     "hearts": 5,
     "maxHearts": 5,
@@ -20,7 +20,12 @@
     "animationSpeed": 0,
     "pauseBreaks": 0,
     "categoryChoice": 0,
-    "categoryRearrange": 0
+    "categoryRearrange": 0,
+    "perItemMedianBonus": {
+      "sort_2": 0,
+      "sort_3": 0,
+      "sort_4": 0
+    }
   },
   "gameMemory": {
     "sort_2": {
@@ -51,5 +56,10 @@
       "longestSeconds": null,
       "entries": []
     }
+  },
+  "modeBetCounts": {
+    "sort_2": 0,
+    "sort_3": 0,
+    "sort_4": 0
   }
 }

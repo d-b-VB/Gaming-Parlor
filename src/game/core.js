@@ -21,7 +21,7 @@ export function animationDuration(baseMs, state) { const level = state.upgrades?
 export function hashSeed(seed) { let h = 2166136261; for (let i = 0; i < seed.length; i += 1) { h ^= seed.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
 export function createRng(seed) { let state = hashSeed(seed) || 1; return () => { state |= 0; state = (state + 0x6d2b79f5) | 0; let t = Math.imul(state ^ (state >>> 15), 1 | state); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 export function shuffle(items, rng) { const result = [...items]; for (let i = result.length - 1; i > 0; i -= 1) { const j = Math.floor(rng() * (i + 1)); [result[i], result[j]] = [result[j], result[i]]; } return result; }
-export function matchesSelector(item, rule) { const all = (values, req = []) => req.every((x) => values.includes(x)); const none = (values, exc = []) => exc.every((x) => !values.includes(x)); if (rule.kind && item.kind !== rule.kind) return false; if (rule.kinds && !rule.kinds.includes(item.kind)) return false; if (!all(item.tags, rule.requiredTags)) return false; if (!none(item.tags, rule.excludesTags)) return false; if (!all(item.colors, rule.containsColors)) return false; if (!none(item.colors, rule.excludesColors)) return false; if (rule.colorCount !== undefined && item.colors.length !== rule.colorCount) return false; if (rule.exactColors) { const a = [...item.colors].sort(); const b = [...rule.exactColors].sort(); if (a.length !== b.length || !b.every((color, index) => a[index] === color)) return false; } return true; }
+export function matchesSelector(item, rule) { const all = (values, req = []) => req.every((x) => values.includes(x)); const none = (values, exc = []) => exc.every((x) => !values.includes(x)); if (rule.itemIds && !rule.itemIds.includes(item.id)) return false; if (rule.kind && item.kind !== rule.kind) return false; if (rule.kinds && !rule.kinds.includes(item.kind)) return false; if (!all(item.tags, rule.requiredTags)) return false; if (!none(item.tags, rule.excludesTags)) return false; if (!all(item.colors, rule.containsColors)) return false; if (!none(item.colors, rule.excludesColors)) return false; if (rule.colorCount !== undefined && item.colors.length !== rule.colorCount) return false; if (rule.exactColors) { const a = [...item.colors].sort(); const b = [...rule.exactColors].sort(); if (a.length !== b.length || !b.every((color, index) => a[index] === color)) return false; } return true; }
 export function eligibleItems(items, selector) { return items.filter((item) => matchesSelector(item, selector.selector)); }
 function overlapPenalty(item, selectors) { return selectors.filter((selector) => matchesSelector(item, selector.selector)).length; }
 function boardIsUnambiguous(groups, chosen) {
@@ -72,6 +72,9 @@ export function addRoundMemory(state, modeId, timeSeconds, createdAt, mistakes =
 export function createClubBet(modeId, offer, stake) { return { modeId, targetId: offer.id, targetSeconds: offer.timeSeconds, mistakeLimit: offer.mistakeLimit ?? 0, oddsMultiplier: offer.oddsMultiplier, oddsLabel: offer.oddsLabel, stake, cost: stake * CLUB_COST }; }
 export function payoutScore(state, modeId) { return MODES[modeId].baseDiamonds + state.upgrades.spades.global + state.upgrades.spades[modeId]; }
 export function spadeCost(scope, owned) { const base = scope === 'global' ? 25 : scope === 'sort_2' ? 12 : scope === 'sort_3' ? 9 : 6; const growth = scope === 'global' ? 1.6 : 1.5; return Math.ceil(base * growth ** owned); }
+export function perItemMedianBonusCost(modeId) { const levels = modeId === 'sort_2' ? 8 : modeId === 'sort_3' ? 12 : 16; return Array.from({ length: levels }, (_, owned) => spadeCost(modeId, owned)).reduce((sum, cost) => sum + cost, 0); }
+export function hasModeBetHistory(state, modeId) { return (state.modeBetCounts?.[modeId] ?? 0) > 0; }
+export function hasPerItemMedianBonus(state, modeId) { return (state.upgrades?.perItemMedianBonus?.[modeId] ?? 0) > 0; }
 function ensureItemStats(next, modeId) {
   next.itemStats ??= {};
   next.itemStats[modeId] ??= { fastestSeconds: null, longestSeconds: null, entries: [] };
@@ -82,23 +85,26 @@ export function itemTimingTargets(state, modeId) { const entries = state.itemSta
 export function settleItemTiming(state, modeId, itemId, timeSeconds, createdAt = new Date().toISOString()) {
   const next = structuredClone(state);
   const stats = ensureItemStats(next, modeId);
+  const targets = itemTimingTargets(next, modeId);
   const hasHistory = stats.entries.length > 0;
   const isNewLongest = hasHistory && timeSeconds > stats.longestSeconds;
   const isNewFastest = hasHistory && timeSeconds < stats.fastestSeconds;
+  const medianBonusDelta = hasPerItemMedianBonus(next, modeId) && Number.isFinite(targets.medianSeconds) && timeSeconds < targets.medianSeconds ? 1 : 0;
   const heartsDelta = isNewLongest ? -1 : 0;
-  const diamondsDelta = isNewFastest ? payoutScore(next, modeId) : 0;
+  const diamondsDelta = (isNewFastest ? payoutScore(next, modeId) : 0) + medianBonusDelta;
   stats.fastestSeconds = hasHistory ? Math.min(stats.fastestSeconds, timeSeconds) : timeSeconds;
   stats.longestSeconds = hasHistory ? Math.max(stats.longestSeconds, timeSeconds) : timeSeconds;
-  stats.entries = [...stats.entries, { itemId, timeSeconds, createdAt, isNewFastest, isNewLongest }].slice(-200);
+  stats.entries = [...stats.entries, { itemId, timeSeconds, createdAt, isNewFastest, isNewLongest, medianBonusDelta }].slice(-200);
   next.resources.hearts = Math.max(0, next.resources.hearts + heartsDelta);
   next.resources.diamonds += diamondsDelta;
-  const event = { type: 'itemTiming', modeId, itemId, timeSeconds, createdAt, heartsDelta, diamondsDelta, isNewFastest, isNewLongest };
+  const event = { type: 'itemTiming', modeId, itemId, timeSeconds, createdAt, heartsDelta, diamondsDelta, medianBonusDelta, isNewFastest, isNewLongest };
   next.eventLog = [...next.eventLog, event].slice(-50);
   return { state: next, event };
 }
-export function buyClubBet(state, bet) { if (bet.stake <= 0) return { ...state, activeClubBet: null }; if (bet.oddsLabel === '1:2' && bet.stake % 2 !== 0) throw new Error('1:2 wagers must be paid in multiples of 2 Clubs'); if (state.resources.diamonds < bet.cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= bet.cost; next.activeClubBet = { ...bet, startingBank: state.resources.diamonds }; return next; }
+export function buyClubBet(state, bet) { if (bet.stake <= 0) return { ...state, activeClubBet: null }; if (bet.oddsLabel === '1:2' && bet.stake % 2 !== 0) throw new Error('1:2 wagers must be paid in multiples of 2 Clubs'); if (state.resources.diamonds < bet.cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= bet.cost; next.activeClubBet = { ...bet, startingBank: state.resources.diamonds }; next.modeBetCounts ??= {}; next.modeBetCounts[bet.modeId] = (next.modeBetCounts[bet.modeId] ?? 0) + 1; return next; }
 export function unlockMode(state, modeId) { const mode = MODES[modeId]; if (state.unlockedModes[modeId]) return state; if (state.resources.diamonds < mode.unlockCost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= mode.unlockCost; next.unlockedModes[modeId] = true; return next; }
 export function buySpade(state, scope) { const cost = spadeCost(scope, state.upgrades.spades[scope]); if (state.resources.diamonds < cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= cost; next.upgrades.spades[scope] += 1; return next; }
+export function buyPerItemMedianBonus(state, modeId) { if (!hasModeBetHistory(state, modeId)) throw new Error('Make at least one bet in this mode first'); if (hasPerItemMedianBonus(state, modeId)) return state; const cost = perItemMedianBonusCost(modeId); if (state.resources.diamonds < cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= cost; next.upgrades ??= {}; next.upgrades.perItemMedianBonus ??= { sort_2: 0, sort_3: 0, sort_4: 0 }; next.upgrades.perItemMedianBonus[modeId] = 1; return next; }
 export function buyAnimationSpeed(state) { const owned = state.upgrades?.animationSpeed ?? 0; const cost = animationSpeedCost(owned); if (state.resources.diamonds < cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= cost; next.upgrades ??= {}; next.upgrades.animationSpeed = owned + 1; return next; }
 export function restoreHeart(state) { if (state.resources.hearts >= state.resources.maxHearts) return state; if (state.resources.diamonds < HEART_RESTORE_COST) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= HEART_RESTORE_COST; next.resources.hearts += 1; return next; }
 export function mistakePressure(entries, mistakes) { const actualMistakes = entries.filter((entry) => entry.entryType === 'actual' && Number.isFinite(entry.mistakes)).map((entry) => entry.mistakes); if (!actualMistakes.length) return { medianMistakes: null, maxMistakes: null, heartsLost: 0, highMistakeRound: false, newWorstMistakeRound: false }; const medianMistakes = median(actualMistakes); const maxMistakes = Math.max(...actualMistakes); const highMistakeRound = mistakes >= medianMistakes + 2; const newWorstMistakeRound = mistakes > maxMistakes; return { medianMistakes, maxMistakes, highMistakeRound, newWorstMistakeRound, heartsLost: (highMistakeRound ? 1 : 0) + (newWorstMistakeRound ? 1 : 0) }; }

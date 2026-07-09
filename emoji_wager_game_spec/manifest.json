@@ -1,6 +1,6 @@
 {
   "package": "emoji_wager_game_spec",
-  "version": "0.2.0",
+  "version": "0.2.12",
   "created_for": "Codex/GitHub implementation",
   "files": [
     "README.md",
@@ -17,6 +17,7 @@
     "docs/10_open_design_questions.md",
     "data/items.json",
     "data/category_selectors.json",
+    "data/cross_cutting_categories.json",
     "data/default_state.json",
     "data/README.md"
   ]
