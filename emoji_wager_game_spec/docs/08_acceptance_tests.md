@@ -65,6 +65,7 @@
 - Winning Club bets add extra actual memory entries equal to floor(net bet profit / starting bank).
 - Finishing above the selected Club time target or above the selected mistake target pays no Club winnings.
 - A mode with no actual completed rounds has no Heart safety timer, and the first run does not lose Hearts for taking too long.
+- Heart safety follows staged actual-run calibration for every mode: run 2 uses run 1 ×2, run 3 uses the slowest of the first 2 runs, run 4 uses the median of the first 3, run 5 uses the second slowest of the first 4, and later runs use the simple actual-run median.
 - Finishing after the Heart safety threshold loses Hearts.
 - Finishing worse than every actual memory entry for that mode loses 2 Hearts total.
 - Completing one unlocked mode adds rest entries to other unlocked modes.

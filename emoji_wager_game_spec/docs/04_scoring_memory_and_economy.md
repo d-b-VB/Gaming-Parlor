@@ -76,17 +76,18 @@ Lower target times must have higher payouts.  A proposition should only become a
 
 ## Heart safety threshold
 
-Heart loss still needs a clear safety line.  The first prototype may use the estimated 50% target, median remembered time, or a slightly easier line as the Heart safety threshold.  The chosen approach should be centralized in scoring configuration and covered by tests.
+Heart loss still needs a clear safety line.  Use only actual completed runs for the Heart safety sequence; rest entries can influence betting targets, but they do not set the early Heart timer.
 
-If a mode has no actual completed rounds yet, the first round for that mode should have no Heart safety timer and no Heart loss for taking too long.  It is a calibration run; let the player take as long as needed.  After at least one actual score exists but fewer than 5 memory entries exist for a mode, use starter defaults per mode.
+For every game mode:
 
-Suggested starter defaults:
-
-| Mode | Safe / 50% target | Sharp / 25% target | Long-shot / 10% target | Heart safety |
-| --- | ---: | ---: | ---: | ---: |
-| 2-way sort | 35s | 28s | 22s | 45s |
-| 3-way sort | 50s | 40s | 32s | 65s |
-| 4-way sort | 70s | 55s | 45s | 90s |
+| Actual runs before this round | Heart safety threshold |
+| ---: | --- |
+| 0 | Infinite; no Heart timer and no Heart loss for taking too long. |
+| 1 | Prior run time × 2. |
+| 2 | Slowest of the first 2 runs. |
+| 3 | Median time of the first 3 runs. |
+| 4 | Second slowest of the first 4 runs. |
+| 5+ | Simple median of actual run times. |
 
 ## Round outcome
 
@@ -156,7 +157,7 @@ First-prototype purchases:
 - Buy 1 2-way Spade payout upgrade: cost starts at 12 Diamonds and increases by 1.5x per 2-way Spade, rounded up.
 - Buy 1 3-way Spade payout upgrade: cost starts at 9 Diamonds and increases by 1.5x per 3-way Spade, rounded up.
 - Buy 1 4-way Spade payout upgrade: cost starts at 6 Diamonds and increases by 1.5x per 4-way Spade, rounded up.
-- Buy the per-item median-speed payout upgrade after making at least one Club bet in that mode.  It pays +1 Diamond for each item solved faster than that mode's historical median item time.  Its one-time cost equals the total early mode-Spade cost from level 1 through 8 for 2-way sort, level 1 through 12 for 3-way sort, and level 1 through 16 for 4-way sort.
+- Buy repeatable per-item median-speed payout upgrades after making at least one Club bet in that mode.  Each level pays +1 Diamond for each item solved faster than that mode's historical median item time.  Level 1 costs the total early mode-Spade cost from level 1 through 8 for 2-way sort, level 1 through 12 for 3-way sort, and level 1 through 16 for 4-way sort; later levels increase from that base cost.
 - Increase max Hearts by 1: cost starts at 20 Diamonds and doubles each time.
 
 Future upgrade families:

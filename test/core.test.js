@@ -185,6 +185,17 @@ test('first round has no presumed Heart timer or loss', () => {
   assert.equal(next.gameMemory.sort_2.entries.at(-1).timeSeconds, 999);
 });
 
+test('heart safety thresholds stage from actual run history', () => {
+  const entries = (...times) => times.map((timeSeconds, index) => ({ timeSeconds, entryType: 'actual', createdAt: `run-${index}` }));
+  assert.equal(heartSafety('sort_2', entries()), Infinity);
+  assert.equal(heartSafety('sort_2', entries(30)), 60);
+  assert.equal(heartSafety('sort_2', entries(30, 50)), 50);
+  assert.equal(heartSafety('sort_2', entries(30, 50, 40)), 40);
+  assert.equal(heartSafety('sort_2', entries(30, 50, 40, 70)), 50);
+  assert.equal(heartSafety('sort_2', entries(30, 50, 40, 70, 60)), 50);
+  assert.equal(heartSafety('sort_2', [...entries(30, 50, 40), { timeSeconds: 999, entryType: 'rest' }]), 40);
+});
+
 test('round settlement records mistakes and tolerates missing mode memory', () => {
   const partial = structuredClone(defaultState);
   delete partial.gameMemory.sort_2;
@@ -229,6 +240,7 @@ test('per-item median payout costs use early spade totals and require mode betti
   assert.equal(perItemMedianBonusCost('sort_2'), 594);
   assert.equal(perItemMedianBonusCost('sort_3'), 2322);
   assert.equal(perItemMedianBonusCost('sort_4'), 7876);
+  assert.equal(perItemMedianBonusCost('sort_2', 1), 1040);
   let state = structuredClone(defaultState);
   state.resources.diamonds = 10000;
   assert.throws(() => buyPerItemMedianBonus(state, 'sort_2'), /Make at least one bet/);
@@ -237,6 +249,9 @@ test('per-item median payout costs use early spade totals and require mode betti
   state = buyPerItemMedianBonus(state, 'sort_2');
   assert.equal(hasPerItemMedianBonus(state, 'sort_2'), true);
   assert.equal(state.resources.diamonds, 10000 - 1 - 594);
+  state = buyPerItemMedianBonus(state, 'sort_2');
+  assert.equal(state.upgrades.perItemMedianBonus.sort_2, 2);
+  assert.equal(state.resources.diamonds, 10000 - 1 - 594 - 1040);
   state.itemStats.sort_2.entries = [
     { itemId: 'slow', timeSeconds: 3, createdAt: 'a' },
     { itemId: 'mid', timeSeconds: 2, createdAt: 'b' },
@@ -245,8 +260,8 @@ test('per-item median payout costs use early spade totals and require mode betti
   state.itemStats.sort_2.fastestSeconds = 1;
   state.itemStats.sort_2.longestSeconds = 3;
   const result = settleItemTiming(state, 'sort_2', 'bonus', 1.5, 'd');
-  assert.equal(result.event.medianBonusDelta, 1);
-  assert.ok(result.event.diamondsDelta >= 1);
+  assert.equal(result.event.medianBonusDelta, 2);
+  assert.ok(result.event.diamondsDelta >= 2);
 });
 
 test('animation speed upgrades cost diamonds and shorten travel duration', () => {
