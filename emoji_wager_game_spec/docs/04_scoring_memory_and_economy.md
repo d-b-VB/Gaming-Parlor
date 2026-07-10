@@ -35,10 +35,14 @@ When the player completes game mode `G` with time `T`:
 In addition to whole-round completion time, record the elapsed time for each correctly sorted prompt item.
 
 - The first recorded item time calibrates item timing and should not itself trigger a fastest or slowest reward/penalty.
-- If a later item time is slower than the player's previous longest recorded item time for that mode, immediately lose 1 Heart.
+- If a later item time is slower than the hidden slow-item danger line, immediately lose 1 Heart.  Prefer `min(median item time × 2, median item time + IQR, prior slowest item time)` once item timing history exists.  Do not show this exact slowest threshold; show real-time Heart-loss feedback when it is crossed.
 - If a later item time is faster than the player's previous fastest recorded item time for that mode, immediately award Diamonds equal to that mode's current Spade score / base round payout before Heart penalties.
 - Store recent item timing entries with item id, elapsed seconds, timestamp, and whether the entry created a fastest or longest record.
 - Use the per-mode fastest, median, and longest item times as live item countdown references in the play UI.
+
+## First-round calibration pseudo-scores
+
+The first completed round in a mode should remain non-punitive, but it should not invite sandbagging.  Store the actual first-round time and item-pace pseudo-scores as temporary calibration entries.  Candidate pseudo-scores include second-half pace ×2, last-quarter pace ×4, exponentially weighted item pace, last-half median item pace, midhinge item pace, narrowest-window modal item pace for all items, and narrowest-window modal item pace for the second half.  Drop any pseudo-score slower than the actual first-round time, deduplicate identical scores, and remove the slowest temporary calibration entry after each later actual round in that mode.
 
 For a prototype with only one unlocked mode, step 3 has no visible effect until more modes are unlocked.
 
@@ -52,7 +56,7 @@ Record the number of wrong dispatches on every completed round.  Compare each ne
 
 ## Animation speed upgrades
 
-Animation speed upgrades are Diamond purchases that make glyph travel/rejection animations shorter.  They should not change board correctness, timer math, payouts, or item timing thresholds; they only reduce animation waiting time between player actions.
+Glyph movement should be a meaningful part of round time: a prompt travels from the hidden queue to the center, then to the selected category, or slinks back to the queue on a mistake.  Correct-move duration should be tied roughly to the mode's median item timing; mistake-return duration should be tied roughly to the slow/longest item timing so errors feel expensive.  Animation speed upgrades are Diamond purchases that shorten those travel/rejection animations.  They do not change board correctness, payouts, or item timing thresholds, but because the player waits for movement before the next prompt, faster glyphs materially improve achievable round times.
 
 ## Why rest entries exist
 
@@ -158,12 +162,14 @@ First-prototype purchases:
 - Buy 1 3-way Spade payout upgrade: cost starts at 9 Diamonds and increases by 1.5x per 3-way Spade, rounded up.
 - Buy 1 4-way Spade payout upgrade: cost starts at 6 Diamonds and increases by 1.5x per 4-way Spade, rounded up.
 - Buy repeatable per-item median-speed payout upgrades after making at least one Club bet in that mode.  Each level pays +1 Diamond for each item solved faster than that mode's historical median item time.  Level 1 costs the total early mode-Spade cost from level 1 through 8 for 2-way sort, level 1 through 12 for 3-way sort, and level 1 through 16 for 4-way sort; later levels increase from that base cost.
+- Buy study time: each level adds 1 automatic pre-round second for reading categories before the timer starts; sorting any glyph starts the timer early.
+- Buy pauses per round: each level adds 1 player-triggered pause during a round.
+- Buy pause length: each level adds 1 second to each pause.
+- Buy queue visibility: the queue starts hidden except for the active prompt and mistaken returned glyphs; each level reveals one additional upcoming prompt.
 - Increase max Hearts by 1: cost starts at 20 Diamonds and doubles each time.
 
 Future upgrade families:
 
-- Faster glyph travel and entry animations.
-- Pause breaks within a round.
 - Category choice before a round.
 - Category rearrangement before a round.
 

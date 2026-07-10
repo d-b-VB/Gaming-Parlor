@@ -36,7 +36,12 @@
 - Inactive directions do not dispatch in modes that do not use them.
 - A correct answer removes that glyph from the queue.
 - A wrong answer sends that glyph to the back of the queue.
-- The timer does not pause for correct or wrong answers unless a pause-break upgrade explicitly applies.
+- The timer does not pause for correct or wrong answers unless a pause upgrade is actively being used.
+- The queue hides unrevealed future glyph identities by default while preserving visible queue length.
+- Queue-visibility upgrades reveal additional upcoming prompt identities.
+- Mistaken glyphs returned to the queue remain visibly identified.
+- Study-time upgrades delay the game timer at round start until study expires or the player sorts.
+- Pause upgrades let the player pause with Space or a button, freezing round and item timers until the pause expires.
 - Once the queue is down to the final prompt item, both the Heart safety countdown and active Club bet countdown are hidden.
 - A correct streak increments after correct answers.
 - A wrong answer resets the streak to zero.
@@ -52,7 +57,7 @@
 - A round with more mistakes than the prior maximum mistake count loses 1 additional Heart.
 - Correctly sorted individual items record per-item timing entries for the selected mode.
 - The first individual item timing entry calibrates fastest/longest item stats without awarding Diamonds or removing Hearts.
-- A new slowest individual item time for that mode removes 1 Heart.
+- An individual item time slower than the hidden slow danger line removes 1 Heart and gives immediate feedback.
 - A new fastest individual item time for that mode awards Diamonds equal to that mode's full-round payout score.
 - The center prompt shows item timing countdown clocks for fastest, median, and slowest item records once item history exists.
 - The run's percentile against prior memory is recorded or derivable.
@@ -65,6 +70,7 @@
 - Winning Club bets add extra actual memory entries equal to floor(net bet profit / starting bank).
 - Finishing above the selected Club time target or above the selected mistake target pays no Club winnings.
 - A mode with no actual completed rounds has no Heart safety timer, and the first run does not lose Hearts for taking too long.
+- First-round actual time and derived item-pace pseudo-scores are stored as temporary calibration entries; pseudo-scores slower than the actual first-round time are dropped, identical scores are deduplicated, and later actual rounds remove the slowest temporary calibration entry.
 - Heart safety follows staged actual-run calibration for every mode: run 2 uses run 1 ×2, run 3 uses the slowest of the first 2 runs, run 4 uses the median of the first 3, run 5 uses the second slowest of the first 4, and later runs use the simple actual-run median.
 - Finishing after the Heart safety threshold loses Hearts.
 - Finishing worse than every actual memory entry for that mode loses 2 Hearts total.
@@ -72,7 +78,8 @@
 - Rest entries persist in target-estimation windows as a counterweight to high-stakes weighted fast entries.
 - Buying a global Spade increases future Diamond payouts for all sorting modes.
 - Buying a mode-specific Spade increases future Diamond payouts only for that mode.
-- Buying an animation speed upgrade spends Diamonds and shortens glyph travel animations without changing sorting correctness.
+- Buying an animation speed upgrade spends Diamonds and shortens deliberately weighty glyph travel animations without changing sorting correctness.
+- Buying study-time, pause-count, pause-length, and queue-visibility upgrades spends Diamonds and increments the corresponding upgrade level.
 - Restoring a Heart spends Diamonds and cannot exceed max Hearts.
 - State persists after page reload.
 
@@ -81,7 +88,7 @@
 - Editing the Club stake input does not rerender the whole screen or jump focus back to the top.
 - The main play UI shows only target glyphs for the active groups in the first prototype.
 - The mode selector shows 2-way, 3-way, and 4-way sort.
-- The shop exposes Heart restore, mode unlocks, and Spade payout upgrades.
+- The shop exposes Heart restore, mode unlocks, Spade payout upgrades, animation speed, study time, pauses, and queue-visibility upgrades.
 
 ## Non-goals
 

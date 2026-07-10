@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "0.2.13",
+  "schemaVersion": "0.2.16",
   "resources": {
     "hearts": 5,
     "maxHearts": 5,
@@ -18,14 +18,17 @@
       "sort_4": 0
     },
     "animationSpeed": 0,
-    "pauseBreaks": 0,
     "categoryChoice": 0,
     "categoryRearrange": 0,
     "perItemMedianBonus": {
       "sort_2": 0,
       "sort_3": 0,
       "sort_4": 0
-    }
+    },
+    "studyTime": 0,
+    "pauseCount": 0,
+    "pauseLength": 0,
+    "queueVision": 0
   },
   "gameMemory": {
     "sort_2": {

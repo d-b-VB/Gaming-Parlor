@@ -311,3 +311,18 @@ input { width: 100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1
   pointer-events: none;
 }
 .center-card .prompt { position: relative; z-index: 1; }
+
+/* v0.2.16: hidden queue, study/pause controls, and intentionally weighty travel. */
+.hidden-glyph {
+  color: #c29a58;
+  opacity: 0.38;
+  text-shadow: 0 0 10px rgba(255, 210, 122, 0.12);
+}
+.status-row button {
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  min-height: 0;
+}
+.motion-clone {
+  transition: none;
+}

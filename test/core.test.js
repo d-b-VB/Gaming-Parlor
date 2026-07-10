@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { generateBoard, matchesSelector, estimateTargets, heartSafety, createClubBet, buyClubBet, settleRound, settleItemTiming, itemTimingTargets, mistakePressure, unlockMode, buySpade, buyPerItemMedianBonus, buyAnimationSpeed, animationSpeedCost, animationDuration, spadeCost, payoutScore, perItemMedianBonusCost, hasPerItemMedianBonus, streakDuration } from '../src/game/core.js';
+import { generateBoard, matchesSelector, estimateTargets, heartSafety, createClubBet, buyClubBet, settleRound, settleItemTiming, itemTimingTargets, itemSlowHeartThreshold, firstRoundCalibrationScores, mistakePressure, unlockMode, buySpade, buyPerItemMedianBonus, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, spadeCost, payoutScore, perItemMedianBonusCost, hasPerItemMedianBonus, streakDuration } from '../src/game/core.js';
 
 const items = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/items.json', import.meta.url))).items;
 const baseSelectors = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/category_selectors.json', import.meta.url))).selectors;
@@ -196,6 +196,24 @@ test('heart safety thresholds stage from actual run history', () => {
   assert.equal(heartSafety('sort_2', [...entries(30, 50, 40), { timeSeconds: 999, entryType: 'rest' }]), 40);
 });
 
+test('first round calibration creates temporary pseudo-scores no slower than actual', () => {
+  const scores = firstRoundCalibrationScores(100, [10, 8, 6, 4, 3, 2, 2, 1], 8);
+  assert.equal(scores[0].source, 'actual_first_round');
+  assert.ok(scores.some((score) => score.source.includes('modal_item_pace')));
+  assert.ok(scores.some((score) => score.source.includes('modal_second_half_item_pace')));
+  assert.equal(new Set(scores.map((score) => score.timeSeconds.toFixed(2))).size, scores.length);
+  assert.ok(scores.every((score) => score.timeSeconds <= 100));
+  let state = settleRound(structuredClone(defaultState), 'sort_2', 100, 0, 'calibration', 't0', [10, 8, 6, 4, 3, 2, 2, 1]).gameMemory.sort_2.entries;
+  assert.ok(state.length > 1);
+  assert.ok(state.every((entry) => entry.temporary));
+  const slowestTemporary = Math.max(...state.map((entry) => entry.timeSeconds));
+  const next = structuredClone(defaultState);
+  next.gameMemory.sort_2.entries = state;
+  state = settleRound(next, 'sort_2', 50, 0, 'after-calibration', 't1').gameMemory.sort_2.entries;
+  assert.equal(state.some((entry) => entry.temporary && entry.timeSeconds === slowestTemporary), false);
+  assert.equal(state.at(-1).temporary, undefined);
+});
+
 test('round settlement records mistakes and tolerates missing mode memory', () => {
   const partial = structuredClone(defaultState);
   delete partial.gameMemory.sort_2;
@@ -236,6 +254,18 @@ test('item timing records fastest and longest pressure events', () => {
   assert.equal(targets.longestSeconds, 3);
 });
 
+test('item slow Heart threshold uses median, IQR, and prior slowest', () => {
+  let state = structuredClone(defaultState);
+  state.itemStats.sort_2.entries = [1, 1.2, 1.4, 1.6, 10].map((timeSeconds) => ({ timeSeconds }));
+  state.itemStats.sort_2.fastestSeconds = 1;
+  state.itemStats.sort_2.longestSeconds = 10;
+  assert.equal(itemSlowHeartThreshold(state, 'sort_2'), 1.8);
+  const result = settleItemTiming(state, 'sort_2', 'too-slow', 2.1, 'slow');
+  assert.equal(result.event.heartsDelta, -1);
+  const safe = settleItemTiming(state, 'sort_2', 'safe', 1.3, 'safe');
+  assert.equal(safe.event.heartsDelta, 0);
+});
+
 test('per-item median payout costs use early spade totals and require mode betting', () => {
   assert.equal(perItemMedianBonusCost('sort_2'), 594);
   assert.equal(perItemMedianBonusCost('sort_3'), 2322);
@@ -264,6 +294,33 @@ test('per-item median payout costs use early spade totals and require mode betti
   assert.ok(result.event.diamondsDelta >= 2);
 });
 
+
+
+test('study pause and queue visibility upgrades cost diamonds and increment levels', () => {
+  let state = structuredClone(defaultState);
+  state.resources.diamonds = 1000;
+  assert.equal(studyTimeCost(0), 8);
+  assert.equal(pauseCountCost(0), 120);
+  assert.equal(pauseLengthCost(0), 60);
+  assert.equal(queueVisionCost(0), 35);
+  state = buyStudyTime(state);
+  assert.equal(state.upgrades.studyTime, 1);
+  assert.equal(state.resources.diamonds, 992);
+  state = buyPauseCount(state);
+  assert.equal(state.upgrades.pauseCount, 1);
+  assert.equal(state.resources.diamonds, 872);
+  state = buyPauseLength(state);
+  assert.equal(state.upgrades.pauseLength, 1);
+  assert.equal(state.resources.diamonds, 812);
+  state = buyQueueVision(state);
+  assert.equal(state.upgrades.queueVision, 1);
+  assert.equal(state.resources.diamonds, 777);
+  assert.ok(studyTimeCost(1) > studyTimeCost(0));
+  assert.ok(pauseCountCost(1) > pauseCountCost(0));
+  assert.ok(pauseLengthCost(1) > pauseLengthCost(0));
+  assert.ok(queueVisionCost(1) > queueVisionCost(0));
+});
+
 test('animation speed upgrades cost diamonds and shorten travel duration', () => {
   let state = structuredClone(defaultState);
   state.resources.diamonds = 100;
@@ -274,6 +331,18 @@ test('animation speed upgrades cost diamonds and shorten travel duration', () =>
   assert.ok(animationDuration(1000, state) < 1000);
   state.upgrades.animationSpeed = 100;
   assert.equal(animationDuration(1000, state), 450);
+});
+
+test('max Heart upgrades increase heart spaces with escalating costs', () => {
+  let state = structuredClone(defaultState);
+  state.resources.hearts = 3;
+  state.resources.diamonds = 100;
+  assert.equal(maxHeartCost(state.resources.maxHearts), 20);
+  state = buyMaxHeart(state);
+  assert.equal(state.resources.maxHearts, 6);
+  assert.equal(state.resources.hearts, 4);
+  assert.equal(state.resources.diamonds, 80);
+  assert.equal(maxHeartCost(state.resources.maxHearts), 40);
 });
 
 test('spade costs and streak animation scale upward and downward respectively', () => {

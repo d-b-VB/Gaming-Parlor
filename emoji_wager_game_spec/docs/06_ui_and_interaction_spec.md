@@ -10,7 +10,7 @@ The first playable version should prioritize a usable game loop and tests over v
 
 Between rounds, show the mode selector, shop, Club betting propositions, resources, and setup controls.
 
-When a sorting round starts, the sorting game should take the whole screen. Hide the shop, mode selector, and betting setup until the round ends.
+When a sorting round starts, the sorting game should take the whole screen. Hide the shop, mode selector, and betting setup until the round ends.  If the player owns study time, start with a pre-round study countdown; the game timer begins when study time expires or the player sorts the first glyph.
 
 ## Main play screen
 
@@ -20,7 +20,7 @@ The full-screen sorting view should include:
 - Visible target glyph groups assigned to each active direction.
 - A center prompt glyph with three stacked item timing countdown clocks behind it after item timing history exists.
 - A queue/progress indicator.
-- Full visible emoji prompt queue under the timer bars.
+- A prompt queue under the timer bars that shows queue length by default while hiding unrevealed identities.
 - Completion timer.
 - Countdown bar for Heart safety.
 - Countdown bar for the active Club bet, if a bet is active.
@@ -28,7 +28,7 @@ The full-screen sorting view should include:
 - Current Hearts, Diamonds, and total Spade score / expected Diamond payout for the selected mode.
 - Current streak.
 
-The first UI should show only the target glyphs for each group.  Directional category groups on the left and right should stack glyphs vertically in tight boxes to frame the board.  The prompt queue should start at the same visual width as the initial countdown bars, then shrink as prompts are removed so the remaining queue becomes visually shorter over time.  Category labels, swatches, and explanatory text can be added later if needed.
+The first UI should show only the target glyphs for each group.  Directional category groups on the left and right should stack glyphs vertically in tight boxes to frame the board.  The prompt queue should start at the same visual width as the initial countdown bars, then shrink as prompts are removed so the remaining queue becomes visually shorter over time.  By default, hide the identity of unrevealed future queue items while preserving their slots; show the active prompt and any mistaken prompt that has been returned to the queue.  Queue-visibility upgrades reveal additional upcoming prompts.  Category labels, swatches, and explanatory text can be added later if needed.
 
 ## Mode select and unlocks
 
@@ -67,6 +67,11 @@ Correct answer:
 - Show individual-item timing feedback when the item sets a new fastest or new slowest personal item time for that mode, including the Diamond bonus or Heart loss.
 - Behind the center prompt, show stacked item clocks for fastest, median, and slowest item timing records so the player can feel the pressure before the slowest-item Heart loss triggers.
 
+Pause and study:
+
+- Study time is automatic before a round and gives the player time to inspect the category layout without running the game timer.
+- Pressing Space or the on-screen Pause button consumes one purchased pause, freezes the round timer and item timer, and resumes automatically when pause time expires.
+
 Wrong answer:
 
 - Glyph visibly moves toward the chosen edge.
@@ -95,9 +100,12 @@ The first shop can be simple and functional.  It should include:
 - Buy 2-way Spade payout upgrade.
 - Buy 3-way Spade payout upgrade.
 - Buy 4-way Spade payout upgrade.
-- Buy animation speed upgrades that shorten glyph travel animations.
+- Buy animation speed upgrades that shorten deliberately weighty glyph travel animations.
+- Buy study-time upgrades.
+- Buy pause-count and pause-length upgrades.
+- Buy queue-visibility upgrades.
 
-Future upgrade slots may be visible but disabled for pause breaks, category choice, and category rearrangement.
+Future upgrade slots may be visible but disabled for category choice and category rearrangement.
 
 ## Accessibility
 
