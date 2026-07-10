@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "0.2.16",
+  "resources": {
+    "hearts": 5,
+    "maxHearts": 5,
+    "diamonds": 20
+  },
+  "unlockedModes": {
+    "sort_2": true,
+    "sort_3": false,
+    "sort_4": false
+  },
+  "upgrades": {
+    "spades": {
+      "global": 0,
+      "sort_2": 0,
+      "sort_3": 0,
+      "sort_4": 0
+    },
+    "animationSpeed": 0,
+    "categoryChoice": 0,
+    "categoryRearrange": 0,
+    "perItemMedianBonus": {
+      "sort_2": 0,
+      "sort_3": 0,
+      "sort_4": 0
+    },
+    "studyTime": 0,
+    "pauseCount": 0,
+    "pauseLength": 0,
+    "queueVision": 0
+  },
+  "gameMemory": {
+    "sort_2": {
+      "entries": []
+    },
+    "sort_3": {
+      "entries": []
+    },
+    "sort_4": {
+      "entries": []
+    }
+  },
+  "activeClubBet": null,
+  "eventLog": [],
+  "itemStats": {
+    "sort_2": {
+      "fastestSeconds": null,
+      "longestSeconds": null,
+      "entries": []
+    },
+    "sort_3": {
+      "fastestSeconds": null,
+      "longestSeconds": null,
+      "entries": []
+    },
+    "sort_4": {
+      "fastestSeconds": null,
+      "longestSeconds": null,
+      "entries": []
+    }
+  },
+  "modeBetCounts": {
+    "sort_2": 0,
+    "sort_3": 0,
+    "sort_4": 0
+  }
+}
