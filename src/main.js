@@ -1,8 +1,8 @@
-import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, percentileAtRun, createClubBet, buyClubBet, unlockMode, buySpade, buyPerItemMedianBonus, restoreHeart, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, settleRound, settleItemTiming, itemTimingTargets, spadeCost, payoutScore, perItemMedianBonusCost, hasModeBetHistory, streakDuration } from './game/core.js?v=0.2.16';
+import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, percentileAtRun, createClubBet, buyClubBet, unlockMode, buySpade, buyPerItemMedianBonus, restoreHeart, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, settleRound, settleItemTiming, itemTimingTargets, spadeCost, payoutScore, perItemMedianBonusCost, hasModeBetHistory, streakDuration } from './game/core.js?v=0.2.17';
 
 const root = document.querySelector('#root');
-const APP_VERSION = 'v0.2.16';
-const SAVE_SCHEMA_VERSION = '0.2.16-local';
+const APP_VERSION = 'v0.2.17';
+const SAVE_SCHEMA_VERSION = '0.2.17-local';
 const arrows = { left: '←', right: '→', up: '↑', down: '↓' };
 let items = [];
 let selectors = [];
@@ -264,6 +264,26 @@ async function animateGlyphTravel(html, direction, isCorrect) {
   await animation.finished.catch(() => {});
   clone.remove();
 }
+
+function showItemOutcomeFloat({ diamonds = 0, hearts = 0 } = {}) {
+  const center = root.querySelector('.center-card')?.getBoundingClientRect();
+  if (!center) return;
+  const originX = center.left + center.width / 2;
+  const originY = center.top + center.height / 2;
+  const effects = [];
+  if (diamonds > 0) effects.push({ kind: 'diamond', text: diamonds === 1 ? '+♦' : `+♦${diamonds}` });
+  if (hearts < 0) effects.push({ kind: 'heart', text: hearts === -1 ? '-♥' : `-♥${Math.abs(hearts)}` });
+  effects.forEach((effect, index) => {
+    const node = document.createElement('span');
+    node.className = `outcome-float ${effect.kind}`;
+    node.textContent = effect.text;
+    node.style.left = `${originX + (index - (effects.length - 1) / 2) * 42}px`;
+    node.style.top = `${originY}px`;
+    document.body.append(node);
+    window.setTimeout(() => node.remove(), 1150);
+  });
+}
+
 function finishRound() {
   const finalElapsed = startedAt ? (Date.now() - startedAt - pausedAccumMs - (paused ? Date.now() - pauseStartedAt : 0)) / 1000 : elapsed;
   const final = Math.max(1, Number(finalElapsed.toFixed(2)));
@@ -325,6 +345,7 @@ async function dispatch(direction) {
     save();
     if (itemResult.event.heartsDelta < 0) itemHeartLosses += Math.abs(itemResult.event.heartsDelta);
     if (itemResult.event.diamondsDelta > 0) itemDiamondBonuses += itemResult.event.diamondsDelta;
+    showItemOutcomeFloat({ diamonds: itemResult.event.diamondsDelta, hearts: itemResult.event.heartsDelta });
     if (itemResult.event.isNewFastest || itemResult.event.isNewLongest) itemRecordCount += 1;
     roundItemTimes.push(itemSeconds);
     queue.shift();

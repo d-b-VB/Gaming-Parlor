@@ -57,8 +57,8 @@
 - A round with more mistakes than the prior maximum mistake count loses 1 additional Heart.
 - Correctly sorted individual items record per-item timing entries for the selected mode.
 - The first individual item timing entry calibrates fastest/longest item stats without awarding Diamonds or removing Hearts.
-- An individual item time slower than the hidden slow danger line removes 1 Heart and gives immediate feedback.
-- A new fastest individual item time for that mode awards Diamonds equal to that mode's full-round payout score.
+- An individual item time slower than the hidden slow danger line removes 1 Heart and gives immediate feedback with a -Heart symbol falling from the center.
+- A new fastest individual item time for that mode awards Diamonds equal to that mode's full-round payout score and shows a +Diamond symbol rising from the center.
 - The center prompt shows item timing countdown clocks for fastest, median, and slowest item records once item history exists.
 - The run's percentile against prior memory is recorded or derivable.
 - Target offers are generated from recent rest-adjusted performance percentile estimates or starter defaults.

@@ -64,7 +64,7 @@ Correct answer:
 - Soft success animation.
 - Streak increments.
 - Movement and next-entry animations get faster as streak rises.
-- Show individual-item timing feedback when the item sets a new fastest or new slowest personal item time for that mode, including the Diamond bonus or Heart loss.
+- Show individual-item timing feedback when the item sets a new fastest or new slowest personal item time for that mode, including immediate visual floaters: a +Diamond symbol rises from the center when Diamonds are won, and a -Heart symbol falls from the center when a Heart is lost.
 - Behind the center prompt, show stacked item clocks for fastest, median, and slowest item timing records so the player can feel the pressure before the slowest-item Heart loss triggers.
 
 Pause and study:
@@ -87,7 +87,7 @@ Winning Club bet:
 Heart loss:
 
 - Clear but not overly punishing visual feedback.
-- Show Hearts lost and why.
+- Show Hearts lost and why, including a falling -Heart floater at the moment the loss occurs.
 
 ## Shop display
 
