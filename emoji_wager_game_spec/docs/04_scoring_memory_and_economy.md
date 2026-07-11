@@ -36,9 +36,10 @@ In addition to whole-round completion time, record the elapsed time for each cor
 
 - The first recorded item time calibrates item timing and should not itself trigger a fastest or slowest reward/penalty.
 - If a later item time is slower than the hidden slow-item danger line, immediately lose 1 Heart.  Prefer `min(median item time × 2, median item time + IQR, prior slowest item time)` once item timing history exists.  Do not show this exact slowest threshold; show real-time Heart-loss feedback when it is crossed.
-- If a later item time is faster than the player's previous fastest recorded item time for that mode, immediately award Diamonds equal to that mode's current Spade score / base round payout before Heart penalties.
-- Store recent item timing entries with item id, elapsed seconds, timestamp, and whether the entry created a fastest or longest record.
-- Use the per-mode fastest, median, and longest item times as live item countdown references in the play UI.
+- If a later item time beats the elite item target, immediately award Diamonds equal to that mode's current Spade score / base round payout before Heart penalties.  The elite target starts as the top 1% item-speed threshold over the full item history, which behaves like the fastest item for roughly the first 100 item records without becoming permanently impossible afterward.
+- Store full item timing history with item id, elapsed seconds, timestamp, percentile-at-run, and whether the entry created a fastest, longest, or elite result.
+- The repeatable per-item payout upgrade should use a meta-median target: take the median of prior item percentile-at-run values, then convert that percentile back into a target speed using the full item-time history.  This makes the reward reflect how the player has actually been performing over time instead of assuming a fixed 50/50 median.
+- Use the per-mode fastest and meta-median item times as live item countdown references in the play UI.  Keep the hidden slow Heart-loss threshold hidden; do not render the red slowest timer.
 
 ## First-round calibration pseudo-scores
 
@@ -161,7 +162,7 @@ First-prototype purchases:
 - Buy 1 2-way Spade payout upgrade: cost starts at 12 Diamonds and increases by 1.5x per 2-way Spade, rounded up.
 - Buy 1 3-way Spade payout upgrade: cost starts at 9 Diamonds and increases by 1.5x per 3-way Spade, rounded up.
 - Buy 1 4-way Spade payout upgrade: cost starts at 6 Diamonds and increases by 1.5x per 4-way Spade, rounded up.
-- Buy repeatable per-item median-speed payout upgrades after making at least one Club bet in that mode.  Each level pays +1 Diamond for each item solved faster than that mode's historical median item time.  Level 1 costs the total early mode-Spade cost from level 1 through 8 for 2-way sort, level 1 through 12 for 3-way sort, and level 1 through 16 for 4-way sort; later levels increase from that base cost.
+- Buy repeatable per-item meta-median-speed payout upgrades after making at least one Club bet in that mode.  Each level pays +1 Diamond for each item solved faster than that mode's percentile-at-run meta-median item target.  Level cost is 8× the corresponding mode Spade cost for 2-way sort, 12× for 3-way sort, and 16× for 4-way sort, using the upgrade level as the Spade-cost level.
 - Buy study time: each level adds 1 automatic pre-round second for reading categories before the timer starts; sorting any glyph starts the timer early.
 - Buy pauses per round: each level adds 1 player-triggered pause during a round.
 - Buy pause length: each level adds 1 second to each pause.

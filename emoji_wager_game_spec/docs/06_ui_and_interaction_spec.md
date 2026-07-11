@@ -18,7 +18,7 @@ The full-screen sorting view should include:
 
 - Active directional zones for the selected mode.
 - Visible target glyph groups assigned to each active direction.
-- A center prompt glyph with three stacked item timing countdown clocks behind it after item timing history exists.
+- A center prompt glyph with item timing countdown clocks behind it after item timing history exists; show fastest/elite and meta-median clocks, but keep the slow Heart-loss threshold hidden.
 - A queue/progress indicator.
 - A prompt queue under the timer bars that shows queue length by default while hiding unrevealed identities.
 - Completion timer.
@@ -64,8 +64,8 @@ Correct answer:
 - Soft success animation.
 - Streak increments.
 - Movement and next-entry animations get faster as streak rises.
-- Show individual-item timing feedback when the item sets a new fastest or new slowest personal item time for that mode, including immediate visual floaters: a +Diamond symbol rises from the center when Diamonds are won, and a -Heart symbol falls from the center when a Heart is lost.
-- Behind the center prompt, show stacked item clocks for fastest, median, and slowest item timing records so the player can feel the pressure before the slowest-item Heart loss triggers.
+- Show individual-item timing feedback when the item beats the elite item target, beats the meta-median item target, or crosses the hidden slow Heart-loss line, including immediate visual floaters: a +Diamond symbol rises from the center when Diamonds are won, and a -Heart symbol falls from the center when a Heart is lost.
+- Behind the center prompt, show stacked item clocks for the fastest/elite and meta-median item timing targets.  Do not show the red slowest timer; the slow Heart-loss threshold should stay hidden except for real-time loss feedback.
 
 Pause and study:
 

@@ -103,7 +103,7 @@ export function addRoundMemory(state, modeId, timeSeconds, createdAt, mistakes =
 export function createClubBet(modeId, offer, stake) { return { modeId, targetId: offer.id, targetSeconds: offer.timeSeconds, mistakeLimit: offer.mistakeLimit ?? 0, oddsMultiplier: offer.oddsMultiplier, oddsLabel: offer.oddsLabel, stake, cost: stake * CLUB_COST }; }
 export function payoutScore(state, modeId) { return MODES[modeId].baseDiamonds + state.upgrades.spades.global + state.upgrades.spades[modeId]; }
 export function spadeCost(scope, owned) { const base = scope === 'global' ? 25 : scope === 'sort_2' ? 12 : scope === 'sort_3' ? 9 : 6; const growth = scope === 'global' ? 1.6 : 1.5; return Math.ceil(base * growth ** owned); }
-export function perItemMedianBonusCost(modeId, owned = 0) { const levels = modeId === 'sort_2' ? 8 : modeId === 'sort_3' ? 12 : 16; const baseCost = Array.from({ length: levels }, (_, spadeLevel) => spadeCost(modeId, spadeLevel)).reduce((sum, cost) => sum + cost, 0); return Math.ceil(baseCost * 1.75 ** owned); }
+export function perItemMedianBonusCost(modeId, owned = 0) { const multiplier = modeId === 'sort_2' ? 8 : modeId === 'sort_3' ? 12 : 16; return multiplier * spadeCost(modeId, owned); }
 export function hasModeBetHistory(state, modeId) { return (state.modeBetCounts?.[modeId] ?? 0) > 0; }
 export function hasPerItemMedianBonus(state, modeId) { return (state.upgrades?.perItemMedianBonus?.[modeId] ?? 0) > 0; }
 function ensureItemStats(next, modeId) {
@@ -112,7 +112,8 @@ function ensureItemStats(next, modeId) {
   next.itemStats[modeId].entries ??= [];
   return next.itemStats[modeId];
 }
-export function itemTimingTargets(state, modeId) { const entries = state.itemStats?.[modeId]?.entries ?? []; if (!entries.length) return { fastestSeconds: null, medianSeconds: null, longestSeconds: null, count: 0 }; const times = entries.map((entry) => entry.timeSeconds); return { fastestSeconds: Math.min(...times), medianSeconds: median(times), longestSeconds: Math.max(...times), count: times.length }; }
+export function itemPercentileAtRun(timeSeconds, entries) { if (!entries.length) return 0.5; return entries.filter((entry) => entry.timeSeconds >= timeSeconds).length / entries.length; }
+export function itemTimingTargets(state, modeId) { const entries = state.itemStats?.[modeId]?.entries ?? []; if (!entries.length) return { fastestSeconds: null, medianSeconds: null, longestSeconds: null, metaMedianSeconds: null, eliteSeconds: null, metaMedianPercentile: null, count: 0 }; const times = entries.map((entry) => entry.timeSeconds); const sorted = [...times].sort((a, b) => a - b); const percentiles = entries.map((entry) => Number.isFinite(entry.percentileAtRun) ? entry.percentileAtRun : itemPercentileAtRun(entry.timeSeconds, entries)).filter(Number.isFinite); const metaMedianPercentile = percentiles.length ? median(percentiles) : 0.5; const metaMedianSeconds = quantile(sorted, Math.max(0, Math.min(1, 1 - metaMedianPercentile))); const eliteSeconds = sorted[Math.floor(0.01 * (sorted.length - 1))]; return { fastestSeconds: Math.min(...times), medianSeconds: median(times), longestSeconds: Math.max(...times), metaMedianSeconds, eliteSeconds, metaMedianPercentile, count: entries.length }; }
 export function itemSlowHeartThreshold(state, modeId) { const entries = state.itemStats?.[modeId]?.entries ?? []; if (!entries.length) return null; const times = entries.map((entry) => entry.timeSeconds); const sorted = [...times].sort((a, b) => a - b); const medianTime = median(sorted); const iqr = quantile(sorted, 0.75) - quantile(sorted, 0.25); return Math.min(medianTime * 2, medianTime + iqr, Math.max(...times)); }
 export function settleItemTiming(state, modeId, itemId, timeSeconds, createdAt = new Date().toISOString()) {
   const next = structuredClone(state);
@@ -121,16 +122,19 @@ export function settleItemTiming(state, modeId, itemId, timeSeconds, createdAt =
   const hasHistory = stats.entries.length > 0;
   const isNewLongest = hasHistory && timeSeconds > stats.longestSeconds;
   const isNewFastest = hasHistory && timeSeconds < stats.fastestSeconds;
-  const medianBonusDelta = Number.isFinite(targets.medianSeconds) && timeSeconds < targets.medianSeconds ? (next.upgrades?.perItemMedianBonus?.[modeId] ?? 0) : 0;
+  const isEliteItem = hasHistory && Number.isFinite(targets.eliteSeconds) && timeSeconds <= targets.eliteSeconds;
+  const medianBonusDelta = Number.isFinite(targets.metaMedianSeconds) && timeSeconds <= targets.metaMedianSeconds ? (next.upgrades?.perItemMedianBonus?.[modeId] ?? 0) : 0;
   const slowThreshold = itemSlowHeartThreshold(next, modeId);
   const heartsDelta = hasHistory && Number.isFinite(slowThreshold) && timeSeconds > slowThreshold ? -1 : 0;
-  const diamondsDelta = (isNewFastest ? payoutScore(next, modeId) : 0) + medianBonusDelta;
+  const eliteBonusDelta = isEliteItem ? payoutScore(next, modeId) : 0;
+  const diamondsDelta = eliteBonusDelta + medianBonusDelta;
   stats.fastestSeconds = hasHistory ? Math.min(stats.fastestSeconds, timeSeconds) : timeSeconds;
   stats.longestSeconds = hasHistory ? Math.max(stats.longestSeconds, timeSeconds) : timeSeconds;
-  stats.entries = [...stats.entries, { itemId, timeSeconds, createdAt, isNewFastest, isNewLongest, slowThreshold, medianBonusDelta }].slice(-200);
+  const percentileAtRun = itemPercentileAtRun(timeSeconds, stats.entries);
+  stats.entries = [...stats.entries, { itemId, timeSeconds, createdAt, percentileAtRun, isNewFastest, isNewLongest, isEliteItem, eliteThreshold: targets.eliteSeconds, slowThreshold, medianBonusDelta, eliteBonusDelta }];
   next.resources.hearts = Math.max(0, next.resources.hearts + heartsDelta);
   next.resources.diamonds += diamondsDelta;
-  const event = { type: 'itemTiming', modeId, itemId, timeSeconds, createdAt, heartsDelta, diamondsDelta, slowThreshold, medianBonusDelta, isNewFastest, isNewLongest };
+  const event = { type: 'itemTiming', modeId, itemId, timeSeconds, createdAt, heartsDelta, diamondsDelta, slowThreshold, medianBonusDelta, eliteBonusDelta, isEliteItem, eliteThreshold: targets.eliteSeconds, metaMedianSeconds: targets.metaMedianSeconds, percentileAtRun, isNewFastest, isNewLongest };
   next.eventLog = [...next.eventLog, event].slice(-50);
   return { state: next, event };
 }

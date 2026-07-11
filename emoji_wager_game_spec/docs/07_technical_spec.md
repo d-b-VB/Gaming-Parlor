@@ -83,7 +83,7 @@ Use unit tests for pure logic:
 - Board generation uniqueness for 2-way, 3-way, and 4-way sort.
 - Target estimation and percentile-at-run calculation.
 - Memory updates, including rest entries for unplayed unlocked modes.
-- Individual item timing updates, including fastest-item Diamond bonuses and slowest-item Heart losses.
+- Individual item timing updates, including elite-percentile Diamond bonuses, percentile-at-run meta-median item payouts, and hidden slow-item Heart losses.
 - Per-item median-speed payout upgrades, including bet-history locks and upgrade costs.
 - Club bet settlement.
 - Spade payout upgrades.

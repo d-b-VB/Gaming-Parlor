@@ -58,8 +58,9 @@
 - Correctly sorted individual items record per-item timing entries for the selected mode.
 - The first individual item timing entry calibrates fastest/longest item stats without awarding Diamonds or removing Hearts.
 - An individual item time slower than the hidden slow danger line removes 1 Heart and gives immediate feedback with a -Heart symbol falling from the center.
-- A new fastest individual item time for that mode awards Diamonds equal to that mode's full-round payout score and shows a +Diamond symbol rising from the center.
-- The center prompt shows item timing countdown clocks for fastest, median, and slowest item records once item history exists.
+- An individual item time at or faster than the elite item threshold awards Diamonds equal to that mode's full-round payout score and shows a +Diamond symbol rising from the center.
+- Per-item payout upgrades use the speed corresponding to the median prior percentile-at-run value, not a fixed literal 50th-percentile time.
+- The center prompt shows item timing countdown clocks for fastest/elite and meta-median item records once item history exists, and does not show the red slowest timer.
 - The run's percentile against prior memory is recorded or derivable.
 - Target offers are generated from recent rest-adjusted performance percentile estimates or starter defaults.
 - Target estimates use recent percentile windows so old data does not prevent the odds from reflecting player improvement.
@@ -79,6 +80,7 @@
 - Buying a global Spade increases future Diamond payouts for all sorting modes.
 - Buying a mode-specific Spade increases future Diamond payouts only for that mode.
 - Buying an animation speed upgrade spends Diamonds and shortens deliberately weighty glyph travel animations without changing sorting correctness.
+- Buying per-item meta-median payout upgrades is more accessible: level cost is 8×/12×/16× the corresponding mode Spade cost for 2-way/3-way/4-way sort.
 - Buying study-time, pause-count, pause-length, and queue-visibility upgrades spends Diamonds and increments the corresponding upgrade level.
 - Restoring a Heart spends Diamonds and cannot exceed max Hearts.
 - State persists after page reload.

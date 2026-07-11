@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { generateBoard, matchesSelector, estimateTargets, heartSafety, createClubBet, buyClubBet, settleRound, settleItemTiming, itemTimingTargets, itemSlowHeartThreshold, firstRoundCalibrationScores, mistakePressure, unlockMode, buySpade, buyPerItemMedianBonus, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, spadeCost, payoutScore, perItemMedianBonusCost, hasPerItemMedianBonus, streakDuration } from '../src/game/core.js';
+import { generateBoard, matchesSelector, estimateTargets, heartSafety, createClubBet, buyClubBet, settleRound, settleItemTiming, itemTimingTargets, itemPercentileAtRun, itemSlowHeartThreshold, firstRoundCalibrationScores, mistakePressure, unlockMode, buySpade, buyPerItemMedianBonus, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, spadeCost, payoutScore, perItemMedianBonusCost, hasPerItemMedianBonus, streakDuration } from '../src/game/core.js';
 
 const items = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/items.json', import.meta.url))).items;
 const baseSelectors = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/category_selectors.json', import.meta.url))).selectors;
@@ -247,6 +247,7 @@ test('item timing records fastest and longest pressure events', () => {
   assert.equal(result.event.heartsDelta, -1);
   result = settleItemTiming(state, 'sort_2', 'emoji:test3', 1, 't3');
   assert.equal(result.event.isNewFastest, true);
+  assert.equal(result.event.eliteBonusDelta, payoutScore(state, 'sort_2'));
   assert.equal(result.event.diamondsDelta, payoutScore(state, 'sort_2'));
   const targets = itemTimingTargets(result.state, 'sort_2');
   assert.equal(targets.fastestSeconds, 1);
@@ -267,10 +268,10 @@ test('item slow Heart threshold uses median, IQR, and prior slowest', () => {
 });
 
 test('per-item median payout costs use early spade totals and require mode betting', () => {
-  assert.equal(perItemMedianBonusCost('sort_2'), 594);
-  assert.equal(perItemMedianBonusCost('sort_3'), 2322);
-  assert.equal(perItemMedianBonusCost('sort_4'), 7876);
-  assert.equal(perItemMedianBonusCost('sort_2', 1), 1040);
+  assert.equal(perItemMedianBonusCost('sort_2'), 96);
+  assert.equal(perItemMedianBonusCost('sort_3'), 108);
+  assert.equal(perItemMedianBonusCost('sort_4'), 96);
+  assert.equal(perItemMedianBonusCost('sort_2', 1), 144);
   let state = structuredClone(defaultState);
   state.resources.diamonds = 10000;
   assert.throws(() => buyPerItemMedianBonus(state, 'sort_2'), /Make at least one bet/);
@@ -278,10 +279,10 @@ test('per-item median payout costs use early spade totals and require mode betti
   state = buyClubBet(state, createClubBet('sort_2', offer, 1));
   state = buyPerItemMedianBonus(state, 'sort_2');
   assert.equal(hasPerItemMedianBonus(state, 'sort_2'), true);
-  assert.equal(state.resources.diamonds, 10000 - 1 - 594);
+  assert.equal(state.resources.diamonds, 10000 - 1 - 96);
   state = buyPerItemMedianBonus(state, 'sort_2');
   assert.equal(state.upgrades.perItemMedianBonus.sort_2, 2);
-  assert.equal(state.resources.diamonds, 10000 - 1 - 594 - 1040);
+  assert.equal(state.resources.diamonds, 10000 - 1 - 96 - 144);
   state.itemStats.sort_2.entries = [
     { itemId: 'slow', timeSeconds: 3, createdAt: 'a' },
     { itemId: 'mid', timeSeconds: 2, createdAt: 'b' },
@@ -290,8 +291,15 @@ test('per-item median payout costs use early spade totals and require mode betti
   state.itemStats.sort_2.fastestSeconds = 1;
   state.itemStats.sort_2.longestSeconds = 3;
   const result = settleItemTiming(state, 'sort_2', 'bonus', 1.5, 'd');
+  assert.equal(itemPercentileAtRun(1.5, state.itemStats.sort_2.entries), 2 / 3);
   assert.equal(result.event.medianBonusDelta, 2);
+  assert.equal(result.event.metaMedianSeconds.toFixed(2), '1.67');
   assert.ok(result.event.diamondsDelta >= 2);
+  state.itemStats.sort_2.entries = Array.from({ length: 250 }, (_, index) => ({ itemId: `i${index}`, timeSeconds: 1 + index / 100, percentileAtRun: 0.5, createdAt: `t${index}` }));
+  state.itemStats.sort_2.fastestSeconds = 1;
+  state.itemStats.sort_2.longestSeconds = 3.49;
+  const retained = settleItemTiming(state, 'sort_2', 'kept', 1.2, 'kept');
+  assert.equal(retained.state.itemStats.sort_2.entries.length, 251);
 });
 
 
