@@ -255,15 +255,19 @@ test('item timing records fastest and longest pressure events', () => {
   assert.equal(targets.longestSeconds, 3);
 });
 
-test('item slow Heart threshold uses median, IQR, and prior slowest', () => {
+test('item slow Heart threshold uses outlier candidates and current-round failures', () => {
   let state = structuredClone(defaultState);
   state.itemStats.sort_2.entries = [1, 1.2, 1.4, 1.6, 10].map((timeSeconds) => ({ timeSeconds }));
   state.itemStats.sort_2.fastestSeconds = 1;
   state.itemStats.sort_2.longestSeconds = 10;
-  assert.equal(itemSlowHeartThreshold(state, 'sort_2'), 1.8);
-  const result = settleItemTiming(state, 'sort_2', 'too-slow', 2.1, 'slow');
+  const threshold = itemSlowHeartThreshold(state, 'sort_2');
+  assert.equal(threshold, 7.375);
+  assert.ok(itemSlowHeartThreshold(state, 'sort_2', [8]) > threshold);
+  const result = settleItemTiming(state, 'sort_2', 'too-slow', 8, 'slow');
   assert.equal(result.event.heartsDelta, -1);
-  const safe = settleItemTiming(state, 'sort_2', 'safe', 1.3, 'safe');
+  const softened = settleItemTiming(state, 'sort_2', 'softened', 7.5, 'soft', [8]);
+  assert.equal(softened.event.heartsDelta, 0);
+  const safe = settleItemTiming(state, 'sort_2', 'safe', 2.1, 'safe');
   assert.equal(safe.event.heartsDelta, 0);
 });
 

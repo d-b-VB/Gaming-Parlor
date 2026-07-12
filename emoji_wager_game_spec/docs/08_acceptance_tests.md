@@ -58,6 +58,7 @@
 - Correctly sorted individual items record per-item timing entries for the selected mode.
 - The first individual item timing entry calibrates fastest/longest item stats without awarding Diamonds or removing Hearts.
 - An individual item time slower than the hidden slow danger line removes 1 Heart and gives immediate feedback with a -Heart symbol falling from the center.
+- The hidden slow danger line is recalculated for every item, includes current-round item times that already cost Hearts as threshold candidates, and therefore softens after slow-item Heart losses within that round.
 - An individual item time at or faster than the elite item threshold awards Diamonds equal to that mode's full-round payout score and shows a +Diamond symbol rising from the center.
 - Per-item payout upgrades use the speed corresponding to the median prior percentile-at-run value, not a fixed literal 50th-percentile time.
 - The center prompt shows item timing countdown clocks for fastest/elite and meta-median item records once item history exists, and does not show the red slowest timer.

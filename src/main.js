@@ -1,8 +1,8 @@
-import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, percentileAtRun, createClubBet, buyClubBet, unlockMode, buySpade, buyPerItemMedianBonus, restoreHeart, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, settleRound, settleItemTiming, itemTimingTargets, spadeCost, payoutScore, perItemMedianBonusCost, hasModeBetHistory, streakDuration } from './game/core.js?v=0.2.18';
+import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, percentileAtRun, createClubBet, buyClubBet, unlockMode, buySpade, buyPerItemMedianBonus, restoreHeart, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, settleRound, settleItemTiming, itemTimingTargets, spadeCost, payoutScore, perItemMedianBonusCost, hasModeBetHistory, streakDuration } from './game/core.js?v=0.2.19';
 
 const root = document.querySelector('#root');
-const APP_VERSION = 'v0.2.18';
-const SAVE_SCHEMA_VERSION = '0.2.18-local';
+const APP_VERSION = 'v0.2.19';
+const SAVE_SCHEMA_VERSION = '0.2.19-local';
 const arrows = { left: '←', right: '→', up: '↑', down: '↓' };
 let items = [];
 let selectors = [];
@@ -33,6 +33,7 @@ let pauseStartedAt = null;
 let pauseEndsAt = null;
 let pausedAccumMs = 0;
 let pausesRemaining = 0;
+let roundSlowHeartLossTimes = [];
 
 function fmt(seconds) {
   return `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
@@ -153,6 +154,7 @@ function startBoard(nextMode = modeId) {
   pauseEndsAt = null;
   pausedAccumMs = 0;
   pausesRemaining = 0;
+  roundSlowHeartLossTimes = [];
   feedback = 'Board ready. Buy Clubs if you want odds, then start the full-screen round.';
   stopTimer();
   render();
@@ -339,10 +341,10 @@ async function dispatch(direction) {
   render();
   await animateGlyphTravel(glyphHtml(prompt.item), direction, isCorrect);
   if (isCorrect) {
-    const itemResult = settleItemTiming(state, modeId, prompt.item.id, itemSeconds);
+    const itemResult = settleItemTiming(state, modeId, prompt.item.id, itemSeconds, new Date().toISOString(), roundSlowHeartLossTimes);
     state = itemResult.state;
     save();
-    if (itemResult.event.heartsDelta < 0) itemHeartLosses += Math.abs(itemResult.event.heartsDelta);
+    if (itemResult.event.heartsDelta < 0) { itemHeartLosses += Math.abs(itemResult.event.heartsDelta); roundSlowHeartLossTimes.push(itemSeconds); }
     if (itemResult.event.diamondsDelta > 0) itemDiamondBonuses += itemResult.event.diamondsDelta;
     showItemOutcomeFloat({ diamonds: itemResult.event.diamondsDelta, hearts: itemResult.event.heartsDelta });
     if (itemResult.event.isNewFastest || itemResult.event.isNewLongest) itemRecordCount += 1;
