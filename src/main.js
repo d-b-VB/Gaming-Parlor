@@ -1,8 +1,8 @@
-import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, percentileAtRun, createClubBet, buyClubBet, unlockMode, buySpade, buyPerItemMedianBonus, restoreHeart, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, settleRound, settleItemTiming, itemTimingTargets, spadeCost, payoutScore, perItemMedianBonusCost, hasModeBetHistory, streakDuration } from './game/core.js?v=0.2.23';
+import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, percentileAtRun, createClubBet, buyClubBet, unlockMode, buySpade, buyPerItemMedianBonus, restoreHeart, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, settleRound, settleItemTiming, itemTimingTargets, spadeCost, payoutScore, perItemMedianBonusCost, hasModeBetHistory, streakDuration } from './game/core.js?v=0.2.24';
 
 const root = document.querySelector('#root');
-const APP_VERSION = 'v0.2.23';
-const SAVE_SCHEMA_VERSION = '0.2.23-local';
+const APP_VERSION = 'v0.2.24';
+const SAVE_SCHEMA_VERSION = '0.2.24-local';
 const arrows = { left: '←', right: '→', up: '↑', down: '↓' };
 let items = [];
 let selectors = [];
@@ -38,6 +38,10 @@ let debugOpen = false;
 
 function fmt(seconds) {
   return `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
+}
+function fmtDebugSeconds(seconds) {
+  if (!Number.isFinite(seconds)) return '—';
+  return seconds < 10 ? `${seconds.toFixed(2)}s` : `${fmt(seconds)} (${seconds.toFixed(2)}s)`;
 }
 function seed() { return `${modeId}-${Date.now()}-${Math.random().toString(16).slice(2)}`; }
 async function json(path) { const response = await fetch(path); if (!response.ok) throw new Error(`Unable to load ${path}`); return response.json(); }
@@ -122,9 +126,9 @@ function debugRecordsHtml(targets, safety) {
   const entries = state.gameMemory?.[modeId]?.entries ?? [];
   const stats = itemTimingTargets(state, modeId);
   const itemEntries = state.itemStats?.[modeId]?.entries ?? [];
-  const rows = entries.slice(-18).map((entry, index) => `<tr><td>${entries.length - Math.min(entries.length, 18) + index + 1}</td><td>${entry.timeSeconds?.toFixed?.(2) ?? entry.timeSeconds}s</td><td>${Number.isFinite(entry.mistakes) ? entry.mistakes : '—'}</td><td>${escapeHtml(entryTags(entry))}</td></tr>`).join('') || '<tr><td colspan="4">No round memory yet.</td></tr>';
-  const itemRows = itemEntries.slice(-12).map((entry, index) => `<tr><td>${itemEntries.length - Math.min(itemEntries.length, 12) + index + 1}</td><td>${escapeHtml(entry.itemId ?? 'item')}</td><td>${entry.timeSeconds?.toFixed?.(2) ?? entry.timeSeconds}s</td><td>${Number.isFinite(entry.percentileAtRun) ? `${Math.round(entry.percentileAtRun * 100)}%` : '—'}</td><td>${[entry.isEliteItem ? 'elite' : '', entry.isNewFastest ? 'fastest' : '', entry.isNewLongest ? 'longest' : ''].filter(Boolean).join(' · ') || '—'}</td></tr>`).join('') || '<tr><td colspan="5">No item timing entries yet.</td></tr>';
-  return `<section class="panel debug-panel"><h2>Debug records for ${MODES[modeId].name}</h2><p class="hint">Shows the records feeding Heart safety, Club odds, mistake pressure, and item-timing bonuses. Temporary calibration records are replaced one at a time by later real runs.</p><div class="debug-grid"><div><h3>Round memory</h3><p>Heart safety now: <strong>${Number.isFinite(safety) ? fmt(safety) : '∞'}</strong></p><table><thead><tr><th>#</th><th>Time</th><th>Err</th><th>Used for</th></tr></thead><tbody>${rows}</tbody></table></div><div><h3>Club targets</h3><ul>${targets.map((target) => `<li>${escapeHtml(target.label)}: ${fmt(target.timeSeconds)} / ≤${target.mistakeLimit} errors · ${target.available ? 'available' : `${target.actualCount}/${target.minHistory}`}</li>`).join('')}</ul><h3>Item timing</h3><p>Elite ${stats.eliteSeconds ? fmt(stats.eliteSeconds) : '—'} · meta-median ${stats.metaMedianSeconds ? fmt(stats.metaMedianSeconds) : '—'} · entries ${stats.count}</p><table><thead><tr><th>#</th><th>Item</th><th>Time</th><th>Pct</th><th>Flags</th></tr></thead><tbody>${itemRows}</tbody></table></div></div></section>`;
+  const rows = entries.map((entry, index) => `<tr><td>${index + 1}</td><td>${fmtDebugSeconds(entry.timeSeconds)}</td><td>${Number.isFinite(entry.mistakes) ? entry.mistakes : '—'}</td><td>${escapeHtml(entryTags(entry))}</td></tr>`).join('') || '<tr><td colspan="4">No round memory yet.</td></tr>';
+  const itemRows = itemEntries.map((entry, index) => `<tr><td>${index + 1}</td><td>${escapeHtml(entry.itemId ?? 'item')}</td><td>${fmtDebugSeconds(entry.timeSeconds)}</td><td>${Number.isFinite(entry.percentileAtRun) ? `${Math.round(entry.percentileAtRun * 100)}%` : '—'}</td><td>${[entry.isEliteItem ? 'elite' : '', entry.isNewFastest ? 'fastest' : '', entry.isNewLongest ? 'longest' : '', entry.eliteBonusDelta ? `+♦${entry.eliteBonusDelta}` : '', entry.medianBonusDelta ? `median +♦${entry.medianBonusDelta}` : ''].filter(Boolean).join(' · ') || '—'}</td></tr>`).join('') || '<tr><td colspan="5">No item timing entries yet.</td></tr>';
+  return `<section class="panel debug-panel"><h2>Debug records for ${MODES[modeId].name}</h2><p class="hint">Shows the full stored records feeding Heart safety, Club odds, mistake pressure, and item-timing bonuses. Temporary calibration records are replaced one at a time by later real runs.</p><div class="debug-grid"><div><h3>Round memory (${entries.length})</h3><p>Heart safety now: <strong>${fmtDebugSeconds(safety)}</strong></p><div class="debug-scroll"><table><thead><tr><th>#</th><th>Time</th><th>Err</th><th>Used for</th></tr></thead><tbody>${rows}</tbody></table></div></div><div><h3>Club targets</h3><ul>${targets.map((target) => `<li>${escapeHtml(target.label)}: ${fmtDebugSeconds(target.timeSeconds)} / ≤${target.mistakeLimit} errors · ${target.available ? 'available' : `${target.actualCount}/${target.minHistory}`}</li>`).join('')}</ul><h3>Item timing (${itemEntries.length})</h3><p>Elite ${fmtDebugSeconds(stats.eliteSeconds)} · meta-median ${fmtDebugSeconds(stats.metaMedianSeconds)} · fastest ${fmtDebugSeconds(stats.fastestSeconds)} · median ${fmtDebugSeconds(stats.medianSeconds)} · longest ${fmtDebugSeconds(stats.longestSeconds)}${Number.isFinite(stats.metaMedianPercentile) ? ` · meta pct ${Math.round(stats.metaMedianPercentile * 100)}%` : ''}</p><div class="debug-scroll"><table><thead><tr><th>#</th><th>Item</th><th>Time</th><th>Pct</th><th>Flags</th></tr></thead><tbody>${itemRows}</tbody></table></div></div></div></section>`;
 }
 function timerPct(targetSeconds) {
   if (!targetSeconds || !promptStartedAt) return 0;

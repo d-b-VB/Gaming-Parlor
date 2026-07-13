@@ -364,8 +364,9 @@ input { width: 100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1
 .debug-toggle { padding: 0.45rem 0.75rem; color: #fff8ea; background: rgba(32,24,17,0.55); }
 .debug-panel { margin: 1rem 0; border-color: rgba(128,255,219,0.35); }
 .debug-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; }
-.debug-panel table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+.debug-scroll { max-height: 420px; overflow: auto; border-radius: 12px; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08); }
+.debug-panel table { width: 100%; min-width: 620px; border-collapse: collapse; font-size: 0.82rem; }
 .debug-panel th, .debug-panel td { padding: 0.38rem 0.45rem; border-bottom: 1px solid rgba(255,255,255,0.11); text-align: left; vertical-align: top; }
-.debug-panel th { color: #ffd27a; }
+.debug-panel th { color: #ffd27a; position: sticky; top: 0; background: #201811; z-index: 1; }
 .debug-panel ul { margin: 0 0 1rem; padding-left: 1.1rem; color: #d6c6ad; }
 @media (max-width: 960px) { .debug-grid { grid-template-columns: 1fr; } }
