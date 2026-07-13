@@ -1,8 +1,8 @@
-import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, percentileAtRun, createClubBet, buyClubBet, unlockMode, buySpade, buyPerItemMedianBonus, restoreHeart, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, settleRound, settleItemTiming, itemTimingTargets, spadeCost, payoutScore, perItemMedianBonusCost, hasModeBetHistory, streakDuration } from './game/core.js?v=0.2.22';
+import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, percentileAtRun, createClubBet, buyClubBet, unlockMode, buySpade, buyPerItemMedianBonus, restoreHeart, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, settleRound, settleItemTiming, itemTimingTargets, spadeCost, payoutScore, perItemMedianBonusCost, hasModeBetHistory, streakDuration } from './game/core.js?v=0.2.23';
 
 const root = document.querySelector('#root');
-const APP_VERSION = 'v0.2.22';
-const SAVE_SCHEMA_VERSION = '0.2.22-local';
+const APP_VERSION = 'v0.2.23';
+const SAVE_SCHEMA_VERSION = '0.2.23-local';
 const arrows = { left: '←', right: '→', up: '↑', down: '↓' };
 let items = [];
 let selectors = [];
@@ -34,6 +34,7 @@ let pauseEndsAt = null;
 let pausedAccumMs = 0;
 let pausesRemaining = 0;
 let roundSlowHeartLossTimes = [];
+let debugOpen = false;
 
 function fmt(seconds) {
   return `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
@@ -105,6 +106,25 @@ function queueStripHtml() {
     const revealed = index === 0 || index <= visibleAhead || prompt.revealed;
     return `<span class="queue-glyph ${index === 0 ? 'next' : ''} ${revealed ? '' : 'hidden-glyph'}">${revealed ? glyphHtml(prompt.item) : '◆'}</span>`;
   }).join('')}</div>`;
+}
+
+function entryTags(entry) {
+  const tags = [entry.entryType || 'actual'];
+  if (entry.temporary) tags.push('temporary');
+  if (entry.calibrationSource) tags.push(entry.calibrationSource);
+  if (entry.weightedByBet) tags.push(`bet-weight ${entry.weightedIndex ?? ''}`.trim());
+  if (entry.entryType === 'actual' && !entry.weightedByBet) tags.push('heart/odds');
+  if (entry.entryType === 'actual' && !entry.weightedByBet && (!entry.calibrationSource || entry.calibrationSource === 'actual_first_round')) tags.push('mistakes');
+  return tags.join(' · ');
+}
+function debugRecordsHtml(targets, safety) {
+  if (!debugOpen) return '';
+  const entries = state.gameMemory?.[modeId]?.entries ?? [];
+  const stats = itemTimingTargets(state, modeId);
+  const itemEntries = state.itemStats?.[modeId]?.entries ?? [];
+  const rows = entries.slice(-18).map((entry, index) => `<tr><td>${entries.length - Math.min(entries.length, 18) + index + 1}</td><td>${entry.timeSeconds?.toFixed?.(2) ?? entry.timeSeconds}s</td><td>${Number.isFinite(entry.mistakes) ? entry.mistakes : '—'}</td><td>${escapeHtml(entryTags(entry))}</td></tr>`).join('') || '<tr><td colspan="4">No round memory yet.</td></tr>';
+  const itemRows = itemEntries.slice(-12).map((entry, index) => `<tr><td>${itemEntries.length - Math.min(itemEntries.length, 12) + index + 1}</td><td>${escapeHtml(entry.itemId ?? 'item')}</td><td>${entry.timeSeconds?.toFixed?.(2) ?? entry.timeSeconds}s</td><td>${Number.isFinite(entry.percentileAtRun) ? `${Math.round(entry.percentileAtRun * 100)}%` : '—'}</td><td>${[entry.isEliteItem ? 'elite' : '', entry.isNewFastest ? 'fastest' : '', entry.isNewLongest ? 'longest' : ''].filter(Boolean).join(' · ') || '—'}</td></tr>`).join('') || '<tr><td colspan="5">No item timing entries yet.</td></tr>';
+  return `<section class="panel debug-panel"><h2>Debug records for ${MODES[modeId].name}</h2><p class="hint">Shows the records feeding Heart safety, Club odds, mistake pressure, and item-timing bonuses. Temporary calibration records are replaced one at a time by later real runs.</p><div class="debug-grid"><div><h3>Round memory</h3><p>Heart safety now: <strong>${Number.isFinite(safety) ? fmt(safety) : '∞'}</strong></p><table><thead><tr><th>#</th><th>Time</th><th>Err</th><th>Used for</th></tr></thead><tbody>${rows}</tbody></table></div><div><h3>Club targets</h3><ul>${targets.map((target) => `<li>${escapeHtml(target.label)}: ${fmt(target.timeSeconds)} / ≤${target.mistakeLimit} errors · ${target.available ? 'available' : `${target.actualCount}/${target.minHistory}`}</li>`).join('')}</ul><h3>Item timing</h3><p>Elite ${stats.eliteSeconds ? fmt(stats.eliteSeconds) : '—'} · meta-median ${stats.metaMedianSeconds ? fmt(stats.metaMedianSeconds) : '—'} · entries ${stats.count}</p><table><thead><tr><th>#</th><th>Item</th><th>Time</th><th>Pct</th><th>Flags</th></tr></thead><tbody>${itemRows}</tbody></table></div></div></section>`;
 }
 function timerPct(targetSeconds) {
   if (!targetSeconds || !promptStartedAt) return 0;
@@ -385,9 +405,12 @@ function render() {
   const progress = board.queue.length - queue.length;
   const studyLeft = studying ? Math.max(0, (studyEndsAt - Date.now()) / 1000) : 0;
   const pauseLeft = paused ? Math.max(0, (pauseEndsAt - Date.now()) / 1000) : 0;
+  const medianBonusLevel = state.upgrades.perItemMedianBonus[modeId] ?? 0;
+  const nextMedianBonus = medianBonusLevel + 1;
   const sideZone = (direction) => `<button class="zone zone-${direction}" data-dispatch="${direction}"><span class="direction">${arrows[direction]}</span><span class="groups vertical-groups">${groupByDirection(direction).map((group) => `<span class="glyph-group" title="${group.label}">${group.items.map((item) => glyphHtml(item)).join('')}</span>`).join('')}</span></button>`;
   const boardHtml = `<div class="play-hud"><div class="status-row"><span>⏱ ${elapsed.toFixed(1)}s</span><span>${heartsHtml()}</span><span>Queue ${queue.length}/${board.queue.length}</span><span>Streak ${streak}</span><span>Study ${studying ? studyLeft.toFixed(1) : '—'}</span><span>Pause ${paused ? pauseLeft.toFixed(1) : pausesRemaining}</span><button id="pause-round" ${inRound && !studying && !paused && pausesRemaining > 0 ? '' : 'disabled'}>Pause</button><span>Item ♦${itemDiamondBonuses} / ♥-${itemHeartLosses}</span></div>${barsHtml(safety, state.activeClubBet, inRound && queue.length === 1)}</div>
       <div class="sort-board framed-board mode-${mode.directions.length}">${mode.directions.map(sideZone).join('')}<div class="center-card ${motion ? 'busy' : ''}">${current ? itemTimerHtml() : ''}<span class="prompt ${motion ? 'ghost-prompt' : ''}">${current ? glyphHtml(current.item) : '🏁'}</span><span>${current ? `${progress}/${board.queue.length} sorted` : 'Round finished'}</span></div></div><p class="feedback" role="status">${feedback}</p>`;
+  const debugHtml = debugRecordsHtml(targets, safety);
   const summaryHtml = lastSummary ? `<section class="panel post-round"><h2>Round summary</h2><div class="summary-grid"><span>Mode</span><strong>${lastSummary.modeName}</strong><span>Time</span><strong>${lastSummary.timeSeconds.toFixed(2)}s</strong><span>Percentile score</span><strong>${Math.round(lastSummary.percentile * 100)}%</strong><span>Mistakes</span><strong>${lastSummary.mistakes}</strong><span>Diamond payout</span><strong>♦ ${lastSummary.diamondsDelta}</strong><span>Item speed bonus</span><strong>♦ ${lastSummary.itemDiamondBonuses}</strong><span>Heart change</span><strong>${lastSummary.heartsDelta} round / -${lastSummary.itemHeartLosses} item</strong><span>Mistake pressure</span><strong>${lastSummary.mistakeHeartsLost ? `-${lastSummary.mistakeHeartsLost} ♥` : 'Safe'}${Number.isFinite(lastSummary.medianMistakes) ? ` · median ${lastSummary.medianMistakes}` : ''}</strong><span>Item records</span><strong>${lastSummary.itemRecordCount}</strong><span>Bet result</span><strong>${lastSummary.betTarget ? `${lastSummary.betWon ? 'Won' : 'Lost'} vs ${fmt(lastSummary.betTarget)} / ≤${lastSummary.betMistakeLimit} errors (${lastSummary.betWinnings ? `♦ ${lastSummary.betWinnings}, +${lastSummary.betConfidenceWeight} memory` : 'no payout'})` : 'No bet'}</strong></div><button id="continue-lobby" class="primary-action">Continue</button></section>` : '';
   root.innerHTML = inRound ? `
     <main class="play-shell">
@@ -395,19 +418,21 @@ function render() {
       ${boardHtml}
     </main>` : `
     <main class="app-shell">
-      <div class="version-banner"><span>Emoji Wager Sort ${APP_VERSION}</span><span>Between rounds</span></div>
+      <div class="version-banner"><span>Emoji Wager Sort ${APP_VERSION}</span><span>Between rounds</span><button id="toggle-debug" class="debug-toggle">${debugOpen ? 'Hide debug records' : 'Show debug records'}</button></div>
       <header class="hero"><div><p class="eyebrow">Gaming Parlor</p><h1>Emoji Wager Sort</h1><p>Set your mode, shop, and bet here. When the round starts, sorting takes the whole screen.</p><p class="save-scope">Save ${escapeHtml(state.saveMeta.localSaveId)} is local to this browser profile. If another device looks identical, it is probably still on the seeded starter stats unless you imported or synced site data outside the game.</p></div><div class="resources"><span>${heartsHtml()}</span><span>♦ ${state.resources.diamonds}</span><span>♠ ${modePayout(modeId)} ${mode.name} payout</span></div></header>
       ${summaryHtml}
+      ${debugHtml}
       <section class="panel mode-panel"><h2>Modes</h2><div class="mode-grid">${modeList.map((candidate) => `<button data-mode="${candidate.id}" class="${candidate.id === modeId ? 'selected' : ''}"><strong>${candidate.name}</strong><span>♠ score ${modePayout(candidate.id)} · pays ♦${modePayout(candidate.id)}</span><span>${state.unlockedModes[candidate.id] ? 'Select' : `Unlock ♦${candidate.unlockCost}`}</span></button>`).join('')}</div></section>
       <section class="lobby-layout"><section class="panel"><h2>Ready: ${mode.name}</h2><p>${board.queue.length} glyphs queued. Active directions: ${mode.directions.map((direction) => arrows[direction]).join(' ')}</p>${queueStripHtml()}<button id="start-round" class="primary-action">Start full-screen round</button><button id="new-board">New board</button><p class="feedback" role="status">${feedback}</p></section>
       <section class="panel"><h2>Club wager</h2><p class="hint">Harder times pay more. Locked propositions need more actual history in this mode.</p><div class="target-list">${targets.map((offer) => `<button data-target="${offer.id}" class="${offer.id === selectedTarget ? 'selected' : ''}" ${offer.available ? '' : 'disabled'}><strong>${offer.label}</strong><span>Beat ${fmt(offer.timeSeconds)} / ≤${offer.mistakeLimit} errors</span><span>${offer.oddsLabel}</span><small>${offer.available ? 'Available' : `${offer.actualCount}/${offer.minHistory} history`}</small></button>`).join('')}</div><label class="stake-row">Clubs<input id="stake" type="number" min="${selectedTarget === 'half' ? 2 : 1}" step="${selectedTarget === 'half' ? 2 : 1}" value="${stake}"></label><button id="buy-bet" ${targets.find((offer) => offer.id === selectedTarget)?.available && !(selectedTarget === 'half' && stake % 2 !== 0) ? '' : 'disabled'}>Buy bet for ♦${stake}</button></section>
-      <section class="panel shop"><h2>Spade shop</h2><p class="hint">Current ${mode.name} spade score: ${modePayout(modeId)} Diamonds before Heart penalties.</p><button id="restore-heart">Restore Heart ♦5</button><button id="buy-max-heart">+1 Max Heart ♦${maxHeartCost(state.resources.maxHearts)}</button><button id="buy-global">+1 Global ♠ ♦${spadeCost('global', state.upgrades.spades.global)}</button><button id="buy-mode">+1 ${mode.name} ♠ ♦${spadeCost(modeId, state.upgrades.spades[modeId])}</button><button id="buy-item-median" ${hasModeBetHistory(state, modeId) ? '' : 'disabled'}>Meta-median item bonus Lv.${state.upgrades.perItemMedianBonus[modeId] ?? 0}: +♦1 beat item target ♦${perItemMedianBonusCost(modeId, state.upgrades.perItemMedianBonus[modeId] ?? 0)}</button><small>${hasModeBetHistory(state, modeId) ? `Current item-target bonus: +♦${state.upgrades.perItemMedianBonus[modeId] ?? 0} per item.` : 'Locked until you buy one Club bet in this mode.'}</small><button id="buy-study">+1s Study Time Lv.${state.upgrades.studyTime} ♦${studyTimeCost(state.upgrades.studyTime)}</button><button id="buy-pause-count">+1 Pause/Round Lv.${state.upgrades.pauseCount} ♦${pauseCountCost(state.upgrades.pauseCount)}</button><button id="buy-pause-length">+1s Pause Length Lv.${state.upgrades.pauseLength} ♦${pauseLengthCost(state.upgrades.pauseLength)}</button><button id="buy-queue-vision">Reveal +1 Queue Glyph Lv.${state.upgrades.queueVision} ♦${queueVisionCost(state.upgrades.queueVision)}</button><button id="buy-speed">Faster glyphs Lv.${state.upgrades.animationSpeed} ♦${animationSpeedCost(state.upgrades.animationSpeed)}</button><button disabled>Choose/rearrange categories soon</button><button id="reset-save">Reset save</button></section></section>
+      <section class="panel shop"><h2>Spade shop</h2><p class="hint">Current ${mode.name} spade score: ${modePayout(modeId)} Diamonds before Heart penalties.</p><button id="restore-heart">Restore Heart ♦5</button><button id="buy-max-heart">+1 Max Heart ♦${maxHeartCost(state.resources.maxHearts)}</button><button id="buy-global">+1 Global ♠ ♦${spadeCost('global', state.upgrades.spades.global)}</button><button id="buy-mode">+1 ${mode.name} ♠ ♦${spadeCost(modeId, state.upgrades.spades[modeId])}</button><button id="buy-item-median" ${hasModeBetHistory(state, modeId) ? '' : 'disabled'}>Meta-median item bonus Lv.${medianBonusLevel}: buy +♦${nextMedianBonus} per item target ♦${perItemMedianBonusCost(modeId, medianBonusLevel)}</button><small>${hasModeBetHistory(state, modeId) ? `Current item-target bonus: +♦${medianBonusLevel}; next upgrade pays +♦${nextMedianBonus} per item that beats the meta-median.` : 'Locked until you buy one Club bet in this mode.'}</small><button id="buy-study">+1s Study Time Lv.${state.upgrades.studyTime} ♦${studyTimeCost(state.upgrades.studyTime)}</button><button id="buy-pause-count">+1 Pause/Round Lv.${state.upgrades.pauseCount} ♦${pauseCountCost(state.upgrades.pauseCount)}</button><button id="buy-pause-length">+1s Pause Length Lv.${state.upgrades.pauseLength} ♦${pauseLengthCost(state.upgrades.pauseLength)}</button><button id="buy-queue-vision">Reveal +1 Queue Glyph Lv.${state.upgrades.queueVision} ♦${queueVisionCost(state.upgrades.queueVision)}</button><button id="buy-speed">Faster glyphs Lv.${state.upgrades.animationSpeed} ♦${animationSpeedCost(state.upgrades.animationSpeed)}</button><button disabled>Choose/rearrange categories soon</button><button id="reset-save">Reset save</button></section></section>
     </main>`;
   root.querySelectorAll('[data-dispatch]').forEach((button) => button.addEventListener('click', () => dispatch(button.dataset.dispatch)));
   root.querySelectorAll('[data-mode]').forEach((button) => button.addEventListener('click', () => { const id = button.dataset.mode; if (state.unlockedModes[id]) startBoard(id); else tryAction(() => unlockMode(state, id)); }));
   root.querySelectorAll('[data-target]').forEach((button) => button.addEventListener('click', () => { selectedTarget = button.dataset.target; if (selectedTarget === 'half' && stake % 2 !== 0) stake += 1; render(); }));
   root.querySelector('#stake')?.addEventListener('input', (event) => { stake = Math.max(1, Number(event.target.value || 1)); });
   root.querySelector('#buy-bet')?.addEventListener('click', buyBet);
+  root.querySelector('#toggle-debug')?.addEventListener('click', () => { debugOpen = !debugOpen; render(); });
   root.querySelector('#restore-heart')?.addEventListener('click', () => tryAction(() => restoreHeart(state)));
   root.querySelector('#buy-max-heart')?.addEventListener('click', () => tryAction(() => buyMaxHeart(state)));
   root.querySelector('#buy-global')?.addEventListener('click', () => tryAction(() => buySpade(state, 'global')));
