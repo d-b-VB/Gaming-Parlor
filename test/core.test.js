@@ -199,18 +199,25 @@ test('heart safety thresholds stage from actual run history', () => {
 test('first round calibration creates temporary pseudo-scores no slower than actual', () => {
   const scores = firstRoundCalibrationScores(100, [10, 8, 6, 4, 3, 2, 2, 1], 8);
   assert.equal(scores[0].source, 'actual_first_round');
-  assert.ok(scores.some((score) => score.source.includes('modal_item_pace')));
-  assert.ok(scores.some((score) => score.source.includes('modal_second_half_item_pace')));
+  assert.equal(scores.length, 2);
+  assert.equal(scores[1].source, 'first_round_calibration_median');
+  assert.ok(scores[1].derivedSources.includes('modal_item_pace'));
+  assert.ok(scores[1].derivedSources.includes('modal_second_half_item_pace'));
   assert.equal(new Set(scores.map((score) => score.timeSeconds.toFixed(2))).size, scores.length);
   assert.ok(scores.every((score) => score.timeSeconds <= 100));
+  assert.equal(scores[1].timeSeconds, 80);
   let state = settleRound(structuredClone(defaultState), 'sort_2', 100, 0, 'calibration', 't0', [10, 8, 6, 4, 3, 2, 2, 1]).gameMemory.sort_2.entries;
   assert.ok(state.length > 1);
   assert.ok(state.every((entry) => entry.temporary));
-  const slowestTemporary = Math.max(...state.map((entry) => entry.timeSeconds));
+  assert.equal(heartSafety('sort_2', state), 100);
+  const firstRoundEntry = state.find((entry) => entry.calibrationSource === 'actual_first_round');
+  const slowestNonFirstTemporary = Math.max(...state.filter((entry) => entry.calibrationSource !== 'actual_first_round').map((entry) => entry.timeSeconds));
   const next = structuredClone(defaultState);
   next.gameMemory.sort_2.entries = state;
   state = settleRound(next, 'sort_2', 50, 0, 'after-calibration', 't1').gameMemory.sort_2.entries;
-  assert.equal(state.some((entry) => entry.temporary && entry.timeSeconds === slowestTemporary), false);
+  assert.equal(state.some((entry) => entry.temporary && entry.timeSeconds === slowestNonFirstTemporary), false);
+  assert.ok(state.some((entry) => entry.calibrationSource === 'actual_first_round' && entry.timeSeconds === firstRoundEntry.timeSeconds));
+  assert.equal(heartSafety('sort_2', state), 100);
   assert.equal(state.at(-1).temporary, undefined);
 });
 

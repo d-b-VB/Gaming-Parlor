@@ -72,8 +72,10 @@
 - Winning Club bets add extra actual memory entries equal to floor(net bet profit / starting bank).
 - Finishing above the selected Club time target or above the selected mistake target pays no Club winnings.
 - A mode with no actual completed rounds has no Heart safety timer, and the first run does not lose Hearts for taking too long.
-- First-round actual time and derived item-pace pseudo-scores are stored as temporary calibration entries; pseudo-scores slower than the actual first-round time are dropped, identical scores are deduplicated, and later actual rounds remove the slowest temporary calibration entry.
-- Heart safety follows staged actual-run calibration for every mode: run 2 uses run 1 ×2, run 3 uses the slowest of the first 2 runs, run 4 uses the median of the first 3, run 5 uses the second slowest of the first 4, and later runs use the simple actual-run median.
+- First-round actual time and a single derived item-pace calibration score are stored as temporary calibration entries; derived ingredients slower than the actual first-round time are dropped, identical scores are deduplicated, and the remaining derived ingredients are aggregated by median.
+- First-round item-pace calibration must include animation/transition overhead by allocating non-item elapsed round time across item times before scaling item statistics to whole-round scores.
+- Later actual rounds remove the derived temporary calibration aggregate before retiring the actual first-round calibration entry.
+- Heart safety follows staged calibration for every mode using real runs plus the single first-round calibration aggregate: the individual derived first-round ingredients and bet-weighted duplicate entries must not count as extra actual runs for Heart safety, new-worst Heart penalties, or mistake-pressure baselines.
 - Finishing after the Heart safety threshold loses Hearts.
 - Finishing worse than every actual memory entry for that mode loses 2 Hearts total.
 - Completing one unlocked mode adds rest entries to other unlocked modes.

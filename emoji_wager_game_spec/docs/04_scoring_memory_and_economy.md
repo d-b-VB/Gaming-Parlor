@@ -43,7 +43,7 @@ In addition to whole-round completion time, record the elapsed time for each cor
 
 ## First-round calibration pseudo-scores
 
-The first completed round in a mode should remain non-punitive, but it should not invite sandbagging.  Store the actual first-round time and item-pace pseudo-scores as temporary calibration entries.  Candidate pseudo-scores include second-half pace ×2, last-quarter pace ×4, exponentially weighted item pace, last-half median item pace, midhinge item pace, narrowest-window modal item pace for all items, and narrowest-window modal item pace for the second half.  Drop any pseudo-score slower than the actual first-round time, deduplicate identical scores, and remove the slowest temporary calibration entry after each later actual round in that mode.
+The first completed round in a mode should remain non-punitive, but it should not invite sandbagging.  Store the actual first-round time and item-pace pseudo-scores as temporary calibration entries.  Candidate pseudo-score ingredients include second-half pace ×2, last-quarter pace ×4, exponentially weighted item pace, last-half median item pace, midhinge item pace, narrowest-window modal item pace for all items, and narrowest-window modal item pace for the second half.  Item timing records only prompt decision time, so before scaling any item-time ingredient to a whole-round score, allocate the first round's non-item elapsed time (animation, transition, and other overhead) evenly across the item times.  Drop any ingredient slower than the actual first-round time, deduplicate identical scores, and store the median of the remaining derived ingredients as a single temporary first-round calibration score.  Remove that derived temporary calibration score before retiring the actual first-round calibration entry.
 
 For a prototype with only one unlocked mode, step 3 has no visible effect until more modes are unlocked.
 
@@ -81,7 +81,7 @@ Lower target times must have higher payouts.  A proposition should only become a
 
 ## Heart safety threshold
 
-Heart loss still needs a clear safety line.  Use only actual completed runs for the Heart safety sequence; rest entries can influence betting targets, but they do not set the early Heart timer.
+Heart loss still needs a clear safety line.  Use real completed runs plus the single aggregated first-round calibration median for the Heart safety sequence; do not count the individual derived ingredients as separate runs.  Rest entries and bet-weighted duplicate entries can influence betting targets, but they do not set the early Heart timer.  The actual first-round calibration entry remains separate until it is eventually retired after the derived temporary aggregate.
 
 For every game mode:
 
@@ -105,7 +105,7 @@ Given completion time `T`:
 
 ## New worst time
 
-If `T` is worse than every actual score currently in that mode's memory, lose 2 Hearts total instead of 1 Heart.  Rest entries do not count as actual scores for this comparison.
+If `T` is worse than every actual score currently in that mode's memory, lose 2 Hearts total instead of 1 Heart.  Rest entries, bet-weighted duplicates, and individual unaggregated calibration ingredients do not count as actual scores for this comparison.
 
 ## Diamond payout
 
