@@ -72,10 +72,10 @@
 - Winning Club bets add extra actual memory entries equal to floor(net bet profit / starting bank).
 - Finishing above the selected Club time target or above the selected mistake target pays no Club winnings.
 - A mode with no actual completed rounds has no Heart safety timer, and the first run does not lose Hearts for taking too long.
-- First-round actual time and a single derived item-pace calibration score are stored as temporary calibration entries; derived ingredients slower than the actual first-round time are dropped, identical scores are deduplicated, and the remaining derived ingredients are aggregated by median.
+- First-round actual time and several derived item-pace calibration scores are stored as temporary calibration entries; derived ingredients slower than the actual first-round time are dropped and identical scores are deduplicated.
 - First-round item-pace calibration must include animation/transition overhead by allocating non-item elapsed round time across item times before scaling item statistics to whole-round scores.
-- Later actual rounds remove the derived temporary calibration aggregate before retiring the actual first-round calibration entry.
-- Heart safety follows staged calibration for every mode using real runs plus the single first-round calibration aggregate: the individual derived first-round ingredients and bet-weighted duplicate entries must not count as extra actual runs for Heart safety, new-worst Heart penalties, or mistake-pressure baselines.
+- Later actual rounds remove derived temporary calibration entries one at a time before retiring the actual first-round calibration entry, gradually replacing pseudo data with real scores.
+- Heart safety follows staged calibration for every mode using real runs plus the overhead-adjusted first-round pseudo-scores; bet-weighted duplicate entries must not count as extra actual runs for Heart safety, new-worst Heart penalties, or mistake-pressure baselines.
 - Finishing after the Heart safety threshold loses Hearts.
 - Finishing worse than every actual memory entry for that mode loses 2 Hearts total.
 - Completing one unlocked mode adds rest entries to other unlocked modes.
