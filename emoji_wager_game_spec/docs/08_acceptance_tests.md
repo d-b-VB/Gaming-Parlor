@@ -78,8 +78,9 @@
 - Heart safety follows staged calibration for every mode using real runs plus the overhead-adjusted first-round pseudo-scores; bet-weighted duplicate entries must not count as extra actual runs for Heart safety, new-worst Heart penalties, or mistake-pressure baselines.
 - Finishing after the Heart safety threshold loses Hearts.
 - Finishing worse than every actual memory entry for that mode loses 2 Hearts total.
-- Completing one unlocked mode adds rest entries to other unlocked modes.
-- Rest entries persist in target-estimation windows as a counterweight to high-stakes weighted fast entries.
+- Completing a full round in a mode starts or continues an away block for every other unlocked mode with timed records. Each such non-active mode receives at most one marked `rest` per away block.
+- Round rests copy the rested mode's current slowest round time and highest mistake count, and item rests copy the mode's 16/24/32 slowest item timings with percentiles recalculated at load time.
+- Rest entries are visible in debug records and are used for Club timing/history availability, round Heart safety, mistake pressure, and individual item timing as a counterweight to high-stakes weighted fast entries.
 - Buying a global Spade increases future Diamond payouts for all sorting modes.
 - Buying a mode-specific Spade increases future Diamond payouts only for that mode.
 - Buying an animation speed upgrade spends Diamonds and shortens deliberately weighty glyph travel animations without changing sorting correctness.

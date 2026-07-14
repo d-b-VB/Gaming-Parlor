@@ -63,6 +63,9 @@ test('expanded tags keep biological and object categories literal', () => {
   assert.equal(byGlyph['🍳'].tags.includes('human'), false);
   assert.equal(byGlyph['💼'].tags.includes('human'), false);
   assert.equal(byGlyph['🧶'].tags.includes('game'), false);
+  assert.equal(byGlyph['🦇'].tags.includes('bird'), false);
+  assert.equal(byGlyph['🐡'].tags.includes('land'), false);
+  assert.equal(byGlyph['🐡'].tags.includes('water'), true);
 });
 
 
@@ -112,10 +115,47 @@ test('economy handles unlocks, club bets, spades, memory, and winnings', () => {
   state = settleRound(state, 'sort_2', offer.timeSeconds - 1, 0, 'economy-seed', 'test');
   assert.equal(state.activeClubBet, null);
   assert.equal(state.eventLog.at(-1).betWinnings, 3);
-  assert.equal(state.gameMemory.sort_3.entries.at(-1).entryType, 'rest');
+  assert.equal(state.gameMemory.sort_3.entries.length, 0);
 });
 
 
+
+test('mode-away rest records accrue once per outside mode block and feed all calculations', () => {
+  let state = structuredClone(defaultState);
+  state.resources.diamonds = 100;
+  state = unlockMode(state, 'sort_3');
+  state = unlockMode(state, 'sort_4');
+  const counts = () => Object.fromEntries(Object.keys(state.gameMemory).map((modeId) => [modeId, state.gameMemory[modeId].entries.filter((entry) => entry.entryType === 'rest').length]));
+  const play = (modeId, time, mistakes = 0) => { state = settleRound(state, modeId, time, mistakes, `${modeId}-${time}`, `${modeId}-${time}`, [1, 2, 3, 4]); };
+  for (const time of [80, 70, 60, 50, 40]) play('sort_2', time, time === 80 ? 3 : 0);
+  for (const time of [90, 80, 70, 60]) play('sort_3', time, 1);
+  for (const time of [120, 110, 100]) play('sort_4', time, 2);
+  for (const time of [45, 44, 43]) play('sort_2', time, 0);
+  for (const time of [55, 54]) play('sort_3', time, 0);
+  assert.deepEqual(counts(), { sort_2: 3, sort_3: 2, sort_4: 2 });
+  const sort2Rests = state.gameMemory.sort_2.entries.filter((entry) => entry.entryType === 'rest');
+  assert.ok(sort2Rests.every((entry) => entry.timeSeconds === 70));
+  assert.ok(sort2Rests.every((entry) => entry.mistakes === 0));
+  assert.ok(estimateTargets('sort_2', state.gameMemory.sort_2.entries).find((target) => target.id === 'even').actualCount >= 8);
+  assert.ok(heartSafety('sort_2', state.gameMemory.sort_2.entries) >= 50);
+  assert.equal(mistakePressure(state.gameMemory.sort_2.entries, 4).maxMistakes, 0);
+});
+
+test('mode-away rest records load slow item timing samples with current percentiles', () => {
+  let state = structuredClone(defaultState);
+  state.resources.diamonds = 100;
+  state = unlockMode(state, 'sort_3');
+  state.itemStats.sort_2.entries = Array.from({ length: 20 }, (_, index) => ({ itemId: `item-${index}`, timeSeconds: index + 1, createdAt: `item-${index}` }));
+  state.itemStats.sort_2.fastestSeconds = 1;
+  state.itemStats.sort_2.longestSeconds = 20;
+  state = settleRound(state, 'sort_2', 60, 0, 's2', 's2');
+  state = settleRound(state, 'sort_3', 80, 0, 's3', 's3');
+  const restItems = state.itemStats.sort_2.entries.filter((entry) => entry.entryType === 'rest');
+  assert.equal(restItems.length, 16);
+  assert.deepEqual(restItems.slice(0, 3).map((entry) => entry.itemId), ['item-19', 'item-18', 'item-17']);
+  assert.equal(restItems[0].percentileAtRun, itemPercentileAtRun(20, state.itemStats.sort_2.entries.slice(0, 20)));
+  assert.ok(itemTimingTargets(state, 'sort_2').longestSeconds >= 20);
+});
 test('bet propositions use sensible odds and require enough actual history', () => {
   const lowHistory = structuredClone(defaultState).gameMemory.sort_2.entries;
   const lowTargets = estimateTargets('sort_2', lowHistory);
@@ -193,7 +233,7 @@ test('heart safety thresholds stage from actual run history', () => {
   assert.equal(heartSafety('sort_2', entries(30, 50, 40)), 40);
   assert.equal(heartSafety('sort_2', entries(30, 50, 40, 70)), 50);
   assert.equal(heartSafety('sort_2', entries(30, 50, 40, 70, 60)), 50);
-  assert.equal(heartSafety('sort_2', [...entries(30, 50, 40), { timeSeconds: 999, entryType: 'rest' }]), 40);
+  assert.equal(heartSafety('sort_2', [...entries(30, 50, 40), { timeSeconds: 999, entryType: 'rest' }]), 50);
 });
 
 test('first round calibration creates temporary pseudo-scores no slower than actual', () => {
@@ -301,9 +341,9 @@ test('per-item median payout costs use early spade totals and require mode betti
   state.itemStats.sort_2.fastestSeconds = 1;
   state.itemStats.sort_2.longestSeconds = 3;
   const result = settleItemTiming(state, 'sort_2', 'bonus', 1.5, 'd');
-  assert.equal(itemPercentileAtRun(1.5, state.itemStats.sort_2.entries), 2 / 3);
+  assert.equal(itemPercentileAtRun(1.5, state.itemStats.sort_2.entries), 0.625);
   assert.equal(result.event.medianBonusDelta, 2);
-  assert.equal(result.event.metaMedianSeconds.toFixed(2), '1.67');
+  assert.equal(result.event.metaMedianSeconds.toFixed(2), '1.50');
   assert.ok(result.event.diamondsDelta >= 2);
   state.itemStats.sort_2.entries = Array.from({ length: 250 }, (_, index) => ({ itemId: `i${index}`, timeSeconds: 1 + index / 100, percentileAtRun: 0.5, createdAt: `t${index}` }));
   state.itemStats.sort_2.fastestSeconds = 1;

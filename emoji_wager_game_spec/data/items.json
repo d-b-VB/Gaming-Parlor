@@ -86,7 +86,6 @@
       "source": "emoji",
       "tags": [
         "animal",
-        "bird",
         "black",
         "flying",
         "mammal",
@@ -7051,8 +7050,10 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "animal",
-        "land",
-        "sea"
+        "invertebrate",
+        "sea",
+        "swimming",
+        "water"
       ],
       "kind": "emoji",
       "colors": []
@@ -7064,8 +7065,10 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "animal",
-        "land",
-        "sea"
+        "invertebrate",
+        "sea",
+        "swimming",
+        "water"
       ],
       "kind": "emoji",
       "colors": []
@@ -7077,8 +7080,11 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "animal",
-        "land",
-        "sea"
+        "fish",
+        "sea",
+        "swimming",
+        "vertebrate",
+        "water"
       ],
       "kind": "emoji",
       "colors": []
@@ -7090,8 +7096,11 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "animal",
-        "land",
-        "sea"
+        "fish",
+        "sea",
+        "swimming",
+        "vertebrate",
+        "water"
       ],
       "kind": "emoji",
       "colors": []
@@ -7103,8 +7112,11 @@
       "source": "unicode_emoji_expansion",
       "tags": [
         "animal",
-        "land",
-        "sea"
+        "mammal",
+        "sea",
+        "swimming",
+        "vertebrate",
+        "water"
       ],
       "kind": "emoji",
       "colors": []
@@ -16419,7 +16431,6 @@
     ],
     "bird": [
       "emoji:baby_chick",
-      "emoji:bat",
       "emoji:bird",
       "emoji:chicken",
       "emoji:dodo",
@@ -17408,6 +17419,10 @@
       "symbol:star",
       "symbol:star_filled"
     ],
+    "fish": [
+      "emoji:blowfish",
+      "emoji:tropical_fish"
+    ],
     "five": [
       "emoji:star",
       "symbol:star_filled",
@@ -18042,6 +18057,7 @@
       "emoji:bee",
       "emoji:butterfly",
       "emoji:crab",
+      "emoji:jellyfish",
       "emoji:lady_beetle",
       "emoji:lobster",
       "emoji:octopus",
@@ -18049,6 +18065,7 @@
       "emoji:shrimp",
       "emoji:snail",
       "emoji:spider",
+      "emoji:squid",
       "emoji:worm"
     ],
     "island": [
@@ -18093,7 +18110,6 @@
       "emoji:bird",
       "emoji:bison",
       "emoji:black_large_square",
-      "emoji:blowfish",
       "emoji:boar",
       "emoji:bug",
       "emoji:car",
@@ -18133,7 +18149,6 @@
       "emoji:hippopotamus",
       "emoji:horse",
       "emoji:horse_2",
-      "emoji:jellyfish",
       "emoji:kangaroo",
       "emoji:koala",
       "emoji:lady_beetle",
@@ -18180,14 +18195,11 @@
       "emoji:speak_no_evil_monkey",
       "emoji:spider",
       "emoji:spider_2",
-      "emoji:spouting_whale",
-      "emoji:squid",
       "emoji:swan",
       "emoji:t_rex",
       "emoji:tiger",
       "emoji:tiger_2",
       "emoji:train",
-      "emoji:tropical_fish",
       "emoji:turkey",
       "emoji:turtle",
       "emoji:unicorn_face",
@@ -18376,6 +18388,7 @@
       "emoji:skunk",
       "emoji:sloth",
       "emoji:snowflake_2",
+      "emoji:spouting_whale",
       "emoji:tiger",
       "emoji:tiger_2",
       "emoji:unicorn_face",
@@ -20012,12 +20025,17 @@
       "emoji:strawberry"
     ],
     "swimming": [
+      "emoji:blowfish",
       "emoji:dolphin",
       "emoji:fish",
+      "emoji:jellyfish",
       "emoji:octopus",
       "emoji:penguin",
       "emoji:seal",
       "emoji:shark",
+      "emoji:spouting_whale",
+      "emoji:squid",
+      "emoji:tropical_fish",
       "emoji:whale"
     ],
     "symbol": [
@@ -20421,6 +20439,7 @@
     "vertebrate": [
       "emoji:bat",
       "emoji:bear",
+      "emoji:blowfish",
       "emoji:cat",
       "emoji:chicken",
       "emoji:cow",
@@ -20452,7 +20471,9 @@
       "emoji:shark",
       "emoji:sheep",
       "emoji:snake",
+      "emoji:spouting_whale",
       "emoji:tiger",
+      "emoji:tropical_fish",
       "emoji:turtle",
       "emoji:whale",
       "emoji:zebra"
@@ -20475,6 +20496,7 @@
       "symbol:club"
     ],
     "water": [
+      "emoji:blowfish",
       "emoji:cloud",
       "emoji:crocodile",
       "emoji:dolphin",
@@ -20482,10 +20504,14 @@
       "emoji:flamingo",
       "emoji:frog",
       "emoji:ice",
+      "emoji:jellyfish",
       "emoji:octopus",
       "emoji:shark",
       "emoji:ship",
       "emoji:snowflake",
+      "emoji:spouting_whale",
+      "emoji:squid",
+      "emoji:tropical_fish",
       "emoji:turtle"
     ],
     "water_vehicle": [

@@ -19,7 +19,7 @@ Each memory entry should include enough information to support future probabilit
 
 The exact persisted structure is an implementation concern, but it must support probability-style target estimation from recent rest-adjusted performance percentiles rather than a hard-coded 25th percentile Club line or a speed target averaged across all historical data.
 
-Actual entries come from completed rounds.  Rest entries are artificial easing entries applied to unplayed unlocked modes.
+Actual entries come from completed rounds.  Rest entries are artificial easing entries applied to unlocked modes with existing records while the player completes full rounds in other modes.
 
 ## Updating memory after a completed round
 
@@ -27,8 +27,10 @@ When the player completes game mode `G` with time `T`:
 
 1. Score `T` against `G`'s pre-round memory and record the percentile outcome for the run.
 2. Add an `actual` memory entry with time `T` to game `G`.
-3. For every other unlocked game mode, add a `rest` entry equal to that other mode's current worst remembered time.
-4. Keep long memory history, trimming only to a high storage safety cap if needed.
+3. If this completion begins or continues an away block for other unlocked modes with existing timed records, add at most one `rest` entry per away block to each such non-active mode.  For example, a block of several 3-way rounds after 2-way play gives 2-way one rest, not one rest per 3-way round.
+4. A round-level rest uses the rested mode's slowest current round time and highest current mistake count, counting any timed actual, temporary calibration, or prior rest entry that is still present and excluding bet-weighted duplicates.
+5. An item-level rest also copies the rested mode's 16/24/32 slowest item timing records for 2-/3-/4-way sort.  Preserve item ids when present, mark the new entries as `rest`, and compute each percentile at the time the rest is loaded against the current item timing history.
+6. Keep long memory history, trimming only to a high storage safety cap if needed.
 
 ## Item timing pressure
 
@@ -45,7 +47,7 @@ In addition to whole-round completion time, record the elapsed time for each cor
 
 The first completed round in a mode should remain non-punitive, but it should not invite sandbagging.  Store the actual first-round time and item-pace pseudo-scores as temporary calibration entries.  Candidate pseudo-score ingredients include second-half pace ×2, last-quarter pace ×4, exponentially weighted item pace, last-half median item pace, midhinge item pace, narrowest-window modal item pace for all items, and narrowest-window modal item pace for the second half.  Item timing records only prompt decision time, so before scaling any item-time ingredient to a whole-round score, allocate the first round's non-item elapsed time (animation, transition, and other overhead) evenly across the item times.  Drop any ingredient slower than the actual first-round time, deduplicate identical scores, and store the remaining derived ingredients as temporary first-round calibration scores.  Remove derived temporary calibration entries one at a time before retiring the actual first-round calibration entry, so the pseudo data set is gradually replaced by real scores.
 
-For a prototype with only one unlocked mode, step 3 has no visible effect until more modes are unlocked.
+For a prototype with only one unlocked mode, away-block rests have no visible effect until more modes are unlocked and completed.
 
 ## Mistake pressure
 
@@ -63,7 +65,7 @@ Glyph movement should be a meaningful part of round time: a prompt travels from 
 
 Yes: the documentation mentions rests as the mechanism that rewards rotating between games.
 
-Rest entries are not punishments and should not be described as bad scores.  They represent expectations cooling off while a mode is neglected.  They lower the bar for Heart safety and Club betting targets when the player returns, encouraging the player to rotate between 2-way, 3-way, and 4-way sorting instead of grinding only one mode forever.
+Rest entries are not punishments and should not be described as bad scores.  They represent expectations cooling off while a mode is neglected.  Rest entries are marked as `rest`, visible in debug records, and used everywhere a normal non-bet timing baseline is used: Club target timing and history availability, round-level Heart safety, mistake pressure, and individual item timing.  This encourages the player to rotate between 2-way, 3-way, and 4-way sorting instead of grinding only one mode forever.
 
 ## Target estimation
 
@@ -77,22 +79,22 @@ For the first prototype, generate five pre-round target offers with harder times
 - **5:1** long-shot proposition.
 - **10:1** extreme proposition.
 
-Lower target times must have higher payouts.  A proposition should only become available once that mode has enough actual history to statistically justify showing the odds.  The UI may show unavailable propositions as locked, with the required history count.  The implementation can start with empirical percentiles over recent actual/rest memory, then improve later.  The UI should frame these as estimates, not guarantees.
+Lower target times must have higher payouts.  A proposition should only become available once that mode has enough timed non-bet history, including rests and temporary calibration records, to statistically justify showing the odds.  The UI may show unavailable propositions as locked, with the required history count.  The implementation can start with empirical percentiles over recent actual/rest memory, then improve later.  The UI should frame these as estimates, not guarantees.
 
 ## Heart safety threshold
 
-Heart loss still needs a clear safety line.  Use real completed runs plus the overhead-adjusted first-round calibration pseudo-scores for the Heart safety sequence.  Rest entries and bet-weighted duplicate entries can influence betting targets, but they do not set the early Heart timer.  The actual first-round calibration entry remains separate until it is eventually retired after the derived temporary pseudo-scores.
+Heart loss still needs a clear safety line.  Use real completed runs, the overhead-adjusted first-round calibration pseudo-scores, and rest entries for the Heart safety sequence.  Bet-weighted duplicate entries can influence confidence weighting but do not set the early Heart timer.  The actual first-round calibration entry remains separate until it is eventually retired after the derived temporary pseudo-scores.
 
 For every game mode:
 
-| Actual runs before this round | Heart safety threshold |
+| Timed non-bet entries before this round | Heart safety threshold |
 | ---: | --- |
 | 0 | Infinite; no Heart timer and no Heart loss for taking too long. |
 | 1 | Prior run time × 2. |
 | 2 | Slowest of the first 2 runs. |
 | 3 | Median time of the first 3 runs. |
 | 4 | Second slowest of the first 4 runs. |
-| 5+ | Simple median of actual run times. |
+| 5+ | Simple median of timed non-bet entries. |
 
 ## Round outcome
 
@@ -105,7 +107,7 @@ Given completion time `T`:
 
 ## New worst time
 
-If `T` is worse than every actual score currently in that mode's memory, lose 2 Hearts total instead of 1 Heart.  Rest entries, bet-weighted duplicates, and individual unaggregated calibration ingredients do not count as actual scores for this comparison.
+If `T` is worse than every non-bet score currently in that mode's memory, including rests, lose 2 Hearts total instead of 1 Heart.  Bet-weighted duplicates and individual unaggregated calibration ingredients do not count for this comparison.
 
 ## Diamond payout
 
@@ -149,7 +151,7 @@ else:
   diamondWinnings = 0
 ```
 
-The Club purchase cost is paid before the round.  On a winning bet, return the stake plus the odds profit.  For the 1:2 proposition, only accept stakes in multiples of 2; for example, a 4-Club stake returns the 4-Club stake plus 2 Diamonds of profit when it wins.  The odds should increase as the target becomes harder to beat.  Mistake targets should be estimated from prior actual mistake counts for the same mode.  Easier odds may allow more mistakes, while harder odds should trend toward zero mistakes.  If an estimate lands between two mistake counts, round down toward zero so the player must meet the stricter mistake target.  On a winning bet, compute net bet profit, divide it by the player's starting bank before the stake purchase, round down, and add that many extra actual memory entries for the winning time and mistakes.  This makes high-bankroll, high-odds wins count as stronger evidence of true performance.  Rest entries should persist in the target-estimation window as a counterweight to those fast weighted wins, so rotating away from a mode can still cool expectations.
+The Club purchase cost is paid before the round.  On a winning bet, return the stake plus the odds profit.  For the 1:2 proposition, only accept stakes in multiples of 2; for example, a 4-Club stake returns the 4-Club stake plus 2 Diamonds of profit when it wins.  The odds should increase as the target becomes harder to beat.  Mistake targets should be estimated from prior non-bet mistake counts for the same mode, including rests.  Easier odds may allow more mistakes, while harder odds should trend toward zero mistakes.  If an estimate lands between two mistake counts, round down toward zero so the player must meet the stricter mistake target.  On a winning bet, compute net bet profit, divide it by the player's starting bank before the stake purchase, round down, and add that many extra actual memory entries for the winning time and mistakes.  This makes high-bankroll, high-odds wins count as stronger evidence of true performance.  Rest entries should persist in the target-estimation window as a counterweight to those fast weighted wins, so rotating away from a mode can still cool expectations.
 
 ## Purchases and upgrades
 

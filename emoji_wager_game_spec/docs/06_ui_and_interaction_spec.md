@@ -48,7 +48,7 @@ Fivefold      Beat 00:23   5:1
 Tenfold       Beat 00:19   10:1
 ```
 
-Only enable propositions once the selected mode has enough actual history to justify the estimate.  Locked propositions may be visible with the current and required history counts.  The player selects one available offer and buys as many Clubs as desired with Diamonds.  During the round, show the selected time target, mistake target, and whether the bet is still alive.  After the round, show whether the bet paid out and how many Diamonds were won.
+Only enable propositions once the selected mode has enough timed non-bet history, including rests, to justify the estimate.  Locked propositions may be visible with the current and required history counts.  The player selects one available offer and buys as many Clubs as desired with Diamonds.  During the round, show the selected time target, mistake target, and whether the bet is still alive.  After the round, show whether the bet paid out and how many Diamonds were won.
 
 ## Heart display
 

@@ -1,8 +1,8 @@
-import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, percentileAtRun, createClubBet, buyClubBet, unlockMode, buySpade, buyPerItemMedianBonus, restoreHeart, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, settleRound, settleItemTiming, itemTimingTargets, spadeCost, payoutScore, perItemMedianBonusCost, hasModeBetHistory, streakDuration } from './game/core.js?v=0.2.24';
+import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, percentileAtRun, itemPercentileAtRun, createClubBet, buyClubBet, unlockMode, buySpade, buyPerItemMedianBonus, restoreHeart, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, settleRound, settleItemTiming, itemTimingTargets, spadeCost, payoutScore, perItemMedianBonusCost, hasModeBetHistory, streakDuration } from './game/core.js?v=0.2.26';
 
 const root = document.querySelector('#root');
-const APP_VERSION = 'v0.2.24';
-const SAVE_SCHEMA_VERSION = '0.2.24-local';
+const APP_VERSION = 'v0.2.26';
+const SAVE_SCHEMA_VERSION = '0.2.26-local';
 const arrows = { left: '←', right: '→', up: '↑', down: '↓' };
 let items = [];
 let selectors = [];
@@ -67,6 +67,9 @@ function normalizeSave(candidate, defaultState) {
   next.upgrades.queueVision ??= 0;
   next.upgrades.perItemMedianBonus ??= { sort_2: 0, sort_3: 0, sort_4: 0 };
   next.modeBetCounts ??= { sort_2: 0, sort_3: 0, sort_4: 0 };
+  next.restTracking ??= { lastCompletedModeId: null, awayBlock: 0, restedBlockByMode: {} };
+  next.restTracking.restedBlockByMode ??= {};
+  next.restTracking.awayBlock ??= 0;
   next.saveMeta = {
     localSaveId: next.saveMeta?.localSaveId || makeLocalSaveId(),
     schemaVersion: SAVE_SCHEMA_VERSION,
@@ -117,8 +120,9 @@ function entryTags(entry) {
   if (entry.temporary) tags.push('temporary');
   if (entry.calibrationSource) tags.push(entry.calibrationSource);
   if (entry.weightedByBet) tags.push(`bet-weight ${entry.weightedIndex ?? ''}`.trim());
-  if (entry.entryType === 'actual' && !entry.weightedByBet) tags.push('heart/odds');
-  if (entry.entryType === 'actual' && !entry.weightedByBet && (!entry.calibrationSource || entry.calibrationSource === 'actual_first_round')) tags.push('mistakes');
+  if (['actual', 'rest'].includes(entry.entryType) && !entry.weightedByBet) tags.push('heart/odds');
+  if (['actual', 'rest'].includes(entry.entryType) && !entry.weightedByBet) tags.push('mistakes');
+  if (entry.restedWhilePlaying) tags.push(`away during ${entry.restedWhilePlaying}`);
   return tags.join(' · ');
 }
 function debugRecordsHtml(targets, safety) {
@@ -127,8 +131,8 @@ function debugRecordsHtml(targets, safety) {
   const stats = itemTimingTargets(state, modeId);
   const itemEntries = state.itemStats?.[modeId]?.entries ?? [];
   const rows = entries.map((entry, index) => `<tr><td>${index + 1}</td><td>${fmtDebugSeconds(entry.timeSeconds)}</td><td>${Number.isFinite(entry.mistakes) ? entry.mistakes : '—'}</td><td>${escapeHtml(entryTags(entry))}</td></tr>`).join('') || '<tr><td colspan="4">No round memory yet.</td></tr>';
-  const itemRows = itemEntries.map((entry, index) => `<tr><td>${index + 1}</td><td>${escapeHtml(entry.itemId ?? 'item')}</td><td>${fmtDebugSeconds(entry.timeSeconds)}</td><td>${Number.isFinite(entry.percentileAtRun) ? `${Math.round(entry.percentileAtRun * 100)}%` : '—'}</td><td>${[entry.isEliteItem ? 'elite' : '', entry.isNewFastest ? 'fastest' : '', entry.isNewLongest ? 'longest' : '', entry.eliteBonusDelta ? `+♦${entry.eliteBonusDelta}` : '', entry.medianBonusDelta ? `median +♦${entry.medianBonusDelta}` : ''].filter(Boolean).join(' · ') || '—'}</td></tr>`).join('') || '<tr><td colspan="5">No item timing entries yet.</td></tr>';
-  return `<section class="panel debug-panel"><h2>Debug records for ${MODES[modeId].name}</h2><p class="hint">Shows the full stored records feeding Heart safety, Club odds, mistake pressure, and item-timing bonuses. Temporary calibration records are replaced one at a time by later real runs.</p><div class="debug-grid"><div><h3>Round memory (${entries.length})</h3><p>Heart safety now: <strong>${fmtDebugSeconds(safety)}</strong></p><div class="debug-scroll"><table><thead><tr><th>#</th><th>Time</th><th>Err</th><th>Used for</th></tr></thead><tbody>${rows}</tbody></table></div></div><div><h3>Club targets</h3><ul>${targets.map((target) => `<li>${escapeHtml(target.label)}: ${fmtDebugSeconds(target.timeSeconds)} / ≤${target.mistakeLimit} errors · ${target.available ? 'available' : `${target.actualCount}/${target.minHistory}`}</li>`).join('')}</ul><h3>Item timing (${itemEntries.length})</h3><p>Elite ${fmtDebugSeconds(stats.eliteSeconds)} · meta-median ${fmtDebugSeconds(stats.metaMedianSeconds)} · fastest ${fmtDebugSeconds(stats.fastestSeconds)} · median ${fmtDebugSeconds(stats.medianSeconds)} · longest ${fmtDebugSeconds(stats.longestSeconds)}${Number.isFinite(stats.metaMedianPercentile) ? ` · meta pct ${Math.round(stats.metaMedianPercentile * 100)}%` : ''}</p><div class="debug-scroll"><table><thead><tr><th>#</th><th>Item</th><th>Time</th><th>Pct</th><th>Flags</th></tr></thead><tbody>${itemRows}</tbody></table></div></div></div></section>`;
+  const itemRows = itemEntries.map((entry, index) => `<tr><td>${index + 1}</td><td>${escapeHtml(entry.itemId ?? 'item')}</td><td>${fmtDebugSeconds(entry.timeSeconds)}</td><td>${`${Math.round(itemPercentileAtRun(entry.timeSeconds, itemEntries.slice(0, index)) * 100)}%`}</td><td>${[entry.entryType === 'rest' ? 'rest' : '', entry.restedWhilePlaying ? `away during ${entry.restedWhilePlaying}` : '', entry.isEliteItem ? 'elite' : '', entry.isNewFastest ? 'fastest' : '', entry.isNewLongest ? 'longest' : '', entry.eliteBonusDelta ? `+♦${entry.eliteBonusDelta}` : '', entry.medianBonusDelta ? `median +♦${entry.medianBonusDelta}` : ''].filter(Boolean).join(' · ') || '—'}</td></tr>`).join('') || '<tr><td colspan="5">No item timing entries yet.</td></tr>';
+  return `<section class="panel debug-panel"><h2>Debug records for ${MODES[modeId].name}</h2><p class="hint">Shows the full stored records feeding Heart safety, Club odds, mistake pressure, and item-timing bonuses. Temporary calibration records are replaced one at a time by later real runs.</p><div class="debug-grid"><div><h3>Round memory (${entries.length})</h3><p>Heart safety now: <strong>${fmtDebugSeconds(safety)}</strong></p><div class="debug-scroll"><table><thead><tr><th>#</th><th>Time</th><th>Err</th><th>Used for</th></tr></thead><tbody>${rows}</tbody></table></div></div><div><h3>Club targets</h3><ul>${targets.map((target) => `<li>${escapeHtml(target.label)}: ${fmtDebugSeconds(target.timeSeconds)} / ≤${target.mistakeLimit} errors · ${target.available ? 'available' : `${target.actualCount}/${target.minHistory}`}</li>`).join('')}</ul><h3>Item timing (${itemEntries.length})</h3><p>Elite ${fmtDebugSeconds(stats.eliteSeconds)} · meta-median ${fmtDebugSeconds(stats.metaMedianSeconds)} · fastest ${fmtDebugSeconds(stats.fastestSeconds)} · median ${fmtDebugSeconds(stats.medianSeconds)} · longest ${fmtDebugSeconds(stats.longestSeconds)}${Number.isFinite(stats.metaMedianPercentile) ? ` · meta pct ${Math.round(stats.metaMedianPercentile * 100)}%` : ''}</p><div class="debug-scroll"><table><thead><tr><th>#</th><th>Item</th><th>Time</th><th>Prior pct</th><th>Flags</th></tr></thead><tbody>${itemRows}</tbody></table></div></div></div></section>`;
 }
 function timerPct(targetSeconds) {
   if (!targetSeconds || !promptStartedAt) return 0;

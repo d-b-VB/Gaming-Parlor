@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "0.2.24",
+  "schemaVersion": "0.2.26",
   "resources": {
     "hearts": 5,
     "maxHearts": 5,
@@ -64,5 +64,10 @@
     "sort_2": 0,
     "sort_3": 0,
     "sort_4": 0
+  },
+  "restTracking": {
+    "lastCompletedModeId": null,
+    "awayBlock": 0,
+    "restedBlockByMode": {}
   }
 }
