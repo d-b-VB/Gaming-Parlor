@@ -1,8 +1,35 @@
-export const MODES = {
-  sort_2: { id: 'sort_2', name: '2-Way Sort', directions: ['left', 'right'], groupsPerDirection: 2, glyphsPerGroup: 4, unlockCost: 0, baseDiamonds: 2, heartSafetySeconds: 45, starterTargets: [{ id: 'even', label: 'Even', chance: 0.5, timeSeconds: 35, oddsMultiplier: 1, minHistory: 5, oddsLabel: '1:1' }] },
-  sort_3: { id: 'sort_3', name: '3-Way Sort', directions: ['left', 'right', 'up'], groupsPerDirection: 2, glyphsPerGroup: 4, unlockCost: 15, baseDiamonds: 3, heartSafetySeconds: 65, starterTargets: [{ id: 'even', label: 'Even', chance: 0.5, timeSeconds: 50, oddsMultiplier: 1, minHistory: 5, oddsLabel: '1:1' }] },
-  sort_4: { id: 'sort_4', name: '4-Way Sort', directions: ['left', 'right', 'up', 'down'], groupsPerDirection: 2, glyphsPerGroup: 4, unlockCost: 30, baseDiamonds: 4, heartSafetySeconds: 90, starterTargets: [{ id: 'even', label: 'Even', chance: 0.5, timeSeconds: 70, oddsMultiplier: 1, minHistory: 5, oddsLabel: '1:1' }] },
+const BASE_MODE_CONFIGS = {
+  2: { directions: ['left', 'right'], unlockCost: 0, standardDiamonds: 2, heartSafetySeconds: 45, starterEven: 35 },
+  3: { directions: ['left', 'right', 'up'], unlockCost: 15, standardDiamonds: 3, heartSafetySeconds: 65, starterEven: 50 },
+  4: { directions: ['left', 'right', 'up', 'down'], unlockCost: 30, standardDiamonds: 4, heartSafetySeconds: 90, starterEven: 70 },
 };
+const VARIANTS = {
+  standard: { label: '', payoutMultiplier: 1, unlockMultiplier: 1 },
+  freeform: { label: 'Freeform ', payoutMultiplier: 2, unlockMultiplier: 2 },
+  mystery: { label: 'Mystery ', payoutMultiplier: 4, unlockMultiplier: 4 },
+};
+function modeIdFor(variant, size) { return variant === 'standard' ? `sort_${size}` : `${variant}_${size}`; }
+function buildMode(variant, size) {
+  const base = BASE_MODE_CONFIGS[size];
+  const id = modeIdFor(variant, size);
+  return {
+    id,
+    variant,
+    baseSize: size,
+    name: `${VARIANTS[variant].label}${size}-Way Sort`,
+    directions: base.directions,
+    groupsPerDirection: 2,
+    glyphsPerGroup: 4,
+    unlockCost: variant === 'standard' ? base.unlockCost : base.unlockCost + (variant === 'freeform' ? 20 : 40),
+    baseDiamonds: base.standardDiamonds * VARIANTS[variant].payoutMultiplier,
+    heartSafetySeconds: base.heartSafetySeconds,
+    starterTargets: [{ id: 'even', label: 'Even', chance: 0.5, timeSeconds: base.starterEven, oddsMultiplier: 1, minHistory: 5, oddsLabel: '1:1' }],
+  };
+}
+export const MODES = Object.fromEntries(['standard', 'freeform', 'mystery'].flatMap((variant) => [2, 3, 4].map((size) => {
+  const mode = buildMode(variant, size);
+  return [mode.id, mode];
+})));
 export const modeList = Object.values(MODES);
 export const BET_TIERS = [
   { id: 'half', label: 'Conservative', chance: 0.8, oddsMultiplier: 0.5, minHistory: 5, oddsLabel: '1:2' },
@@ -18,7 +45,8 @@ const CLUB_COST = 1;
 const HEART_RESTORE_COST = 5;
 const MAX_HEART_BASE_COST = 20;
 export function animationSpeedCost(owned) { return Math.ceil(10 * 1.55 ** owned); }
-export function animationDuration(baseMs, state) { const level = state.upgrades?.animationSpeed ?? 0; return Math.round(baseMs * Math.max(0.45, 1 - level * 0.12)); }
+function modeUpgradeValue(state, key, modeId, fallback = 0) { const value = state.upgrades?.[key]; return typeof value === 'number' ? value : (value?.[modeId] ?? fallback); }
+export function animationDuration(baseMs, state, modeId = 'sort_2') { const level = modeUpgradeValue(state, 'animationSpeed', modeId); return Math.round(baseMs * Math.max(0.45, 1 - level * 0.12)); }
 export function studyTimeCost(owned) { return Math.ceil(8 * 1.45 ** owned); }
 export function pauseCountCost(owned) { return Math.ceil(120 * 2.25 ** owned); }
 export function pauseLengthCost(owned) { return Math.ceil(60 * 1.9 ** owned); }
@@ -156,10 +184,13 @@ function addDueRestRecords(next, activeModeId, createdAt) {
 }
 export function addRoundMemory(state, modeId, timeSeconds, createdAt, mistakes = 0, extraActualEntries = 0, extraMeta = {}, itemTimes = []) { const next = structuredClone(state); next.gameMemory ??= {}; next.gameMemory[modeId] ??= { entries: [] }; ensureRestTracking(next); const entries = next.gameMemory[modeId].entries ?? []; const nonRestCount = entries.filter((entry) => entry.entryType !== 'rest').length; if (nonRestCount === 0 && itemTimes.length) { for (const score of firstRoundCalibrationScores(timeSeconds, itemTimes, itemTimes.length)) entries.push({ timeSeconds: score.timeSeconds, mistakes, entryType: 'actual', temporary: true, calibrationSource: score.source, calibrationSources: score.sources, createdAt, percentileAtRun: percentileAtRun(score.timeSeconds, entries) }); } else { const temporaryIndexes = entries.map((entry, index) => ({ entry, index })).filter(({ entry }) => entry.temporary); if (temporaryIndexes.length) { const removableTemporaryIndexes = temporaryIndexes.filter(({ entry }) => entry.calibrationSource !== 'actual_first_round'); const removalCandidates = removableTemporaryIndexes.length ? removableTemporaryIndexes : temporaryIndexes; const removeIndex = removalCandidates.reduce((slowest, candidate) => candidate.entry.timeSeconds > slowest.entry.timeSeconds ? candidate : slowest).index; entries.splice(removeIndex, 1); } entries.push({ timeSeconds, mistakes, entryType: 'actual', createdAt, percentileAtRun: percentileAtRun(timeSeconds, entries) }); } for (let i = 0; i < extraActualEntries; i += 1) entries.push({ timeSeconds, mistakes, entryType: 'actual', createdAt, weightedByBet: true, weightedIndex: i + 1, ...extraMeta }); trimModeMemory(next, modeId); addDueRestRecords(next, modeId, createdAt); return next; }
 export function createClubBet(modeId, offer, stake) { return { modeId, targetId: offer.id, targetSeconds: offer.timeSeconds, mistakeLimit: offer.mistakeLimit ?? 0, oddsMultiplier: offer.oddsMultiplier, oddsLabel: offer.oddsLabel, stake, cost: stake * CLUB_COST }; }
-export function payoutScore(state, modeId) { return MODES[modeId].baseDiamonds + state.upgrades.spades.global + state.upgrades.spades[modeId]; }
-export function spadeCost(scope, owned) { const base = scope === 'global' ? 25 : scope === 'sort_2' ? 12 : scope === 'sort_3' ? 9 : 6; const growth = scope === 'global' ? 1.6 : 1.5; return Math.ceil(base * growth ** owned); }
-export function perItemMedianBonusCost(modeId, owned = 0) { const multiplier = modeId === 'sort_2' ? 8 : modeId === 'sort_3' ? 12 : 16; return multiplier * spadeCost(modeId, owned); }
+export function payoutScore(state, modeId) { return MODES[modeId].baseDiamonds + (state.upgrades.spades.global ?? 0) + (state.upgrades.spades[modeId] ?? 0); }
+function spadeBase(scope) { if (scope === 'global') return 25; const size = MODES[scope]?.baseSize ?? 2; return size === 2 ? 12 : size === 3 ? 9 : 6; }
+export function spadeCost(scope, owned) { const base = spadeBase(scope); const growth = scope === 'global' ? 1.6 : 1.5; return Math.ceil(base * growth ** owned); }
+export function perItemMedianBonusCost(modeId, owned = 0) { const size = MODES[modeId]?.baseSize ?? 2; const multiplier = size === 2 ? 8 : size === 3 ? 12 : 16; return multiplier * spadeCost(modeId, owned); }
+export function sortedItemDisplayCost(modeId) { return Math.max(1, Math.floor(perItemMedianBonusCost(modeId, 0) * 0.75)); }
 export function hasModeBetHistory(state, modeId) { return (state.modeBetCounts?.[modeId] ?? 0) > 0; }
+export function hasSortedItemDisplay(state, modeId) { return Boolean(state.upgrades?.sortedItemDisplay?.[modeId]); }
 export function hasPerItemMedianBonus(state, modeId) { return (state.upgrades?.perItemMedianBonus?.[modeId] ?? 0) > 0; }
 function ensureItemStats(next, modeId) {
   next.itemStats ??= {};
@@ -194,14 +225,17 @@ export function settleItemTiming(state, modeId, itemId, timeSeconds, createdAt =
   return { state: next, event };
 }
 export function buyClubBet(state, bet) { if (bet.stake <= 0) return { ...state, activeClubBet: null }; if (bet.oddsLabel === '1:2' && bet.stake % 2 !== 0) throw new Error('1:2 wagers must be paid in multiples of 2 Clubs'); if (state.resources.diamonds < bet.cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= bet.cost; next.activeClubBet = { ...bet, startingBank: state.resources.diamonds }; next.modeBetCounts ??= {}; next.modeBetCounts[bet.modeId] = (next.modeBetCounts[bet.modeId] ?? 0) + 1; return next; }
-export function unlockMode(state, modeId) { const mode = MODES[modeId]; if (state.unlockedModes[modeId]) return state; if (state.resources.diamonds < mode.unlockCost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= mode.unlockCost; next.unlockedModes[modeId] = true; return next; }
-export function buySpade(state, scope) { const cost = spadeCost(scope, state.upgrades.spades[scope]); if (state.resources.diamonds < cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= cost; next.upgrades.spades[scope] += 1; return next; }
-export function buyPerItemMedianBonus(state, modeId) { if (!hasModeBetHistory(state, modeId)) throw new Error('Make at least one bet in this mode first'); const owned = state.upgrades?.perItemMedianBonus?.[modeId] ?? 0; const cost = perItemMedianBonusCost(modeId, owned); if (state.resources.diamonds < cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= cost; next.upgrades ??= {}; next.upgrades.perItemMedianBonus ??= { sort_2: 0, sort_3: 0, sort_4: 0 }; next.upgrades.perItemMedianBonus[modeId] = owned + 1; return next; }
-export function buyAnimationSpeed(state) { const owned = state.upgrades?.animationSpeed ?? 0; const cost = animationSpeedCost(owned); if (state.resources.diamonds < cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= cost; next.upgrades ??= {}; next.upgrades.animationSpeed = owned + 1; return next; }
-export function buyStudyTime(state) { const owned = state.upgrades?.studyTime ?? 0; const cost = studyTimeCost(owned); if (state.resources.diamonds < cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= cost; next.upgrades ??= {}; next.upgrades.studyTime = owned + 1; return next; }
-export function buyPauseCount(state) { const owned = state.upgrades?.pauseCount ?? 0; const cost = pauseCountCost(owned); if (state.resources.diamonds < cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= cost; next.upgrades ??= {}; next.upgrades.pauseCount = owned + 1; return next; }
-export function buyPauseLength(state) { const owned = state.upgrades?.pauseLength ?? 0; const cost = pauseLengthCost(owned); if (state.resources.diamonds < cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= cost; next.upgrades ??= {}; next.upgrades.pauseLength = owned + 1; return next; }
-export function buyQueueVision(state) { const owned = state.upgrades?.queueVision ?? 0; const cost = queueVisionCost(owned); if (state.resources.diamonds < cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= cost; next.upgrades ??= {}; next.upgrades.queueVision = owned + 1; return next; }
+export function canUnlockMode(state, modeId) { const mode = MODES[modeId]; if (!mode || state.unlockedModes?.[modeId]) return true; if (mode.variant === 'freeform') return [2, 3, 4].every((size) => state.unlockedModes?.[modeIdFor('standard', size)]); if (mode.variant === 'mystery') return [2, 3, 4].every((size) => state.unlockedModes?.[modeIdFor('freeform', size)]); return true; }
+export function unlockMode(state, modeId) { const mode = MODES[modeId]; if (state.unlockedModes[modeId]) return state; if (!canUnlockMode(state, modeId)) throw new Error(`${mode.name} is not available yet`); if (state.resources.diamonds < mode.unlockCost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= mode.unlockCost; next.unlockedModes[modeId] = true; return next; }
+export function buySpade(state, scope) { const cost = spadeCost(scope, state.upgrades.spades[scope] ?? 0); if (state.resources.diamonds < cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= cost; next.upgrades.spades[scope] = (next.upgrades.spades[scope] ?? 0) + 1; return next; }
+export function buyPerItemMedianBonus(state, modeId) { if (!hasModeBetHistory(state, modeId)) throw new Error('Make at least one bet in this mode first'); const owned = state.upgrades?.perItemMedianBonus?.[modeId] ?? 0; const cost = perItemMedianBonusCost(modeId, owned); if (state.resources.diamonds < cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= cost; next.upgrades ??= {}; next.upgrades.perItemMedianBonus ??= {}; next.upgrades.perItemMedianBonus[modeId] = owned + 1; return next; }
+export function buySortedItemDisplay(state, modeId) { if (MODES[modeId]?.variant !== 'standard') throw new Error('Sorted item display is for standard sort only'); if (state.upgrades?.sortedItemDisplay?.[modeId]) return state; const cost = sortedItemDisplayCost(modeId); if (state.resources.diamonds < cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= cost; next.upgrades ??= {}; next.upgrades.sortedItemDisplay ??= {}; next.upgrades.sortedItemDisplay[modeId] = true; return next; }
+function buyModeUpgrade(state, modeId, key, costFn) { const owned = modeUpgradeValue(state, key, modeId); const cost = costFn(owned); if (state.resources.diamonds < cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= cost; next.upgrades ??= {}; if (typeof next.upgrades[key] === 'number' || !next.upgrades[key]) next.upgrades[key] = Object.fromEntries(Object.keys(MODES).map((id) => [id, id === modeId ? (typeof state.upgrades?.[key] === 'number' ? state.upgrades[key] : 0) : 0])); next.upgrades[key][modeId] = owned + 1; return next; }
+export function buyAnimationSpeed(state, modeId = 'sort_2') { return buyModeUpgrade(state, modeId, 'animationSpeed', animationSpeedCost); }
+export function buyStudyTime(state, modeId = 'sort_2') { return buyModeUpgrade(state, modeId, 'studyTime', studyTimeCost); }
+export function buyPauseCount(state, modeId = 'sort_2') { return buyModeUpgrade(state, modeId, 'pauseCount', pauseCountCost); }
+export function buyPauseLength(state, modeId = 'sort_2') { return buyModeUpgrade(state, modeId, 'pauseLength', pauseLengthCost); }
+export function buyQueueVision(state, modeId = 'sort_2') { return buyModeUpgrade(state, modeId, 'queueVision', queueVisionCost); }
 export function restoreHeart(state) { if (state.resources.hearts >= state.resources.maxHearts) return state; if (state.resources.diamonds < HEART_RESTORE_COST) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= HEART_RESTORE_COST; next.resources.hearts += 1; return next; }
 export function maxHeartCost(maxHearts) { return Math.ceil(MAX_HEART_BASE_COST * 2 ** Math.max(0, maxHearts - 5)); }
 export function buyMaxHeart(state) { const cost = maxHeartCost(state.resources.maxHearts); if (state.resources.diamonds < cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= cost; next.resources.maxHearts += 1; next.resources.hearts += 1; return next; }

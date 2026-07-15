@@ -65,7 +65,7 @@ Glyph movement should be a meaningful part of round time: a prompt travels from 
 
 Yes: the documentation mentions rests as the mechanism that rewards rotating between games.
 
-Rest entries are not punishments and should not be described as bad scores.  They represent expectations cooling off while a mode is neglected.  Rest entries are marked as `rest`, visible in debug records, and used everywhere a normal non-bet timing baseline is used: Club target timing and history availability, round-level Heart safety, mistake pressure, and individual item timing.  This encourages the player to rotate between 2-way, 3-way, and 4-way sorting instead of grinding only one mode forever.
+Rest entries are not punishments and should not be described as bad scores.  They represent expectations cooling off while a mode is neglected.  Rest entries are marked as `rest`, visible in debug records, and used everywhere a normal non-bet timing baseline is used: Club target timing and history availability, round-level Heart safety, mistake pressure, and individual item timing.  This encourages the player to rotate across all unlocked Standard, Freeform, and Mystery 2/3/4-way games instead of grinding only one mode forever.
 
 ## Target estimation
 
@@ -122,9 +122,9 @@ payout = max(0, baseDiamonds + spadeBonus + heartPenalty)
 
 Suggested mode base payouts:
 
-- 2-way sort: 2 Diamonds.
-- 3-way sort: 3 Diamonds.
-- 4-way sort: 4 Diamonds.
+- Standard 2-way/3-way/4-way sort: 2/3/4 Diamonds.
+- Freeform 2-way/3-way/4-way sort: 4/6/8 Diamonds.
+- Mystery 2-way/3-way/4-way sort: 8/12/16 Diamonds.
 
 The UI should show this total expected per-round payout before a round starts as the mode's **Spade score**:
 
@@ -158,12 +158,14 @@ The Club purchase cost is paid before the round.  On a winning bet, return the s
 First-prototype purchases:
 
 - Restore 1 Heart: 5 Diamonds.
-- Unlock 3-way sort: 15 Diamonds.
-- Unlock 4-way sort: 30 Diamonds.
+- Unlock Standard 3-way sort: 15 Diamonds.
+- Unlock Standard 4-way sort: 30 Diamonds.
+- After all Standard modes are unlocked, unlock Freeform 2/3/4-way modes in any sequence.
+- After all Freeform modes are unlocked, unlock Mystery 2/3/4-way modes in any sequence.
 - Buy 1 global Spade payout upgrade: cost starts at 25 Diamonds and increases by 1.6x per global Spade, rounded up.
-- Buy 1 2-way Spade payout upgrade: cost starts at 12 Diamonds and increases by 1.5x per 2-way Spade, rounded up.
-- Buy 1 3-way Spade payout upgrade: cost starts at 9 Diamonds and increases by 1.5x per 3-way Spade, rounded up.
-- Buy 1 4-way Spade payout upgrade: cost starts at 6 Diamonds and increases by 1.5x per 4-way Spade, rounded up.
+- Buy 1 mode-specific 2-way Spade payout upgrade: cost starts at 12 Diamonds and increases by 1.5x per mode Spade, rounded up.
+- Buy 1 mode-specific 3-way Spade payout upgrade: cost starts at 9 Diamonds and increases by 1.5x per mode Spade, rounded up.
+- Buy 1 mode-specific 4-way Spade payout upgrade: cost starts at 6 Diamonds and increases by 1.5x per mode Spade, rounded up.
 - Buy repeatable per-item meta-median-speed payout upgrades after making at least one Club bet in that mode.  Each level pays +1 Diamond for each item solved faster than that mode's percentile-at-run meta-median item target.  Level cost is 8× the corresponding mode Spade cost for 2-way sort, 12× for 3-way sort, and 16× for 4-way sort, using the upgrade level as the Spade-cost level.
 - Buy study time: each level adds 1 automatic pre-round second for reading categories before the timer starts; sorting any glyph starts the timer early.
 - Buy pauses per round: each level adds 1 player-triggered pause during a round.

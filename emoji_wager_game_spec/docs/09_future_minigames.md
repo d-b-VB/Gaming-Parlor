@@ -4,7 +4,7 @@ The system should eventually support multiple game families.  Each game or mode 
 
 ## Sorting expansion
 
-The initial family includes 2-way, 3-way, and 4-way sorting.  Future sorting variants could add larger boards, timed category previews, category rearrangement upgrades, or alternate input layouts.
+The current family includes Standard, Freeform, and Mystery variants for 2-way, 3-way, and 4-way sorting. Future sorting variants could add larger boards, timed category previews, category rearrangement upgrades, or alternate input layouts.
 
 ## Tile packing
 

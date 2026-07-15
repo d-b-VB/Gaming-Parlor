@@ -28,13 +28,13 @@ The full-screen sorting view should include:
 - Current Hearts, Diamonds, and total Spade score / expected Diamond payout for the selected mode.
 - Current streak.
 
-The first UI should show only the target glyphs for each group.  Directional category groups on the left and right should stack glyphs vertically in tight boxes to frame the board.  The prompt queue should start at the same visual width as the initial countdown bars, then shrink as prompts are removed so the remaining queue becomes visually shorter over time.  By default, hide the identity of unrevealed future queue items while preserving their slots; show the active prompt and any mistaken prompt that has been returned to the queue.  Queue-visibility upgrades reveal additional upcoming prompts.  Category labels, swatches, and explanatory text can be added later if needed.
+Standard Sort should show target example glyphs for each group without showing category labels. Freeform and Mystery Sort should show blank/black category slots until sorted items reveal where categories live. Directional category groups should stack glyphs vertically in tight boxes to frame the board. The prompt queue should start at the same visual width as the initial countdown bars, then shrink as prompts are removed so the remaining queue becomes visually shorter over time. By default, hide the identity of unrevealed future queue items while preserving their slots; show the active prompt and any mistaken prompt that has been returned to the queue. Queue-visibility upgrades are per game and reveal additional upcoming prompts only for that selected game.
 
 ## Mode select and unlocks
 
-The player should start with 2-way sort unlocked.  3-way sort and 4-way sort should appear in the mode selector as locked purchases.
+The player should start with Standard 2-way sort unlocked. Standard 3-way and Standard 4-way should appear as locked purchases. Once all Standard modes are unlocked, the Freeform 2/3/4-way modes become available to unlock in any sequence. Once all Freeform modes are unlocked, the Mystery 2/3/4-way modes become available to unlock in any sequence.
 
-Locked modes should show their Diamond unlock cost.  After purchase, they should become playable and receive their own memory, target estimates, and mode-specific Spade upgrades.
+Locked modes should show their Diamond unlock cost or prerequisite lock state. After purchase, they should become playable and receive their own memory, target estimates, rests, item timing, queue-visibility, animation/study/pause upgrades, per-item payout upgrade, and mode-specific Spade upgrades.
 
 ## Club betting display
 
@@ -100,10 +100,11 @@ The first shop can be simple and functional.  It should include:
 - Buy 2-way Spade payout upgrade.
 - Buy 3-way Spade payout upgrade.
 - Buy 4-way Spade payout upgrade.
-- Buy animation speed upgrades that shorten deliberately weighty glyph travel animations.
-- Buy study-time upgrades.
-- Buy pause-count and pause-length upgrades.
-- Buy queue-visibility upgrades.
+- Buy per-game animation speed upgrades that shorten deliberately weighty glyph travel animations.
+- Buy per-game study-time upgrades.
+- Buy per-game pause-count and pause-length upgrades.
+- Buy per-game queue-visibility upgrades.
+- Buy Standard-only sorted-item display upgrades per base size.
 
 Future upgrade slots may be visible but disabled for category choice and category rearrangement.
 

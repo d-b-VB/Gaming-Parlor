@@ -1,8 +1,8 @@
 # Gaming Parlor
 
-A zero-dependency, playable browser prototype for the Emoji Wager Sort game. The current visible app build is **v0.2.26**.
+A zero-dependency, playable browser prototype for the Emoji Wager Sort game. The current visible app build is **v0.3.0**.
 
-The bundled strong prototype catalog now includes 1,176 glyph records, 100 base category selectors, and a 52-selector cross-cutting overlay.
+The bundled strong prototype catalog now includes 1,176 glyph records, 100 base category selectors, and a 52-selector cross-cutting overlay. The playable mode set now covers nine distinct Standard, Freeform, and Mystery 2/3/4-way sorting games.
 
 ## Play
 

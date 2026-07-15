@@ -1,8 +1,8 @@
-import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, percentileAtRun, itemPercentileAtRun, createClubBet, buyClubBet, unlockMode, buySpade, buyPerItemMedianBonus, restoreHeart, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, settleRound, settleItemTiming, itemTimingTargets, spadeCost, payoutScore, perItemMedianBonusCost, hasModeBetHistory, streakDuration } from './game/core.js?v=0.2.26';
+import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, percentileAtRun, itemPercentileAtRun, createClubBet, buyClubBet, unlockMode, canUnlockMode, buySpade, buyPerItemMedianBonus, buySortedItemDisplay, restoreHeart, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, sortedItemDisplayCost, hasSortedItemDisplay, settleRound, settleItemTiming, itemTimingTargets, spadeCost, payoutScore, perItemMedianBonusCost, hasModeBetHistory, streakDuration } from './game/core.js?v=0.3.0';
 
 const root = document.querySelector('#root');
-const APP_VERSION = 'v0.2.26';
-const SAVE_SCHEMA_VERSION = '0.2.26-local';
+const APP_VERSION = 'v0.3.0';
+const SAVE_SCHEMA_VERSION = '0.3.0-local';
 const arrows = { left: '←', right: '→', up: '↑', down: '↓' };
 let items = [];
 let selectors = [];
@@ -35,6 +35,8 @@ let pausedAccumMs = 0;
 let pausesRemaining = 0;
 let roundSlowHeartLossTimes = [];
 let debugOpen = false;
+let categoryAssignments = {};
+let sortedByGroup = {};
 
 function fmt(seconds) {
   return `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
@@ -60,13 +62,22 @@ function normalizeSave(candidate, defaultState) {
     next.gameMemory[id].entries ??= [];
   }
   next.upgrades ??= {};
-  next.upgrades.animationSpeed ??= 0;
-  next.upgrades.studyTime ??= 0;
-  next.upgrades.pauseCount ??= 0;
-  next.upgrades.pauseLength ??= 0;
-  next.upgrades.queueVision ??= 0;
-  next.upgrades.perItemMedianBonus ??= { sort_2: 0, sort_3: 0, sort_4: 0 };
-  next.modeBetCounts ??= { sort_2: 0, sort_3: 0, sort_4: 0 };
+  next.upgrades.spades ??= { global: 0 };
+  next.upgrades.spades.global ??= 0;
+  next.upgrades.perItemMedianBonus ??= {};
+  next.upgrades.sortedItemDisplay ??= {};
+  next.modeBetCounts ??= {};
+  for (const key of ['animationSpeed', 'studyTime', 'pauseCount', 'pauseLength', 'queueVision']) {
+    const prior = typeof next.upgrades[key] === 'number' ? next.upgrades[key] : 0;
+    if (typeof next.upgrades[key] !== 'object' || next.upgrades[key] === null) next.upgrades[key] = {};
+    for (const id of Object.keys(MODES)) next.upgrades[key][id] ??= id === 'sort_2' ? prior : 0;
+  }
+  for (const id of Object.keys(MODES)) {
+    next.upgrades.spades[id] ??= 0;
+    next.upgrades.perItemMedianBonus[id] ??= 0;
+    next.upgrades.sortedItemDisplay[id] ??= false;
+    next.modeBetCounts[id] ??= 0;
+  }
   next.restTracking ??= { lastCompletedModeId: null, awayBlock: 0, restedBlockByMode: {} };
   next.restTracking.restedBlockByMode ??= {};
   next.restTracking.awayBlock ??= 0;
@@ -88,6 +99,7 @@ function loadSaved(defaultState) {
   try { return normalizeSave(JSON.parse(localStorage.getItem(STORAGE_KEY)), defaultState); } catch { return normalizeSave(defaultState, defaultState); }
 }
 function groupByDirection(direction) { return board.groups.filter((group) => group.direction === direction); }
+function modeUpgrade(key, id = modeId) { const value = state.upgrades?.[key]; return typeof value === 'number' ? value : (value?.[id] ?? 0); }
 function currentTargets() { return estimateTargets(modeId, state.gameMemory[modeId].entries); }
 function modePayout(id) { return payoutScore(state, id); }
 function escapeHtml(value) {
@@ -108,7 +120,7 @@ function heartsHtml() {
   return `<span class="hearts" aria-label="${state.resources.hearts} of ${state.resources.maxHearts} hearts">${Array.from({ length: state.resources.maxHearts }, (_, index) => `<span class="heart ${index < state.resources.hearts ? 'full' : 'empty'}">${index < state.resources.hearts ? '♥' : '♥'}</span>`).join('')}</span>`;
 }
 function queueStripHtml() {
-  const visibleAhead = state?.upgrades?.queueVision ?? 0;
+  const visibleAhead = modeUpgrade('queueVision');
   return `<div class="queue-strip" style="--queue-total:${board.queue.length}" aria-label="Prompt queue">${queue.map((prompt, index) => {
     const revealed = index === 0 || index <= visibleAhead || prompt.revealed;
     return `<span class="queue-glyph ${index === 0 ? 'next' : ''} ${revealed ? '' : 'hidden-glyph'}">${revealed ? glyphHtml(prompt.item) : '◆'}</span>`;
@@ -183,6 +195,8 @@ function startBoard(nextMode = modeId) {
   pausedAccumMs = 0;
   pausesRemaining = 0;
   roundSlowHeartLossTimes = [];
+  categoryAssignments = {};
+  sortedByGroup = {};
   feedback = 'Board ready. Buy Clubs if you want odds, then start the full-screen round.';
   stopTimer();
   render();
@@ -211,9 +225,9 @@ function startRound() {
   inRound = true;
   lastSummary = null;
   feedback = 'Full-screen round started. Sort every glyph as fast as you can.';
-  pausesRemaining = state.upgrades.pauseCount ?? 0;
+  pausesRemaining = modeUpgrade('pauseCount');
   pausedAccumMs = 0;
-  const studySeconds = state.upgrades.studyTime ?? 0;
+  const studySeconds = modeUpgrade('studyTime');
   if (studySeconds > 0) {
     studying = true;
     studyEndsAt = Date.now() + studySeconds * 1000;
@@ -235,7 +249,7 @@ function backOfQueuePoint() {
   const rect = root.querySelector('.queue-strip')?.getBoundingClientRect() || root.querySelector('.center-card').getBoundingClientRect();
   return { x: rect.right - Math.min(24, rect.width / 2), y: rect.top + rect.height / 2 };
 }
-function pauseSeconds() { return 1 + (state.upgrades.pauseLength ?? 0); }
+function pauseSeconds() { return 1 + modeUpgrade('pauseLength'); }
 function endPause() {
   if (!paused) return;
   const pauseMs = Date.now() - pauseStartedAt;
@@ -273,7 +287,7 @@ async function animateGlyphTravel(html, direction, isCorrect) {
     ? Math.max(1000, Math.min(1900, (timing.medianSeconds || 2) * 650))
     : Math.max(1600, Math.min(3000, (timing.longestSeconds || 3) * 750));
   if (!clone.animate) {
-    await new Promise((resolve) => window.setTimeout(resolve, animationDuration(adaptiveBase, state)));
+    await new Promise((resolve) => window.setTimeout(resolve, animationDuration(adaptiveBase, state, modeId)));
     clone.remove();
     return;
   }
@@ -289,7 +303,7 @@ async function animateGlyphTravel(html, direction, isCorrect) {
         { left: `${zone.x}px`, top: `${zone.y}px`, transform: 'translate(-50%, -50%) scale(0.58) rotate(-7deg)', opacity: 0.96, offset: 0.62 },
         { left: `${back.x}px`, top: `${back.y}px`, transform: 'translate(-50%, -50%) scale(0.34)', opacity: 0, offset: 1 },
       ];
-  const animation = clone.animate(keyframes, { duration: animationDuration(adaptiveBase, state), easing: 'cubic-bezier(0.18, 0.84, 0.24, 1)', fill: 'forwards' });
+  const animation = clone.animate(keyframes, { duration: animationDuration(adaptiveBase, state, modeId), easing: 'cubic-bezier(0.18, 0.84, 0.24, 1)', fill: 'forwards' });
   await animation.finished.catch(() => {});
   clone.remove();
 }
@@ -351,6 +365,45 @@ function finishRound() {
   motion = null;
   render();
 }
+
+function assignedGroupsForDirection(direction) {
+  return Object.entries(categoryAssignments).filter(([, assignedDirection]) => assignedDirection === direction).map(([groupId]) => groupId);
+}
+function freeformDirectionHasSpace(direction) {
+  return assignedGroupsForDirection(direction).length < MODES[modeId].groupsPerDirection;
+}
+function sortDecision(prompt, direction) {
+  const mode = MODES[modeId];
+  if (mode.variant !== 'freeform') return { isCorrect: prompt.direction === direction };
+  const assigned = categoryAssignments[prompt.groupId];
+  if (assigned) return { isCorrect: assigned === direction };
+  return { isCorrect: freeformDirectionHasSpace(direction), assignDirection: freeformDirectionHasSpace(direction) ? direction : null };
+}
+function recordSortedPrompt(prompt, direction, decision) {
+  if (decision.assignDirection) categoryAssignments[prompt.groupId] = decision.assignDirection;
+  const mode = MODES[modeId];
+  if (mode.variant !== 'standard' || hasSortedItemDisplay(state, modeId)) {
+    sortedByGroup[prompt.groupId] ??= [];
+    sortedByGroup[prompt.groupId].push(prompt.item);
+  }
+}
+function groupSlotHtml(group, showExamples) {
+  const sorted = sortedByGroup[group.id] ?? [];
+  const content = showExamples ? group.items.map((item) => glyphHtml(item)).join('') : sorted.map((item) => glyphHtml(item)).join('');
+  return `<span class="glyph-group ${content ? '' : 'mystery-group'}">${content || '◆ ◆ ◆ ◆'}</span>`;
+}
+function groupsForZone(direction) {
+  const mode = MODES[modeId];
+  if (mode.variant !== 'freeform') return groupByDirection(direction);
+  const assigned = assignedGroupsForDirection(direction).map((groupId) => board.groups.find((group) => group.id === groupId)).filter(Boolean);
+  return [...assigned, ...Array.from({ length: Math.max(0, mode.groupsPerDirection - assigned.length) }, (_, index) => ({ id: `open-${direction}-${index}`, open: true }))];
+}
+function sideZoneHtml(direction) {
+  const mode = MODES[modeId];
+  const showExamples = mode.variant === 'standard';
+  const slots = groupsForZone(direction).map((group) => group.open ? '<span class="glyph-group mystery-group">◆ ◆ ◆ ◆</span>' : groupSlotHtml(group, showExamples)).join('');
+  return `<button class="zone zone-${direction}" data-dispatch="${direction}"><span class="direction">${arrows[direction]}</span><span class="groups vertical-groups">${slots}</span></button>`;
+}
 async function dispatch(direction) {
   const mode = MODES[modeId];
   if (motion || paused || !inRound || !queue[0] || !mode.directions.includes(direction)) return;
@@ -362,13 +415,15 @@ async function dispatch(direction) {
   }
   ensureTimer();
   const prompt = queue[0];
-  const isCorrect = prompt.direction === direction;
+  const decision = sortDecision(prompt, direction);
+  const isCorrect = decision.isCorrect;
   const itemSeconds = promptStartedAt ? Math.max(0.01, Number(((Date.now() - promptStartedAt) / 1000).toFixed(2))) : 0;
   motion = { busy: true };
   feedback = isCorrect ? `${prompt.item.name} flying ${arrows[direction]}…` : `${prompt.item.name} rejected ${arrows[direction]} and returning to the queue…`;
   render();
   await animateGlyphTravel(glyphHtml(prompt.item), direction, isCorrect);
   if (isCorrect) {
+    recordSortedPrompt(prompt, direction, decision);
     const itemResult = settleItemTiming(state, modeId, prompt.item.id, itemSeconds, new Date().toISOString(), roundSlowHeartLossTimes);
     state = itemResult.state;
     save();
@@ -380,7 +435,7 @@ async function dispatch(direction) {
     queue.shift();
     streak += 1;
     const itemNote = `${itemResult.event.isEliteItem ? ` Elite item: +♦${itemResult.event.eliteBonusDelta}.` : itemResult.event.isNewFastest ? ' New fastest item.' : itemResult.event.heartsDelta < 0 ? ' Too slow: -♥.' : ''}${itemResult.event.medianBonusDelta ? ` Beat item target: +♦${itemResult.event.medianBonusDelta}.` : ''}`;
-    feedback = `Correct ${arrows[direction]} in ${itemSeconds.toFixed(2)}s — streak ${streak}; glide ${animationDuration(streakDuration(220, streak), state)}ms.${itemNote}`;
+    feedback = `Correct ${arrows[direction]} in ${itemSeconds.toFixed(2)}s — streak ${streak}; glide ${animationDuration(streakDuration(220, streak), state, modeId)}ms.${itemNote}`;
     motion = null;
     resetPromptClock();
     if (queue.length === 0) finishRound(); else render();
@@ -415,9 +470,8 @@ function render() {
   const pauseLeft = paused ? Math.max(0, (pauseEndsAt - Date.now()) / 1000) : 0;
   const medianBonusLevel = state.upgrades.perItemMedianBonus[modeId] ?? 0;
   const nextMedianBonus = medianBonusLevel + 1;
-  const sideZone = (direction) => `<button class="zone zone-${direction}" data-dispatch="${direction}"><span class="direction">${arrows[direction]}</span><span class="groups vertical-groups">${groupByDirection(direction).map((group) => `<span class="glyph-group" title="${group.label}">${group.items.map((item) => glyphHtml(item)).join('')}</span>`).join('')}</span></button>`;
   const boardHtml = `<div class="play-hud"><div class="status-row"><span>⏱ ${elapsed.toFixed(1)}s</span><span>${heartsHtml()}</span><span>Queue ${queue.length}/${board.queue.length}</span><span>Streak ${streak}</span><span>Study ${studying ? studyLeft.toFixed(1) : '—'}</span><span>Pause ${paused ? pauseLeft.toFixed(1) : pausesRemaining}</span><button id="pause-round" ${inRound && !studying && !paused && pausesRemaining > 0 ? '' : 'disabled'}>Pause</button><span>Item ♦${itemDiamondBonuses} / ♥-${itemHeartLosses}</span></div>${barsHtml(safety, state.activeClubBet, inRound && queue.length === 1)}</div>
-      <div class="sort-board framed-board mode-${mode.directions.length}">${mode.directions.map(sideZone).join('')}<div class="center-card ${motion ? 'busy' : ''}">${current ? itemTimerHtml() : ''}<span class="prompt ${motion ? 'ghost-prompt' : ''}">${current ? glyphHtml(current.item) : '🏁'}</span><span>${current ? `${progress}/${board.queue.length} sorted` : 'Round finished'}</span></div></div><p class="feedback" role="status">${feedback}</p>`;
+      <div class="sort-board framed-board mode-${mode.directions.length}">${mode.directions.map(sideZoneHtml).join('')}<div class="center-card ${motion ? 'busy' : ''}">${current ? itemTimerHtml() : ''}<span class="prompt ${motion ? 'ghost-prompt' : ''}">${current ? glyphHtml(current.item) : '🏁'}</span><span>${current ? `${progress}/${board.queue.length} sorted` : 'Round finished'}</span></div></div><p class="feedback" role="status">${feedback}</p>`;
   const debugHtml = debugRecordsHtml(targets, safety);
   const summaryHtml = lastSummary ? `<section class="panel post-round"><h2>Round summary</h2><div class="summary-grid"><span>Mode</span><strong>${lastSummary.modeName}</strong><span>Time</span><strong>${lastSummary.timeSeconds.toFixed(2)}s</strong><span>Percentile score</span><strong>${Math.round(lastSummary.percentile * 100)}%</strong><span>Mistakes</span><strong>${lastSummary.mistakes}</strong><span>Diamond payout</span><strong>♦ ${lastSummary.diamondsDelta}</strong><span>Item speed bonus</span><strong>♦ ${lastSummary.itemDiamondBonuses}</strong><span>Heart change</span><strong>${lastSummary.heartsDelta} round / -${lastSummary.itemHeartLosses} item</strong><span>Mistake pressure</span><strong>${lastSummary.mistakeHeartsLost ? `-${lastSummary.mistakeHeartsLost} ♥` : 'Safe'}${Number.isFinite(lastSummary.medianMistakes) ? ` · median ${lastSummary.medianMistakes}` : ''}</strong><span>Item records</span><strong>${lastSummary.itemRecordCount}</strong><span>Bet result</span><strong>${lastSummary.betTarget ? `${lastSummary.betWon ? 'Won' : 'Lost'} vs ${fmt(lastSummary.betTarget)} / ≤${lastSummary.betMistakeLimit} errors (${lastSummary.betWinnings ? `♦ ${lastSummary.betWinnings}, +${lastSummary.betConfidenceWeight} memory` : 'no payout'})` : 'No bet'}</strong></div><button id="continue-lobby" class="primary-action">Continue</button></section>` : '';
   root.innerHTML = inRound ? `
@@ -430,10 +484,10 @@ function render() {
       <header class="hero"><div><p class="eyebrow">Gaming Parlor</p><h1>Emoji Wager Sort</h1><p>Set your mode, shop, and bet here. When the round starts, sorting takes the whole screen.</p><p class="save-scope">Save ${escapeHtml(state.saveMeta.localSaveId)} is local to this browser profile. If another device looks identical, it is probably still on the seeded starter stats unless you imported or synced site data outside the game.</p></div><div class="resources"><span>${heartsHtml()}</span><span>♦ ${state.resources.diamonds}</span><span>♠ ${modePayout(modeId)} ${mode.name} payout</span></div></header>
       ${summaryHtml}
       ${debugHtml}
-      <section class="panel mode-panel"><h2>Modes</h2><div class="mode-grid">${modeList.map((candidate) => `<button data-mode="${candidate.id}" class="${candidate.id === modeId ? 'selected' : ''}"><strong>${candidate.name}</strong><span>♠ score ${modePayout(candidate.id)} · pays ♦${modePayout(candidate.id)}</span><span>${state.unlockedModes[candidate.id] ? 'Select' : `Unlock ♦${candidate.unlockCost}`}</span></button>`).join('')}</div></section>
+      <section class="panel mode-panel"><h2>Modes</h2><div class="mode-grid">${modeList.map((candidate) => `<button data-mode="${candidate.id}" class="${candidate.id === modeId ? 'selected' : ''}"><strong>${candidate.name}</strong><span>♠ score ${modePayout(candidate.id)} · pays ♦${modePayout(candidate.id)}</span><span>${state.unlockedModes[candidate.id] ? 'Select' : canUnlockMode(state, candidate.id) ? `Unlock ♦${candidate.unlockCost}` : 'Locked'}</span></button>`).join('')}</div></section>
       <section class="lobby-layout"><section class="panel"><h2>Ready: ${mode.name}</h2><p>${board.queue.length} glyphs queued. Active directions: ${mode.directions.map((direction) => arrows[direction]).join(' ')}</p>${queueStripHtml()}<button id="start-round" class="primary-action">Start full-screen round</button><button id="new-board">New board</button><p class="feedback" role="status">${feedback}</p></section>
       <section class="panel"><h2>Club wager</h2><p class="hint">Harder times pay more. Locked propositions need more actual history in this mode.</p><div class="target-list">${targets.map((offer) => `<button data-target="${offer.id}" class="${offer.id === selectedTarget ? 'selected' : ''}" ${offer.available ? '' : 'disabled'}><strong>${offer.label}</strong><span>Beat ${fmt(offer.timeSeconds)} / ≤${offer.mistakeLimit} errors</span><span>${offer.oddsLabel}</span><small>${offer.available ? 'Available' : `${offer.actualCount}/${offer.minHistory} history`}</small></button>`).join('')}</div><label class="stake-row">Clubs<input id="stake" type="number" min="${selectedTarget === 'half' ? 2 : 1}" step="${selectedTarget === 'half' ? 2 : 1}" value="${stake}"></label><button id="buy-bet" ${targets.find((offer) => offer.id === selectedTarget)?.available && !(selectedTarget === 'half' && stake % 2 !== 0) ? '' : 'disabled'}>Buy bet for ♦${stake}</button></section>
-      <section class="panel shop"><h2>Spade shop</h2><p class="hint">Current ${mode.name} spade score: ${modePayout(modeId)} Diamonds before Heart penalties.</p><button id="restore-heart">Restore Heart ♦5</button><button id="buy-max-heart">+1 Max Heart ♦${maxHeartCost(state.resources.maxHearts)}</button><button id="buy-global">+1 Global ♠ ♦${spadeCost('global', state.upgrades.spades.global)}</button><button id="buy-mode">+1 ${mode.name} ♠ ♦${spadeCost(modeId, state.upgrades.spades[modeId])}</button><button id="buy-item-median" ${hasModeBetHistory(state, modeId) ? '' : 'disabled'}>Meta-median item bonus Lv.${medianBonusLevel}: buy +♦${nextMedianBonus} per item target ♦${perItemMedianBonusCost(modeId, medianBonusLevel)}</button><small>${hasModeBetHistory(state, modeId) ? `Current item-target bonus: +♦${medianBonusLevel}; next upgrade pays +♦${nextMedianBonus} per item that beats the meta-median.` : 'Locked until you buy one Club bet in this mode.'}</small><button id="buy-study">+1s Study Time Lv.${state.upgrades.studyTime} ♦${studyTimeCost(state.upgrades.studyTime)}</button><button id="buy-pause-count">+1 Pause/Round Lv.${state.upgrades.pauseCount} ♦${pauseCountCost(state.upgrades.pauseCount)}</button><button id="buy-pause-length">+1s Pause Length Lv.${state.upgrades.pauseLength} ♦${pauseLengthCost(state.upgrades.pauseLength)}</button><button id="buy-queue-vision">Reveal +1 Queue Glyph Lv.${state.upgrades.queueVision} ♦${queueVisionCost(state.upgrades.queueVision)}</button><button id="buy-speed">Faster glyphs Lv.${state.upgrades.animationSpeed} ♦${animationSpeedCost(state.upgrades.animationSpeed)}</button><button disabled>Choose/rearrange categories soon</button><button id="reset-save">Reset save</button></section></section>
+      <section class="panel shop"><h2>Spade shop</h2><p class="hint">Current ${mode.name} spade score: ${modePayout(modeId)} Diamonds before Heart penalties.</p><button id="restore-heart">Restore Heart ♦5</button><button id="buy-max-heart">+1 Max Heart ♦${maxHeartCost(state.resources.maxHearts)}</button><button id="buy-global">+1 Global ♠ ♦${spadeCost('global', state.upgrades.spades.global)}</button><button id="buy-mode">+1 ${mode.name} ♠ ♦${spadeCost(modeId, state.upgrades.spades[modeId])}</button><button id="buy-item-median" ${hasModeBetHistory(state, modeId) ? '' : 'disabled'}>Meta-median item bonus Lv.${medianBonusLevel}: buy +♦${nextMedianBonus} per item target ♦${perItemMedianBonusCost(modeId, medianBonusLevel)}</button><small>${hasModeBetHistory(state, modeId) ? `Current item-target bonus: +♦${medianBonusLevel}; next upgrade pays +♦${nextMedianBonus} per item that beats the meta-median.` : 'Locked until you buy one Club bet in this mode.'}</small><button id="buy-study">+1s Study Time Lv.${modeUpgrade('studyTime')} ♦${studyTimeCost(modeUpgrade('studyTime'))}</button><button id="buy-pause-count">+1 Pause/Round Lv.${modeUpgrade('pauseCount')} ♦${pauseCountCost(modeUpgrade('pauseCount'))}</button><button id="buy-pause-length">+1s Pause Length Lv.${modeUpgrade('pauseLength')} ♦${pauseLengthCost(modeUpgrade('pauseLength'))}</button><button id="buy-queue-vision">Reveal +1 Queue Glyph Lv.${modeUpgrade('queueVision')} ♦${queueVisionCost(modeUpgrade('queueVision'))}</button><button id="buy-speed">Faster glyphs Lv.${modeUpgrade('animationSpeed')} ♦${animationSpeedCost(modeUpgrade('animationSpeed'))}</button>${mode.variant === 'standard' ? `<button id="buy-sorted-display" ${hasSortedItemDisplay(state, modeId) ? 'disabled' : ''}>Show sorted items ${hasSortedItemDisplay(state, modeId) ? 'owned' : `♦${sortedItemDisplayCost(modeId)}`}</button>` : ''}<button disabled>Choose/rearrange categories soon</button><button id="reset-save">Reset save</button></section></section>
     </main>`;
   root.querySelectorAll('[data-dispatch]').forEach((button) => button.addEventListener('click', () => dispatch(button.dataset.dispatch)));
   root.querySelectorAll('[data-mode]').forEach((button) => button.addEventListener('click', () => { const id = button.dataset.mode; if (state.unlockedModes[id]) startBoard(id); else tryAction(() => unlockMode(state, id)); }));
@@ -446,11 +500,12 @@ function render() {
   root.querySelector('#buy-global')?.addEventListener('click', () => tryAction(() => buySpade(state, 'global')));
   root.querySelector('#buy-mode')?.addEventListener('click', () => tryAction(() => buySpade(state, modeId)));
   root.querySelector('#buy-item-median')?.addEventListener('click', () => tryAction(() => buyPerItemMedianBonus(state, modeId)));
-  root.querySelector('#buy-study')?.addEventListener('click', () => tryAction(() => buyStudyTime(state)));
-  root.querySelector('#buy-pause-count')?.addEventListener('click', () => tryAction(() => buyPauseCount(state)));
-  root.querySelector('#buy-pause-length')?.addEventListener('click', () => tryAction(() => buyPauseLength(state)));
-  root.querySelector('#buy-queue-vision')?.addEventListener('click', () => tryAction(() => buyQueueVision(state)));
-  root.querySelector('#buy-speed')?.addEventListener('click', () => tryAction(() => buyAnimationSpeed(state)));
+  root.querySelector('#buy-study')?.addEventListener('click', () => tryAction(() => buyStudyTime(state, modeId)));
+  root.querySelector('#buy-pause-count')?.addEventListener('click', () => tryAction(() => buyPauseCount(state, modeId)));
+  root.querySelector('#buy-pause-length')?.addEventListener('click', () => tryAction(() => buyPauseLength(state, modeId)));
+  root.querySelector('#buy-queue-vision')?.addEventListener('click', () => tryAction(() => buyQueueVision(state, modeId)));
+  root.querySelector('#buy-speed')?.addEventListener('click', () => tryAction(() => buyAnimationSpeed(state, modeId)));
+  root.querySelector('#buy-sorted-display')?.addEventListener('click', () => tryAction(() => buySortedItemDisplay(state, modeId)));
   root.querySelector('#pause-round')?.addEventListener('click', activatePause);
   root.querySelector('#start-round')?.addEventListener('click', startRound);
   root.querySelector('#new-board')?.addEventListener('click', () => startBoard());

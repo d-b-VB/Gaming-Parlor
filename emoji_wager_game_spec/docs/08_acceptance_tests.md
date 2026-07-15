@@ -11,18 +11,19 @@
 
 ## Modes and unlocks
 
-- 2-way sort is playable in the default state.
-- 3-way sort is locked in the default state.
-- 4-way sort is locked in the default state.
-- Spending the required Diamonds unlocks 3-way sort.
-- Spending the required Diamonds unlocks 4-way sort.
+- Standard 2-way sort is playable in the default state.
+- Standard 3-way and Standard 4-way sort are locked in the default state.
+- Freeform and Mystery modes are distinct locked games with separate memory and upgrades.
+- Spending the required Diamonds unlocks Standard 3-way and Standard 4-way sort.
+- Freeform modes become unlockable after all Standard modes are unlocked, in any sequence.
+- Mystery modes become unlockable after all Freeform modes are unlocked, in any sequence.
 - Locked modes cannot be started before purchase.
 
 ## Board generation
 
-- A new 2-way sorting round contains exactly 4 groups, 2 directions, and 16 unique glyph prompts.
-- A new 3-way sorting round contains exactly 6 groups, 3 directions, and 24 unique glyph prompts.
-- A new 4-way sorting round contains exactly 8 groups, 4 directions, and 32 unique glyph prompts.
+- Every 2-way Standard/Freeform/Mystery round contains exactly 4 groups, 2 directions, and 16 unique glyph prompts.
+- Every 3-way Standard/Freeform/Mystery round contains exactly 6 groups, 3 directions, and 24 unique glyph prompts.
+- Every 4-way Standard/Freeform/Mystery round contains exactly 8 groups, 4 directions, and 32 unique glyph prompts.
 - Each group contains exactly 4 items.
 - Each active direction has exactly 2 groups.
 - A glyph never appears in two active groups.
@@ -38,7 +39,7 @@
 - A wrong answer sends that glyph to the back of the queue.
 - The timer does not pause for correct or wrong answers unless a pause upgrade is actively being used.
 - The queue hides unrevealed future glyph identities by default while preserving visible queue length.
-- Queue-visibility upgrades reveal additional upcoming prompt identities.
+- Per-game queue-visibility upgrades reveal additional upcoming prompt identities only for that selected game.
 - Mistaken glyphs returned to the queue remain visibly identified.
 - Study-time upgrades delay the game timer at round start until study expires or the player sorts.
 - Pause upgrades let the player pause with Space or a button, freezing round and item timers until the pause expires.
@@ -83,9 +84,10 @@
 - Rest entries are visible in debug records and are used for Club timing/history availability, round Heart safety, mistake pressure, and individual item timing as a counterweight to high-stakes weighted fast entries.
 - Buying a global Spade increases future Diamond payouts for all sorting modes.
 - Buying a mode-specific Spade increases future Diamond payouts only for that mode.
-- Buying an animation speed upgrade spends Diamonds and shortens deliberately weighty glyph travel animations without changing sorting correctness.
+- Buying a per-game animation speed upgrade spends Diamonds and shortens deliberately weighty glyph travel animations for that game without changing sorting correctness.
 - Buying per-item meta-median payout upgrades is more accessible: level cost is 8×/12×/16× the corresponding mode Spade cost for 2-way/3-way/4-way sort.
-- Buying study-time, pause-count, pause-length, and queue-visibility upgrades spends Diamonds and increments the corresponding upgrade level.
+- Buying per-game study-time, pause-count, pause-length, and queue-visibility upgrades spends Diamonds and increments the corresponding upgrade level only for that game.
+- Buying a Standard-only sorted-item display upgrade per base size shows all correctly sorted items in the Standard category zones.
 - Restoring a Heart spends Diamonds and cannot exceed max Hearts.
 - State persists after page reload.
 
@@ -93,8 +95,8 @@
 
 - Editing the Club stake input does not rerender the whole screen or jump focus back to the top.
 - The main play UI shows only target glyphs for the active groups in the first prototype.
-- The mode selector shows 2-way, 3-way, and 4-way sort.
-- The shop exposes Heart restore, mode unlocks, Spade payout upgrades, animation speed, study time, pauses, and queue-visibility upgrades.
+- The mode selector shows all nine Standard, Freeform, and Mystery 2/3/4-way games.
+- The shop exposes Heart restore, mode unlocks, Spade payout upgrades, per-game animation speed, per-game study time, per-game pauses, per-game queue-visibility upgrades, and Standard sorted-item display upgrades.
 
 ## Non-goals
 

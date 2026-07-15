@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { generateBoard, matchesSelector, estimateTargets, heartSafety, createClubBet, buyClubBet, settleRound, settleItemTiming, itemTimingTargets, itemPercentileAtRun, itemSlowHeartThreshold, firstRoundCalibrationScores, mistakePressure, unlockMode, buySpade, buyPerItemMedianBonus, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, spadeCost, payoutScore, perItemMedianBonusCost, hasPerItemMedianBonus, streakDuration } from '../src/game/core.js';
+import { generateBoard, matchesSelector, estimateTargets, heartSafety, createClubBet, buyClubBet, canUnlockMode, settleRound, settleItemTiming, itemTimingTargets, itemPercentileAtRun, itemSlowHeartThreshold, firstRoundCalibrationScores, mistakePressure, unlockMode, buySpade, buyPerItemMedianBonus, buySortedItemDisplay, sortedItemDisplayCost, hasSortedItemDisplay, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, spadeCost, payoutScore, perItemMedianBonusCost, hasPerItemMedianBonus, streakDuration } from '../src/game/core.js';
 
 const items = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/items.json', import.meta.url))).items;
 const baseSelectors = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/category_selectors.json', import.meta.url))).selectors;
@@ -71,7 +71,7 @@ test('expanded tags keep biological and object categories literal', () => {
 
 
 test('board generation creates valid unique boards for each mode', () => {
-  const expectations = { sort_2: [4, 16], sort_3: [6, 24], sort_4: [8, 32] };
+  const expectations = { sort_2: [4, 16], sort_3: [6, 24], sort_4: [8, 32], freeform_2: [4, 16], freeform_3: [6, 24], freeform_4: [8, 32], mystery_2: [4, 16], mystery_3: [6, 24], mystery_4: [8, 32] };
   for (const [modeId, [groups, prompts]] of Object.entries(expectations)) {
     const board = generateBoard(modeId, `seed-${modeId}`, items, selectors);
     assert.equal(board.groups.length, groups);
@@ -97,6 +97,43 @@ test('board generation is reproducible from a stored seed', () => {
   const a = generateBoard('sort_2', 'same-seed', items, selectors);
   const b = generateBoard('sort_2', 'same-seed', items, selectors);
   assert.deepEqual(a.queue.map((prompt) => prompt.item.id), b.queue.map((prompt) => prompt.item.id));
+});
+
+
+test('variant modes are distinct games with gated unlocks and escalating payouts', () => {
+  let state = structuredClone(defaultState);
+  assert.equal(Object.keys(defaultState.gameMemory).length, 9);
+  assert.equal(payoutScore(state, 'sort_2'), 2);
+  assert.equal(payoutScore(state, 'freeform_2'), 4);
+  assert.equal(payoutScore(state, 'mystery_2'), 8);
+  assert.equal(canUnlockMode(state, 'freeform_2'), false);
+  state.resources.diamonds = 1000;
+  state = unlockMode(state, 'sort_3');
+  state = unlockMode(state, 'sort_4');
+  assert.equal(canUnlockMode(state, 'freeform_2'), true);
+  state = unlockMode(state, 'freeform_4');
+  assert.equal(canUnlockMode(state, 'mystery_2'), false);
+  state = unlockMode(state, 'freeform_2');
+  state = unlockMode(state, 'freeform_3');
+  assert.equal(canUnlockMode(state, 'mystery_2'), true);
+  state = unlockMode(state, 'mystery_2');
+  assert.equal(state.unlockedModes.mystery_2, true);
+});
+
+test('per-game upgrades and standard sorted-item display are mode-scoped', () => {
+  let state = structuredClone(defaultState);
+  state.resources.diamonds = 1000;
+  state = buyAnimationSpeed(state, 'freeform_2');
+  assert.equal(state.upgrades.animationSpeed.freeform_2, 1);
+  assert.equal(state.upgrades.animationSpeed.sort_2, 0);
+  state = buyQueueVision(state, 'mystery_2');
+  assert.equal(state.upgrades.queueVision.mystery_2, 1);
+  assert.equal(state.upgrades.queueVision.sort_2, 0);
+  assert.equal(hasSortedItemDisplay(state, 'sort_2'), false);
+  state = buySortedItemDisplay(state, 'sort_2');
+  assert.equal(hasSortedItemDisplay(state, 'sort_2'), true);
+  assert.throws(() => buySortedItemDisplay(state, 'freeform_2'), /standard sort/);
+  assert.ok(sortedItemDisplayCost('sort_2') < perItemMedianBonusCost('sort_2'));
 });
 
 test('economy handles unlocks, club bets, spades, memory, and winnings', () => {
@@ -132,7 +169,7 @@ test('mode-away rest records accrue once per outside mode block and feed all cal
   for (const time of [120, 110, 100]) play('sort_4', time, 2);
   for (const time of [45, 44, 43]) play('sort_2', time, 0);
   for (const time of [55, 54]) play('sort_3', time, 0);
-  assert.deepEqual(counts(), { sort_2: 3, sort_3: 2, sort_4: 2 });
+  assert.deepEqual(Object.fromEntries(Object.entries(counts()).filter(([modeId]) => modeId.startsWith('sort_'))), { sort_2: 3, sort_3: 2, sort_4: 2 });
   const sort2Rests = state.gameMemory.sort_2.entries.filter((entry) => entry.entryType === 'rest');
   assert.ok(sort2Rests.every((entry) => entry.timeSeconds === 70));
   assert.ok(sort2Rests.every((entry) => entry.mistakes === 0));
@@ -362,16 +399,16 @@ test('study pause and queue visibility upgrades cost diamonds and increment leve
   assert.equal(pauseLengthCost(0), 60);
   assert.equal(queueVisionCost(0), 35);
   state = buyStudyTime(state);
-  assert.equal(state.upgrades.studyTime, 1);
+  assert.equal(state.upgrades.studyTime.sort_2, 1);
   assert.equal(state.resources.diamonds, 992);
   state = buyPauseCount(state);
-  assert.equal(state.upgrades.pauseCount, 1);
+  assert.equal(state.upgrades.pauseCount.sort_2, 1);
   assert.equal(state.resources.diamonds, 872);
   state = buyPauseLength(state);
-  assert.equal(state.upgrades.pauseLength, 1);
+  assert.equal(state.upgrades.pauseLength.sort_2, 1);
   assert.equal(state.resources.diamonds, 812);
   state = buyQueueVision(state);
-  assert.equal(state.upgrades.queueVision, 1);
+  assert.equal(state.upgrades.queueVision.sort_2, 1);
   assert.equal(state.resources.diamonds, 777);
   assert.ok(studyTimeCost(1) > studyTimeCost(0));
   assert.ok(pauseCountCost(1) > pauseCountCost(0));
@@ -384,11 +421,11 @@ test('animation speed upgrades cost diamonds and shorten travel duration', () =>
   state.resources.diamonds = 100;
   const cost = animationSpeedCost(0);
   state = buyAnimationSpeed(state);
-  assert.equal(state.upgrades.animationSpeed, 1);
+  assert.equal(state.upgrades.animationSpeed.sort_2, 1);
   assert.equal(state.resources.diamonds, 100 - cost);
   assert.ok(animationDuration(1000, state) < 1000);
-  state.upgrades.animationSpeed = 100;
-  assert.equal(animationDuration(1000, state), 450);
+  state.upgrades.animationSpeed.sort_2 = 100;
+  assert.equal(animationDuration(1000, state, 'sort_2'), 450);
 });
 
 test('max Heart upgrades increase heart spaces with escalating costs', () => {

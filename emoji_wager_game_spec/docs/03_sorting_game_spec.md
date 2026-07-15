@@ -2,19 +2,21 @@
 
 ## Mode structure
 
-The first playable build should support three sorting modes:
+The playable build supports nine distinct sorting games: Standard, Freeform, and Mystery variants for 2-way, 3-way, and 4-way sort.  Each variant/size combination keeps separate memory, bets, rests, item timing, and mode upgrades.
 
-| Mode | Initial access | Directions | Suggested active groups | Suggested glyphs per group | Suggested prompts |
-| --- | --- | --- | --- | --- | --- |
-| 2-way sort | Unlocked | left, right | 4 total / 2 per direction | 4 | 16 |
-| 3-way sort | Purchased | left, right, up | 6 total / 2 per direction | 4 | 24 |
-| 4-way sort | Purchased | left, right, up, down | 8 total / 2 per direction | 4 | 32 |
+| Mode family | Initial access | Directions | Active groups | Glyphs per group | Prompts | Base payout |
+| --- | --- | --- | ---: | ---: | ---: | ---: |
+| Standard 2-way sort | Unlocked | left, right | 4 total / 2 per direction | 4 | 16 | 2 |
+| Standard 3-way sort | Purchased | left, right, up | 6 total / 2 per direction | 4 | 24 | 3 |
+| Standard 4-way sort | Purchased | left, right, up, down | 8 total / 2 per direction | 4 | 32 | 4 |
+| Freeform 2/3/4-way sort | Purchased after all Standard modes are unlocked | same sizes as Standard | 2 per direction | 4 | 16/24/32 | 2× Standard |
+| Mystery 2/3/4-way sort | Purchased after all Freeform modes are unlocked | same sizes as Standard | 2 per direction | 4 | 16/24/32 | 4× Standard |
 
-The 4-way mode matches the original full sorting spec.  The 2-way mode is the starter version and should be the first accessible mode.
+Standard Sort is the current labeled-by-example game: category names are not shown, but the target example glyphs for each group are visible in their direction zones.  A Standard-only per-size upgrade can additionally show every correctly sorted item in its category zone.
 
-The initial prototype should show all active groups around the available directional edges before and during play.  This is a memory/speed game, not a hidden-information game.
+Freeform Sort keeps the same hidden categories and only uses the established directions.  The first correctly placed item from an unassigned category claims any still-open category slot in the chosen direction; later items from that category must follow that established direction.  If a direction already has its two categories assigned, another unassigned category cannot be placed there.  Freeform board generation must be especially strict about preventing overlapping active categories.
 
-The first UI should show only the target glyphs for each group.  Category labels, color swatches, and richer explanations can be added later.
+Mystery Sort has predetermined category directions, but the category example glyphs are hidden.  Correctly sorted items reveal themselves in the relevant category zone; wrong guesses reveal only the mistaken item in the queue, not the hidden category.
 
 ## Controls
 
