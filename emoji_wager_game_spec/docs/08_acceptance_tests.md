@@ -65,12 +65,13 @@
 - The center prompt shows item timing countdown clocks for fastest/elite and meta-median item records once item history exists, and does not show the red slowest timer.
 - The run's percentile against prior memory is recorded or derivable.
 - Target offers are generated from recent rest-adjusted performance percentile estimates or starter defaults.
-- Target estimates use recent percentile windows so old data does not prevent the odds from reflecting player improvement.
+- Target estimates use recent meta-percentile performance windows so old data does not prevent the odds from reflecting player improvement.
+- Every Club target tier converts exactly fair break-even odds into a performance-percentile target with `chance = 1 / (oddsMultiplier + 1)`: 1:1 uses the median prior percentile, 1:2 uses a 2/3 break-even chance and therefore an easier lower percentile, and higher-profit bets use harder higher percentiles.
 - Target offers include a maximum mistake count rounded down toward zero mistakes when fractional.
 - A selected Club bet stores target time, odds, and stake.
 - Buying Clubs for a bet spends Diamonds before the round.
 - Finishing at or below the selected Club time target and at or below the selected mistake target pays Diamonds based on the odds.
-- Winning Club bets add extra actual memory entries equal to floor(net bet profit / starting bank).
+- Winning Club bets add extra actual memory entries equal to floor(net bet profit / starting bank), and those entries can affect later Heart safety and Club target estimates.
 - Finishing above the selected Club time target or above the selected mistake target pays no Club winnings.
 - A mode with no actual completed rounds has no Heart safety timer, and the first run does not lose Hearts for taking too long.
 - First-round actual time and several derived item-pace calibration scores are stored as temporary calibration entries; derived ingredients slower than the actual first-round time are dropped and identical scores are deduplicated.

@@ -379,3 +379,15 @@ input { width: 100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1
   background: rgba(0,0,0,0.42);
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
 }
+
+/* v0.3.1: lay the nine game variants out as an intentional 3x3 mode grid. */
+.mode-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+}
+.mode-grid button {
+  min-height: 6rem;
+}
+@media (max-width: 760px) {
+  .mode-grid { grid-template-columns: 1fr; }
+}

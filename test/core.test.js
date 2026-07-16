@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { generateBoard, matchesSelector, estimateTargets, heartSafety, createClubBet, buyClubBet, canUnlockMode, settleRound, settleItemTiming, itemTimingTargets, itemPercentileAtRun, itemSlowHeartThreshold, firstRoundCalibrationScores, mistakePressure, unlockMode, buySpade, buyPerItemMedianBonus, buySortedItemDisplay, sortedItemDisplayCost, hasSortedItemDisplay, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, spadeCost, payoutScore, perItemMedianBonusCost, hasPerItemMedianBonus, streakDuration } from '../src/game/core.js';
+import { BET_TIERS, generateBoard, matchesSelector, estimateTargets, heartSafety, createClubBet, buyClubBet, canUnlockMode, settleRound, settleItemTiming, itemTimingTargets, itemPercentileAtRun, itemSlowHeartThreshold, firstRoundCalibrationScores, mistakePressure, unlockMode, buySpade, buyPerItemMedianBonus, buySortedItemDisplay, sortedItemDisplayCost, hasSortedItemDisplay, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, spadeCost, payoutScore, perItemMedianBonusCost, hasPerItemMedianBonus, streakDuration } from '../src/game/core.js';
 
 const items = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/items.json', import.meta.url))).items;
 const baseSelectors = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/category_selectors.json', import.meta.url))).selectors;
@@ -198,11 +198,37 @@ test('bet propositions use sensible odds and require enough actual history', () 
   const lowTargets = estimateTargets('sort_2', lowHistory);
   assert.deepEqual(lowTargets.map((target) => target.oddsLabel), ['1:2', '1:1', '2:1', '5:1', '10:1']);
   assert.deepEqual(lowTargets.map((target) => target.available), [false, false, false, false, false]);
-  const richHistory = Array.from({ length: 20 }, (_, index) => ({ timeSeconds: 45 - index, mistakes: index % 4, entryType: 'actual', createdAt: `t${index}` }));
+  const richHistory = Array.from({ length: 20 }, (_, index) => ({ timeSeconds: 45 - index, percentileAtRun: 0.35 + index * 0.03, mistakes: index % 4, entryType: 'actual', createdAt: `t${index}` }));
   const richTargets = estimateTargets('sort_2', richHistory);
   assert.deepEqual(richTargets.map((target) => target.oddsLabel), ['1:2', '1:1', '2:1', '5:1', '10:1']);
   assert.deepEqual(richTargets.map((target) => target.available), [true, true, true, true, true]);
   assert.ok(richTargets[4].timeSeconds < richTargets[0].timeSeconds);
+});
+
+test('club bet chance values are exactly fair for displayed profit odds', () => {
+  for (const tier of BET_TIERS) {
+    assert.equal(tier.chance, 1 / (tier.oddsMultiplier + 1));
+  }
+});
+
+test('club target times use meta-percentile performance across all odds tiers', () => {
+  const improvingHistory = [100, 90, 80, 70, 60, 55, 50, 45, 40, 35].map((timeSeconds, index) => ({
+    timeSeconds,
+    percentileAtRun: 0.68 + index * 0.03,
+    mistakes: 0,
+    entryType: 'actual',
+    createdAt: `meta${index}`,
+  }));
+  const safety = heartSafety('sort_2', improvingHistory);
+  const targets = estimateTargets('sort_2', improvingHistory);
+  const half = targets.find((target) => target.id === 'half');
+  const even = targets.find((target) => target.id === 'even');
+  const double = targets.find((target) => target.id === 'double');
+  assert.ok(half.timeSeconds < safety);
+  assert.ok(even.timeSeconds <= half.timeSeconds);
+  assert.ok(double.timeSeconds <= even.timeSeconds);
+  assert.ok(half.targetPercentile < even.targetPercentile);
+  assert.ok(double.targetPercentile > even.targetPercentile);
 });
 
 
