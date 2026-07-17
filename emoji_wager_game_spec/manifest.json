@@ -18,6 +18,7 @@
     "data/items.json",
     "data/category_selectors.json",
     "data/cross_cutting_categories.json",
+    "data/category_expansion_overlays.json",
     "data/default_state.json",
     "data/README.md"
   ]

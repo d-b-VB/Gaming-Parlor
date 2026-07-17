@@ -45,7 +45,7 @@ Examples:
 
 ## Board generation algorithm
 
-1. Load curated selectors from `data/category_selectors.json`.
+1. Load curated selectors from `data/category_selectors.json`, then append `data/cross_cutting_categories.json` and `data/category_expansion_overlays.json`. The expansion overlay is the preferred home for broad category passes because it keeps new explicit category membership in one reviewable file instead of editing many individual item records.
 2. Filter to selectors with at least 4 eligible items.
 3. Read the active mode config to determine direction count, group count, and prompt count.
 4. Pick the required number of selectors for the board: 4 for 2-way, 6 for 3-way, or 8 for 4-way.

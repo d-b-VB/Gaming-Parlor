@@ -6,13 +6,15 @@ import { BET_TIERS, generateBoard, matchesSelector, estimateTargets, heartSafety
 const items = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/items.json', import.meta.url))).items;
 const baseSelectors = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/category_selectors.json', import.meta.url))).selectors;
 const overlaySelectors = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/cross_cutting_categories.json', import.meta.url))).selectors;
-const selectors = [...baseSelectors, ...overlaySelectors];
+const expansionSelectors = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/category_expansion_overlays.json', import.meta.url))).selectors;
+const selectors = [...baseSelectors, ...overlaySelectors, ...expansionSelectors];
 const defaultState = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/default_state.json', import.meta.url)));
 
 test('catalog is expanded enough for strong prototype coverage', () => {
   assert.ok(items.length >= 603);
   assert.ok(selectors.length >= 146);
   assert.ok(overlaySelectors.length >= 50);
+  assert.ok(expansionSelectors.length >= 25);
   assert.ok(items.filter((item) => item.kind === 'emoji').length >= 342);
 });
 
@@ -36,6 +38,40 @@ test('cross-cutting overlay connects formerly isolated obvious items', () => {
   assert.ok(categoriesFor('emoji:fire_engine').includes('cc_emergency_response'));
   assert.ok(categoriesFor('emoji:artist_palette').includes('cc_art_studio'));
   assert.ok(categoriesFor('emoji:corn').includes('cc_farm_to_table'));
+});
+
+test('category expansion overlay covers discussed face bridges and vignettes', () => {
+  const byId = Object.fromEntries(items.map((item) => [item.id, item]));
+  const categoriesFor = (id) => selectors.filter((selector) => matchesSelector(byId[id], selector.selector)).map((selector) => selector.id);
+  assert.ok(categoriesFor('emoji:overheated_face').includes('cx_hot_heat'));
+  assert.ok(categoriesFor('emoji:freezing_face').includes('cx_cold_freezing'));
+  assert.ok(categoriesFor('emoji:reversed_hand_with_middle_finger_extended').includes('cx_evil_mischief'));
+  assert.ok(categoriesFor('emoji:bow_and_arrow').includes('cx_diagonal_slanted'));
+  assert.ok(categoriesFor('emoji:bow_and_arrow').includes('cx_vignette_diagonal_crossing'));
+  assert.ok(categoriesFor('emoji:zipper_mouth_face').includes('cx_quiet_silent'));
+  assert.ok(categoriesFor('emoji:neutral_face').includes('cx_law_justice_faces'));
+  assert.ok(categoriesFor('emoji:mouse_trap').includes('cx_vignette_mouse_house'));
+  assert.ok(categoriesFor('emoji:amphora').includes('cx_vignette_ancient_ruins'));
+  assert.ok(categoriesFor('emoji:wolf_face').includes('cx_vignette_little_forest_errand'));
+  assert.ok(categoriesFor('emoji:door').includes('cx_vignette_locked_room_mystery'));
+  assert.ok(categoriesFor('emoji:book').includes('cx_vignette_quiet_reading_night'));
+  assert.ok(categoriesFor('emoji:crossed_swords').includes('cx_vignette_pirate_treasure'));
+  assert.ok(categoriesFor('emoji:rocket').includes('cx_vignette_space_visitor'));
+  assert.ok(categoriesFor('emoji:bouquet').includes('cx_vignette_garden_gift'));
+});
+
+test('category expansion gives every face a non-face-dominated bridge category', () => {
+  const byId = Object.fromEntries(items.map((item) => [item.id, item]));
+  const faceIds = items.filter((item) => item.tags.includes('face')).map((item) => item.id);
+  const expansionById = new Map(expansionSelectors.map((selector) => [selector.id, selector]));
+  const nonFaceDominated = expansionSelectors.filter((selector) => {
+    const members = selector.selector.itemIds ?? [];
+    const faceCount = members.filter((id) => byId[id]?.tags.includes('face')).length;
+    return members.length - faceCount > faceCount;
+  });
+  assert.equal(expansionById.get('cx_communication_social_signals').selector.itemIds.includes('emoji:face_with_rolling_eyes'), true);
+  const covered = new Set(nonFaceDominated.flatMap((selector) => selector.selector.itemIds).filter((id) => faceIds.includes(id)));
+  assert.deepEqual(faceIds.filter((id) => !covered.has(id)), []);
 });
 
 test('flag geography categories are categorical and non-subjective', () => {

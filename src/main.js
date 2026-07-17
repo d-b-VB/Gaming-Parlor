@@ -514,9 +514,9 @@ function render() {
 }
 window.addEventListener('keydown', (event) => { const map = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down' }; if (event.code === 'Space') { event.preventDefault(); activatePause(); return; } if (map[event.key]) { event.preventDefault(); dispatch(map[event.key]); } });
 try {
-  const [itemsData, selectorsData, overlayData, stateData] = await Promise.all([json('./emoji_wager_game_spec/data/items.json'), json('./emoji_wager_game_spec/data/category_selectors.json'), json('./emoji_wager_game_spec/data/cross_cutting_categories.json'), json('./emoji_wager_game_spec/data/default_state.json')]);
+  const [itemsData, selectorsData, overlayData, expansionData, stateData] = await Promise.all([json('./emoji_wager_game_spec/data/items.json'), json('./emoji_wager_game_spec/data/category_selectors.json'), json('./emoji_wager_game_spec/data/cross_cutting_categories.json'), json('./emoji_wager_game_spec/data/category_expansion_overlays.json'), json('./emoji_wager_game_spec/data/default_state.json')]);
   items = itemsData.items;
-  selectors = [...selectorsData.selectors, ...overlayData.selectors];
+  selectors = [...selectorsData.selectors, ...overlayData.selectors, ...expansionData.selectors];
   state = loadSaved(stateData);
   save();
   startBoard('sort_2');

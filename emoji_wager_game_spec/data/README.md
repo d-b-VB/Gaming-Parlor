@@ -29,6 +29,10 @@ Curated overlay selectors for broad association categories such as months, profe
 
 The overlay uses explicit `itemIds` so large category passes can be reviewed as one compact data change rather than hundreds of individual tag edits in `items.json`.  Runtime loaders should append these overlay selectors to the base selectors before board generation.
 
+## `category_expansion_overlays.json`
+
+Single-file curated expansion overlay for the large category pass.  It adds face bridge categories, diagonal/quiet/social categories, and the agreed top vignette categories as explicit `itemIds` so the update can be reviewed as one compact data change instead of many individual item-tag edits.  Runtime loaders append these selectors after `category_selectors.json` and `cross_cutting_categories.json`.
+
 ## `default_state.json`
 
 Starter resource, unlock, upgrade, and memory state for local-only prototypes.  2-way sort starts unlocked; 3-way and 4-way sort start locked and must be purchased with Diamonds.
