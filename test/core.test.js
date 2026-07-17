@@ -58,6 +58,24 @@ test('category expansion overlay covers discussed face bridges and vignettes', (
   assert.ok(categoriesFor('emoji:crossed_swords').includes('cx_vignette_pirate_treasure'));
   assert.ok(categoriesFor('emoji:rocket').includes('cx_vignette_space_visitor'));
   assert.ok(categoriesFor('emoji:bouquet').includes('cx_vignette_garden_gift'));
+  assert.ok(categoriesFor('emoji:blowfish').includes('cx_pointy_sharp'));
+  assert.ok(categoriesFor('emoji:carrot').includes('cx_pointy_sharp'));
+  assert.equal(categoriesFor('emoji:corn').includes('cx_pointy_sharp'), false);
+  assert.equal(categoriesFor('emoji:hot_pepper').includes('cx_pointy_sharp'), false);
+  assert.ok(categoriesFor('emoji:christmas_tree').includes('cx_tree_canopy'));
+  assert.ok(categoriesFor('emoji:nest_with_eggs').includes('cx_tree_canopy'));
+  assert.ok(categoriesFor('emoji:nest_with_eggs').includes('cx_nesting_family_life'));
+  assert.ok(categoriesFor('emoji:potted_plant').includes('cx_office_plants'));
+  assert.ok(categoriesFor('emoji:pig_2').includes('cx_pig_pork_luau'));
+  assert.ok(categoriesFor('emoji:bacon').includes('cx_pig_pork_luau'));
+  assert.ok(categoriesFor('emoji:peanuts').includes('cx_africa_peanut_foods'));
+  assert.ok(categoriesFor('emoji:peanuts').includes('cx_north_america_foods'));
+  assert.ok(categoriesFor('emoji:burrito').includes('cx_north_america_foods'));
+  assert.ok(categoriesFor('emoji:croissant').includes('cx_europe_foods'));
+  assert.ok(categoriesFor('emoji:falafel').includes('cx_abrahamic_foods'));
+  assert.ok(categoriesFor('emoji:bagel').includes('cx_round_foods'));
+  assert.ok(categoriesFor('emoji:musical_keyboard').includes('cx_keys_and_keyboards'));
+  assert.ok(categoriesFor('emoji:closed_lock_with_key').includes('cx_keys_and_keyboards'));
 });
 
 test('category expansion gives every face a non-face-dominated bridge category', () => {

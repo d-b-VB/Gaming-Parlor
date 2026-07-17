@@ -1109,6 +1109,330 @@
       },
       "minimumItems": 4,
       "eligibleCount": 16
+    },
+    {
+      "id": "cx_pointy_sharp",
+      "label": "Pointy / Sharp",
+      "selector": {
+        "itemIds": [
+          "emoji:cat",
+          "emoji:cat_2",
+          "emoji:blowfish",
+          "emoji:pencil_2",
+          "emoji:lower_left_ballpoint_pen",
+          "emoji:lower_left_fountain_pen",
+          "emoji:lower_left_crayon",
+          "emoji:dango",
+          "emoji:dagger_knife",
+          "emoji:magic_wand",
+          "emoji:sewing_needle",
+          "symbol:spade_suit",
+          "symbol:spade",
+          "emoji:bison",
+          "emoji:deer",
+          "emoji:carrot",
+          "emoji:pineapple",
+          "emoji:cactus",
+          "emoji:hedgehog",
+          "emoji:bow_and_arrow",
+          "emoji:heart_with_arrow",
+          "emoji:crossed_swords",
+          "symbol:left_arrow",
+          "symbol:right_arrow",
+          "symbol:up_arrow",
+          "symbol:down_arrow",
+          "symbol:triangle",
+          "symbol:filled_triangle",
+          "symbol:outline_triangle",
+          "symbol:warning",
+          "emoji:safety_pin",
+          "emoji:pushpin",
+          "emoji:round_pushpin"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 33
+    },
+    {
+      "id": "cx_tree_canopy",
+      "label": "What Is in a Tree",
+      "selector": {
+        "itemIds": [
+          "emoji:evergreen_tree",
+          "emoji:deciduous_tree",
+          "emoji:palm_tree",
+          "emoji:christmas_tree",
+          "emoji:tanabata_tree",
+          "emoji:wood",
+          "emoji:chipmunk",
+          "emoji:cat",
+          "emoji:cat_2",
+          "emoji:monkey",
+          "emoji:monkey_face",
+          "emoji:bird",
+          "emoji:eagle",
+          "emoji:duck",
+          "emoji:owl",
+          "emoji:parrot",
+          "emoji:swan",
+          "emoji:dodo",
+          "emoji:turkey",
+          "emoji:peacock",
+          "emoji:nest_with_eggs",
+          "emoji:empty_nest",
+          "emoji:snake",
+          "emoji:frog",
+          "emoji:bee",
+          "emoji:butterfly",
+          "emoji:spider",
+          "emoji:spider_2",
+          "emoji:bug",
+          "emoji:beetle",
+          "emoji:lady_beetle",
+          "emoji:ant",
+          "emoji:apple",
+          "emoji:banana",
+          "emoji:pear",
+          "emoji:peach",
+          "emoji:cherries",
+          "emoji:kiwifruit",
+          "emoji:mango",
+          "emoji:coconut",
+          "emoji:chestnut",
+          "emoji:peanuts",
+          "emoji:maple_leaf",
+          "emoji:fallen_leaf",
+          "emoji:leaf_fluttering_in_wind",
+          "emoji:herb",
+          "emoji:blossom",
+          "emoji:cherry_blossom",
+          "emoji:hibiscus"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 49
+    },
+    {
+      "id": "cx_office_plants",
+      "label": "Office Plants",
+      "selector": {
+        "itemIds": [
+          "emoji:potted_plant",
+          "emoji:desktop_computer",
+          "emoji:printer",
+          "emoji:keyboard",
+          "emoji:three_button_mouse",
+          "emoji:briefcase",
+          "emoji:memo",
+          "emoji:pencil_2",
+          "emoji:lower_left_ballpoint_pen",
+          "emoji:calendar",
+          "emoji:card_index",
+          "emoji:file_folder",
+          "emoji:open_file_folder",
+          "emoji:paperclip",
+          "emoji:pushpin",
+          "emoji:office_worker"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 16
+    },
+    {
+      "id": "cx_nesting_family_life",
+      "label": "Nesting / Family Building",
+      "selector": {
+        "itemIds": [
+          "emoji:nest_with_eggs",
+          "emoji:empty_nest",
+          "emoji:bird",
+          "emoji:egg",
+          "emoji:baby",
+          "emoji:child",
+          "emoji:girl",
+          "emoji:boy",
+          "emoji:house_building",
+          "emoji:house_with_garden",
+          "emoji:house_buildings",
+          "emoji:two_hearts",
+          "emoji:heart_with_arrow",
+          "emoji:pregnant_woman",
+          "emoji:older_woman",
+          "emoji:older_man"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 16
+    },
+    {
+      "id": "cx_pig_pork_luau",
+      "label": "Pig / Pork / Luau",
+      "selector": {
+        "itemIds": [
+          "emoji:pig",
+          "emoji:pig_2",
+          "emoji:pig_nose",
+          "emoji:bacon",
+          "emoji:meat",
+          "emoji:meat_on_bone",
+          "emoji:cooking",
+          "emoji:pineapple",
+          "emoji:tropical_drink",
+          "emoji:palm_tree",
+          "emoji:hibiscus",
+          "emoji:water_wave",
+          "emoji:fire",
+          "emoji:roasted_sweet_potato",
+          "emoji:clinking_beer_mugs",
+          "emoji:party_popper",
+          "emoji:confetti_ball"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 17
+    },
+    {
+      "id": "cx_africa_peanut_foods",
+      "label": "Africa / Peanut Foods",
+      "selector": {
+        "itemIds": [
+          "emoji:peanuts",
+          "emoji:hot_pepper",
+          "emoji:ear_of_rice",
+          "emoji:cooking",
+          "emoji:flatbread",
+          "emoji:falafel",
+          "flag:kenya",
+          "flag:uganda",
+          "flag:democratic_republic_congo",
+          "flag:morocco",
+          "flag:egypt",
+          "flag:south_africa"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 12
+    },
+    {
+      "id": "cx_north_america_foods",
+      "label": "North American Foods",
+      "selector": {
+        "itemIds": [
+          "emoji:peanuts",
+          "emoji:burrito",
+          "emoji:taco",
+          "emoji:hamburger",
+          "emoji:hot_dog",
+          "emoji:french_fries",
+          "emoji:pancakes",
+          "emoji:popcorn",
+          "emoji:pie",
+          "emoji:bacon",
+          "flag:united_states",
+          "flag:canada",
+          "flag:mexico"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 13
+    },
+    {
+      "id": "cx_europe_foods",
+      "label": "European Foods",
+      "selector": {
+        "itemIds": [
+          "emoji:croissant",
+          "emoji:baguette_bread",
+          "emoji:cheese",
+          "emoji:wine",
+          "emoji:beer",
+          "emoji:pretzel",
+          "emoji:waffle",
+          "emoji:fondue",
+          "emoji:spaghetti",
+          "flag:italy",
+          "flag:united_kingdom",
+          "flag:greece",
+          "flag:switzerland",
+          "flag:ireland"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 14
+    },
+    {
+      "id": "cx_abrahamic_foods",
+      "label": "Abrahamic Food Bridges",
+      "selector": {
+        "itemIds": [
+          "emoji:falafel",
+          "emoji:bagel",
+          "emoji:bread",
+          "emoji:flatbread",
+          "emoji:stuffed_flatbread",
+          "emoji:wine",
+          "emoji:honey_pot",
+          "emoji:apple",
+          "emoji:fish",
+          "emoji:sheep",
+          "emoji:goat",
+          "emoji:star_of_david",
+          "emoji:star_and_crescent",
+          "emoji:latin_cross",
+          "emoji:orthodox_cross"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 15
+    },
+    {
+      "id": "cx_round_foods",
+      "label": "Round Foods",
+      "selector": {
+        "itemIds": [
+          "emoji:bagel",
+          "emoji:doughnut",
+          "emoji:cupcake",
+          "emoji:pie",
+          "emoji:canned_food",
+          "emoji:cookie",
+          "emoji:pancakes",
+          "emoji:waffle",
+          "emoji:cheese",
+          "emoji:egg",
+          "emoji:tomato",
+          "emoji:peach",
+          "emoji:tangerine",
+          "emoji:melon",
+          "symbol:circle",
+          "symbol:filled_circle",
+          "symbol:outline_circle",
+          "emoji:heavy_large_circle"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 18
+    },
+    {
+      "id": "cx_keys_and_keyboards",
+      "label": "Keys / Keyboards",
+      "selector": {
+        "itemIds": [
+          "emoji:key",
+          "emoji:old_key",
+          "emoji:lock",
+          "emoji:closed_lock_with_key",
+          "emoji:open_lock",
+          "emoji:lock_with_ink_pen",
+          "emoji:keyboard",
+          "emoji:musical_keyboard",
+          "emoji:musical_score",
+          "emoji:three_button_mouse",
+          "emoji:desktop_computer"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 11
     }
   ]
 }
