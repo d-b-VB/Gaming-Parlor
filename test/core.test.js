@@ -255,7 +255,9 @@ test('bet propositions use sensible odds and require enough actual history', () 
   const richHistory = Array.from({ length: 20 }, (_, index) => ({ timeSeconds: 45 - index, percentileAtRun: 0.35 + index * 0.03, mistakes: index % 4, entryType: 'actual', createdAt: `t${index}` }));
   const richTargets = estimateTargets('sort_2', richHistory);
   assert.deepEqual(richTargets.map((target) => target.oddsLabel), ['1:2', '1:1', '2:1', '5:1', '10:1']);
-  assert.deepEqual(richTargets.map((target) => target.available), [true, true, true, true, true]);
+  assert.ok(richTargets.every((target) => target.actualCount >= target.minHistory));
+  assert.ok(richTargets.filter((target) => !target.available).every((target) => target.unavailableReason === 'duplicate-time'));
+  assert.equal(new Set(richTargets.filter((target) => target.available).map((target) => target.timeSeconds)).size, richTargets.filter((target) => target.available).length);
   assert.ok(richTargets[4].timeSeconds < richTargets[0].timeSeconds);
 });
 
@@ -283,6 +285,21 @@ test('club target times use meta-percentile performance across all odds tiers', 
   assert.ok(double.timeSeconds <= even.timeSeconds);
   assert.ok(half.targetPercentile < even.targetPercentile);
   assert.ok(double.targetPercentile > even.targetPercentile);
+});
+
+test('only the lowest payout remains available when club target times converge', () => {
+  const flatHistory = Array.from({ length: 20 }, (_, index) => ({
+    timeSeconds: 42,
+    percentileAtRun: 0.75,
+    mistakes: 0,
+    entryType: 'actual',
+    createdAt: `flat${index}`,
+  }));
+  const targets = estimateTargets('sort_2', flatHistory);
+  assert.deepEqual(targets.map((target) => target.timeSeconds), [42, 42, 42, 42, 42]);
+  assert.deepEqual(targets.map((target) => target.available), [true, false, false, false, false]);
+  assert.equal(targets[0].unavailableReason, undefined);
+  assert.deepEqual(targets.slice(1).map((target) => target.unavailableReason), Array(4).fill('duplicate-time'));
 });
 
 
