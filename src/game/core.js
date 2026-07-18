@@ -182,7 +182,54 @@ function addDueRestRecords(next, activeModeId, createdAt) {
   }
   tracking.lastCompletedModeId = activeModeId;
 }
-export function addRoundMemory(state, modeId, timeSeconds, createdAt, mistakes = 0, extraActualEntries = 0, extraMeta = {}, itemTimes = []) { const next = structuredClone(state); next.gameMemory ??= {}; next.gameMemory[modeId] ??= { entries: [] }; ensureRestTracking(next); const entries = next.gameMemory[modeId].entries ?? []; const nonRestCount = entries.filter((entry) => entry.entryType !== 'rest').length; if (nonRestCount === 0 && itemTimes.length) { for (const score of firstRoundCalibrationScores(timeSeconds, itemTimes, itemTimes.length)) entries.push({ timeSeconds: score.timeSeconds, mistakes, entryType: 'actual', temporary: true, calibrationSource: score.source, calibrationSources: score.sources, createdAt, percentileAtRun: percentileAtRun(score.timeSeconds, entries) }); } else { const temporaryIndexes = entries.map((entry, index) => ({ entry, index })).filter(({ entry }) => entry.temporary); if (temporaryIndexes.length) { const removableTemporaryIndexes = temporaryIndexes.filter(({ entry }) => entry.calibrationSource !== 'actual_first_round'); const removalCandidates = removableTemporaryIndexes.length ? removableTemporaryIndexes : temporaryIndexes; const removeIndex = removalCandidates.reduce((slowest, candidate) => candidate.entry.timeSeconds > slowest.entry.timeSeconds ? candidate : slowest).index; entries.splice(removeIndex, 1); } entries.push({ timeSeconds, mistakes, entryType: 'actual', createdAt, percentileAtRun: percentileAtRun(timeSeconds, entries) }); } for (let i = 0; i < extraActualEntries; i += 1) entries.push({ timeSeconds, mistakes, entryType: 'actual', createdAt, percentileAtRun: percentileAtRun(timeSeconds, entries), weightedByBet: true, weightedIndex: i + 1, ...extraMeta }); trimModeMemory(next, modeId); addDueRestRecords(next, modeId, createdAt); return next; }
+export function betWeightedSyntheticTimes(totalTimeSeconds, itemTimes = [], entryCount = 0) {
+  if (entryCount <= 0) return [];
+  const finiteItems = itemTimes.filter(Number.isFinite);
+  if (!finiteItems.length) return Array.from({ length: entryCount }, () => totalTimeSeconds);
+  const itemCount = finiteItems.length;
+  const totalItemSeconds = finiteItems.reduce((sum, value) => sum + value, 0);
+  const overheadPerItem = Math.max(0, totalTimeSeconds - totalItemSeconds) / itemCount;
+  const adjustedItems = finiteItems.map((value) => value + overheadPerItem).sort((a, b) => a - b);
+  const middle = (itemCount - 1) / 2;
+  const lowerMiddle = Math.floor(middle);
+  const upperMiddle = Math.ceil(middle);
+  const projections = [((adjustedItems[lowerMiddle] + adjustedItems[upperMiddle]) / 2) * itemCount];
+  for (let offset = 0; projections.length < entryCount && (upperMiddle + offset < itemCount || lowerMiddle - offset >= 0); offset += 1) {
+    const slowerIndex = upperMiddle + offset;
+    if (slowerIndex < itemCount && slowerIndex !== lowerMiddle) projections.push(adjustedItems[slowerIndex] * itemCount);
+    if (projections.length >= entryCount) break;
+    const fasterIndex = lowerMiddle - offset;
+    if (fasterIndex >= 0 && fasterIndex !== upperMiddle) projections.push(adjustedItems[fasterIndex] * itemCount);
+  }
+  while (projections.length < entryCount) projections.push(totalTimeSeconds);
+  return projections.slice(0, entryCount);
+}
+
+export function addRoundMemory(state, modeId, timeSeconds, createdAt, mistakes = 0, extraActualEntries = 0, extraMeta = {}, itemTimes = []) {
+  const next = structuredClone(state);
+  next.gameMemory ??= {};
+  next.gameMemory[modeId] ??= { entries: [] };
+  ensureRestTracking(next);
+  const entries = next.gameMemory[modeId].entries ?? [];
+  const nonRestCount = entries.filter((entry) => entry.entryType !== 'rest').length;
+  if (nonRestCount === 0 && itemTimes.length) {
+    for (const score of firstRoundCalibrationScores(timeSeconds, itemTimes, itemTimes.length)) entries.push({ timeSeconds: score.timeSeconds, mistakes, entryType: 'actual', temporary: true, calibrationSource: score.source, calibrationSources: score.sources, createdAt, percentileAtRun: percentileAtRun(score.timeSeconds, entries) });
+  } else {
+    const temporaryIndexes = entries.map((entry, index) => ({ entry, index })).filter(({ entry }) => entry.temporary);
+    if (temporaryIndexes.length) {
+      const removableTemporaryIndexes = temporaryIndexes.filter(({ entry }) => entry.calibrationSource !== 'actual_first_round');
+      const removalCandidates = removableTemporaryIndexes.length ? removableTemporaryIndexes : temporaryIndexes;
+      const removeIndex = removalCandidates.reduce((slowest, candidate) => candidate.entry.timeSeconds > slowest.entry.timeSeconds ? candidate : slowest).index;
+      entries.splice(removeIndex, 1);
+    }
+    entries.push({ timeSeconds, mistakes, entryType: 'actual', createdAt, percentileAtRun: percentileAtRun(timeSeconds, entries) });
+  }
+  const weightedTimes = betWeightedSyntheticTimes(timeSeconds, itemTimes, extraActualEntries);
+  weightedTimes.forEach((weightedTimeSeconds, index) => entries.push({ timeSeconds: weightedTimeSeconds, sourceRoundTimeSeconds: timeSeconds, mistakes, entryType: 'actual', createdAt, percentileAtRun: percentileAtRun(weightedTimeSeconds, entries), weightedByBet: true, syntheticBetWeight: true, weightedIndex: index + 1, ...extraMeta }));
+  trimModeMemory(next, modeId);
+  addDueRestRecords(next, modeId, createdAt);
+  return next;
+}
 export function createClubBet(modeId, offer, stake) { return { modeId, targetId: offer.id, targetSeconds: offer.timeSeconds, mistakeLimit: offer.mistakeLimit ?? 0, oddsMultiplier: offer.oddsMultiplier, oddsLabel: offer.oddsLabel, stake, cost: stake * CLUB_COST }; }
 export function payoutScore(state, modeId) { return MODES[modeId].baseDiamonds + (state.upgrades.spades.global ?? 0) + (state.upgrades.spades[modeId] ?? 0); }
 function spadeBase(scope) { if (scope === 'global') return 25; const size = MODES[scope]?.baseSize ?? 2; return size === 2 ? 12 : size === 3 ? 9 : 6; }
