@@ -1,0 +1,25 @@
+{
+  "package": "emoji_wager_game_spec",
+  "version": "0.3.0",
+  "created_for": "Codex/GitHub implementation",
+  "files": [
+    "README.md",
+    "CODEX_TASK.md",
+    "docs/01_product_brief.md",
+    "docs/02_game_rules.md",
+    "docs/03_sorting_game_spec.md",
+    "docs/04_scoring_memory_and_economy.md",
+    "docs/05_content_generation.md",
+    "docs/06_ui_and_interaction_spec.md",
+    "docs/07_technical_spec.md",
+    "docs/08_acceptance_tests.md",
+    "docs/09_future_minigames.md",
+    "docs/10_open_design_questions.md",
+    "data/items.json",
+    "data/category_selectors.json",
+    "data/cross_cutting_categories.json",
+    "data/category_expansion_overlays.json",
+    "data/default_state.json",
+    "data/README.md"
+  ]
+}
