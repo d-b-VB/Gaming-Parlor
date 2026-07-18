@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { BET_TIERS, generateBoard, matchesSelector, estimateTargets, heartSafety, createClubBet, buyClubBet, canUnlockMode, settleRound, settleItemTiming, itemTimingTargets, itemPercentileAtRun, itemSlowHeartThreshold, firstRoundCalibrationScores, mistakePressure, unlockMode, buySpade, buyPerItemMedianBonus, buySortedItemDisplay, sortedItemDisplayCost, hasSortedItemDisplay, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, spadeCost, payoutScore, perItemMedianBonusCost, hasPerItemMedianBonus, streakDuration } from '../src/game/core.js';
+import { BET_TIERS, generateBoard, matchesSelector, estimateTargets, heartSafety, createClubBet, buyClubBet, canUnlockMode, settleRound, settleItemTiming, itemTimingTargets, itemPercentileAtRun, itemSlowHeartThreshold, firstRoundCalibrationScores, mistakePressure, unlockMode, buySpade, buyPerItemMedianBonus, buySortedItemDisplay, sortedItemDisplayCost, hasSortedItemDisplay, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, spadeCost, payoutScore, perItemMedianBonusCost, hasPerItemMedianBonus, streakDuration, betWeightedSyntheticTimes } from '../src/game/core.js';
 
 const items = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/items.json', import.meta.url))).items;
 const baseSelectors = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/category_selectors.json', import.meta.url))).selectors;
@@ -307,14 +307,24 @@ test('memory keeps long history and bet wins add profit-weighted entries', () =>
   let state = structuredClone(defaultState);
   state.resources.diamonds = 10;
   state.gameMemory.sort_2.entries = Array.from({ length: 25 }, (_, index) => ({ timeSeconds: 60 - index, mistakes: 0, entryType: 'actual', createdAt: `old${index}` }));
-  const offer = { id: 'ten', timeSeconds: 20, mistakeLimit: 0, oddsMultiplier: 10, oddsLabel: '10:1' };
+  const offer = { id: 'ten', timeSeconds: 80, mistakeLimit: 0, oddsMultiplier: 10, oddsLabel: '10:1' };
   state = buyClubBet(state, createClubBet('sort_2', offer, 10));
-  const next = settleRound(state, 'sort_2', 19, 0, 'weighted-win', 'test');
+  const itemTimes = [1, 1.1, 1.3, 1.6, 2, 2.5, 3.1, 3.8, 4.6, 5.5, 6.5, 7.6, 8.8, 10.1, 11.5, 13];
+  const next = settleRound(state, 'sort_2', 80, 0, 'weighted-win', 'test', itemTimes);
+  const syntheticTimes = betWeightedSyntheticTimes(80, itemTimes, 10);
+  const weightedEntries = next.gameMemory.sort_2.entries.filter((entry) => entry.weightedByBet);
   assert.equal(next.eventLog.at(-1).betProfit, 100);
   assert.equal(next.eventLog.at(-1).startingBank, 10);
   assert.equal(next.eventLog.at(-1).betConfidenceWeight, 10);
   assert.equal(next.gameMemory.sort_2.entries.length, 36);
-  assert.equal(next.gameMemory.sort_2.entries.filter((entry) => entry.weightedByBet).length, 10);
+  assert.equal(weightedEntries.length, 10);
+  assert.deepEqual(weightedEntries.map((entry) => entry.timeSeconds), syntheticTimes);
+  assert.ok(new Set(weightedEntries.map((entry) => entry.timeSeconds)).size > 5);
+  assert.equal(weightedEntries[0].syntheticBetWeight, true);
+  assert.equal(weightedEntries[0].sourceRoundTimeSeconds, 80);
+  assert.ok(weightedEntries[1].timeSeconds > weightedEntries[0].timeSeconds);
+  assert.ok(weightedEntries[2].timeSeconds < weightedEntries[0].timeSeconds);
+  assert.ok(weightedEntries.every((entry) => Number.isFinite(entry.percentileAtRun)));
 });
 
 test('target estimates use recent performance windows rather than all past speeds', () => {
