@@ -29,7 +29,7 @@ When the player completes game mode `G` with time `T`:
 2. Add an `actual` memory entry with time `T` to game `G`.
 3. If this completion begins or continues an away block for other unlocked modes with existing timed records, add at most one `rest` entry per away block to each such non-active mode.  For example, a block of several 3-way rounds after 2-way play gives 2-way one rest, not one rest per 3-way round.
 4. A round-level rest uses the rested mode's slowest current round time and highest current mistake count, counting any timed actual, temporary calibration, or prior rest entry that is still present and excluding bet-weighted duplicates.
-5. An item-level rest also copies the rested mode's 16/24/32 slowest item timing records for 2-/3-/4-way sort.  Preserve item ids when present, mark the new entries as `rest`, and compute each percentile at the time the rest is loaded against the current item timing history.
+5. An item-level rest also copies up to the rested mode's 16/24/32 slowest item timing records for 2-/3-/4-way sort, allowing each item id at most once in that rest set.  This uniqueness rule applies even when prior rests are among the slowest records, preventing stacked rests from filling a set with descendants of one unusually slow item.  Preserve item ids when present, mark the new entries as `rest`, and compute each percentile at the time the rest is loaded against the current item timing history.
 6. Keep long memory history, trimming only to a high storage safety cap if needed.
 
 ## Item timing pressure

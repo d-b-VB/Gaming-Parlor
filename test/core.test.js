@@ -247,6 +247,26 @@ test('mode-away rest records load slow item timing samples with current percenti
   assert.equal(restItems[0].percentileAtRun, itemPercentileAtRun(20, state.itemStats.sort_2.entries.slice(0, 20)));
   assert.ok(itemTimingTargets(state, 'sort_2').longestSeconds >= 20);
 });
+
+test('stacked item rests include each item id at most once per rest set', () => {
+  let state = structuredClone(defaultState);
+  state.resources.diamonds = 100;
+  state = unlockMode(state, 'sort_3');
+  state.itemStats.sort_2.entries = Array.from({ length: 20 }, (_, index) => [
+    { itemId: `item-${index}`, timeSeconds: index + 1, createdAt: `fast-${index}` },
+    { itemId: `item-${index}`, timeSeconds: index + 21, createdAt: `slow-${index}` },
+  ]).flat();
+  state = settleRound(state, 'sort_2', 60, 0, 's2-1', 's2-1');
+  state = settleRound(state, 'sort_3', 80, 0, 's3-1', 's3-1');
+  state = settleRound(state, 'sort_2', 55, 0, 's2-2', 's2-2');
+  state = settleRound(state, 'sort_3', 75, 0, 's3-2', 's3-2');
+  const restSets = Map.groupBy(state.itemStats.sort_2.entries.filter((entry) => entry.entryType === 'rest'), (entry) => entry.createdAt);
+  assert.equal(restSets.size, 2);
+  for (const restItems of restSets.values()) {
+    assert.equal(restItems.length, 16);
+    assert.equal(new Set(restItems.map((entry) => entry.itemId)).size, 16);
+  }
+});
 test('bet propositions use sensible odds and require enough actual history', () => {
   const lowHistory = structuredClone(defaultState).gameMemory.sort_2.entries;
   const lowTargets = estimateTargets('sort_2', lowHistory);

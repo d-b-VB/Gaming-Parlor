@@ -173,7 +173,17 @@ function addRestRecordForMode(next, restedModeId, activeModeId, createdAt) {
   next.gameMemory[restedModeId].entries = entries.slice(-MEMORY_LIMIT);
 
   const stats = ensureItemStats(next, restedModeId);
-  const sourceItems = stats.entries.filter((entry) => Number.isFinite(entry.timeSeconds)).sort((a, b) => b.timeSeconds - a.timeSeconds).slice(0, modePromptCount(restedModeId));
+  const seenItemIds = new Set();
+  const sourceItems = stats.entries
+    .filter((entry) => Number.isFinite(entry.timeSeconds))
+    .sort((a, b) => b.timeSeconds - a.timeSeconds)
+    .filter((entry) => {
+      if (entry.itemId == null) return true;
+      if (seenItemIds.has(entry.itemId)) return false;
+      seenItemIds.add(entry.itemId);
+      return true;
+    })
+    .slice(0, modePromptCount(restedModeId));
   for (const item of sourceItems) {
     const percentileAtLoad = itemPercentileAtRun(item.timeSeconds, stats.entries);
     stats.entries.push({ itemId: item.itemId, timeSeconds: item.timeSeconds, createdAt, percentileAtRun: percentileAtLoad, entryType: 'rest', restSource: 'mode_away_block', restedWhilePlaying: activeModeId, sourceItemCreatedAt: item.createdAt });
