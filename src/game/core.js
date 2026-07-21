@@ -1,0 +1,312 @@
+const BASE_MODE_CONFIGS = {
+  2: { directions: ['left', 'right'], unlockCost: 0, standardDiamonds: 2, heartSafetySeconds: 45, starterEven: 35 },
+  3: { directions: ['left', 'right', 'up'], unlockCost: 15, standardDiamonds: 3, heartSafetySeconds: 65, starterEven: 50 },
+  4: { directions: ['left', 'right', 'up', 'down'], unlockCost: 30, standardDiamonds: 4, heartSafetySeconds: 90, starterEven: 70 },
+};
+const VARIANTS = {
+  standard: { label: '', payoutMultiplier: 1, unlockMultiplier: 1 },
+  freeform: { label: 'Freeform ', payoutMultiplier: 2, unlockMultiplier: 2 },
+  mystery: { label: 'Mystery ', payoutMultiplier: 4, unlockMultiplier: 4 },
+};
+function modeIdFor(variant, size) { return variant === 'standard' ? `sort_${size}` : `${variant}_${size}`; }
+function buildMode(variant, size) {
+  const base = BASE_MODE_CONFIGS[size];
+  const id = modeIdFor(variant, size);
+  return {
+    id,
+    variant,
+    baseSize: size,
+    name: `${VARIANTS[variant].label}${size}-Way Sort`,
+    directions: base.directions,
+    groupsPerDirection: 2,
+    glyphsPerGroup: 4,
+    unlockCost: variant === 'standard' ? base.unlockCost : base.unlockCost + (variant === 'freeform' ? 20 : 40),
+    baseDiamonds: base.standardDiamonds * VARIANTS[variant].payoutMultiplier,
+    heartSafetySeconds: base.heartSafetySeconds,
+    starterTargets: [{ id: 'even', label: 'Even', chance: 0.5, timeSeconds: base.starterEven, oddsMultiplier: 1, minHistory: 5, oddsLabel: '1:1' }],
+  };
+}
+export const MODES = Object.fromEntries(['standard', 'freeform', 'mystery'].flatMap((variant) => [2, 3, 4].map((size) => {
+  const mode = buildMode(variant, size);
+  return [mode.id, mode];
+})));
+export const modeList = Object.values(MODES);
+export const BET_TIERS = [
+  { id: 'half', label: 'Conservative', chance: 1 / 1.5, oddsMultiplier: 0.5, minHistory: 5, oddsLabel: '1:2' },
+  { id: 'even', label: 'Even', chance: 0.5, oddsMultiplier: 1, minHistory: 8, oddsLabel: '1:1' },
+  { id: 'double', label: 'Double', chance: 1 / 3, oddsMultiplier: 2, minHistory: 10, oddsLabel: '2:1' },
+  { id: 'five', label: 'Fivefold', chance: 1 / 6, oddsMultiplier: 5, minHistory: 15, oddsLabel: '5:1' },
+  { id: 'ten', label: 'Tenfold', chance: 1 / 11, oddsMultiplier: 10, minHistory: 20, oddsLabel: '10:1' },
+];
+export const STORAGE_KEY = 'gaming-parlor-state-v1';
+export const MEMORY_LIMIT = 2000;
+const TARGET_RECENT_ENTRY_LIMIT = 100;
+const CLUB_COST = 1;
+const HEART_RESTORE_COST = 5;
+const MAX_HEART_BASE_COST = 20;
+export function animationSpeedCost(owned) { return Math.ceil(10 * 1.55 ** owned); }
+function modeUpgradeValue(state, key, modeId, fallback = 0) { const value = state.upgrades?.[key]; return typeof value === 'number' ? value : (value?.[modeId] ?? fallback); }
+export function animationDuration(baseMs, state, modeId = 'sort_2') { const level = modeUpgradeValue(state, 'animationSpeed', modeId); return Math.round(baseMs * Math.max(0.45, 1 - level * 0.12)); }
+export function studyTimeCost(owned) { return Math.ceil(8 * 1.45 ** owned); }
+export function pauseCountCost(owned) { return Math.ceil(120 * 2.25 ** owned); }
+export function pauseLengthCost(owned) { return Math.ceil(60 * 1.9 ** owned); }
+export function queueVisionCost(owned) { return Math.ceil(35 * 1.8 ** owned); }
+export function hashSeed(seed) { let h = 2166136261; for (let i = 0; i < seed.length; i += 1) { h ^= seed.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+export function createRng(seed) { let state = hashSeed(seed) || 1; return () => { state |= 0; state = (state + 0x6d2b79f5) | 0; let t = Math.imul(state ^ (state >>> 15), 1 | state); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+export function shuffle(items, rng) { const result = [...items]; for (let i = result.length - 1; i > 0; i -= 1) { const j = Math.floor(rng() * (i + 1)); [result[i], result[j]] = [result[j], result[i]]; } return result; }
+export function matchesSelector(item, rule) { const all = (values, req = []) => req.every((x) => values.includes(x)); const none = (values, exc = []) => exc.every((x) => !values.includes(x)); if (rule.itemIds && !rule.itemIds.includes(item.id)) return false; if (rule.kind && item.kind !== rule.kind) return false; if (rule.kinds && !rule.kinds.includes(item.kind)) return false; if (!all(item.tags, rule.requiredTags)) return false; if (!none(item.tags, rule.excludesTags)) return false; if (!all(item.colors, rule.containsColors)) return false; if (!none(item.colors, rule.excludesColors)) return false; if (rule.colorCount !== undefined && item.colors.length !== rule.colorCount) return false; if (rule.exactColors) { const a = [...item.colors].sort(); const b = [...rule.exactColors].sort(); if (a.length !== b.length || !b.every((color, index) => a[index] === color)) return false; } return true; }
+export function eligibleItems(items, selector) { return items.filter((item) => matchesSelector(item, selector.selector)); }
+function overlapPenalty(item, selectors) { return selectors.filter((selector) => matchesSelector(item, selector.selector)).length; }
+function boardIsUnambiguous(groups, chosen) {
+  const selectorById = Object.fromEntries(chosen.map((selector) => [selector.id, selector]));
+  const boardItems = groups.flatMap((group) => group.items.map((item) => ({ item, groupId: group.id })));
+  return groups.every((group) => {
+    const selector = selectorById[group.id];
+    return boardItems.every(({ item, groupId }) => groupId === group.id || !matchesSelector(item, selector.selector));
+  });
+}
+export function generateBoard(modeId, seed, items, selectors) {
+  const mode = MODES[modeId];
+  const rng = createRng(seed);
+  const groupCount = mode.directions.length * mode.groupsPerDirection;
+  const viable = selectors.filter((selector) => eligibleItems(items, selector).length >= mode.glyphsPerGroup);
+  for (let attempt = 0; attempt < 160; attempt += 1) {
+    const chosen = shuffle(viable, rng).slice(0, groupCount);
+    const used = new Set();
+    const groups = [];
+    let failed = false;
+    for (let i = 0; i < chosen.length; i += 1) {
+      const selector = chosen[i];
+      const direction = mode.directions[Math.floor(i / mode.groupsPerDirection)];
+      const otherSelectors = chosen.filter((other) => other.id !== selector.id);
+      const candidates = shuffle(eligibleItems(items, selector), rng)
+        .filter((item) => !used.has(item.glyph))
+        .filter((item) => !otherSelectors.some((other) => matchesSelector(item, other.selector)))
+        .sort((a, b) => overlapPenalty(a, chosen) - overlapPenalty(b, chosen));
+      const selected = candidates.slice(0, mode.glyphsPerGroup);
+      if (selected.length < mode.glyphsPerGroup) { failed = true; break; }
+      selected.forEach((item) => used.add(item.glyph));
+      groups.push({ id: selector.id, label: selector.label, direction, items: selected });
+    }
+    if (!failed && used.size === groupCount * mode.glyphsPerGroup && boardIsUnambiguous(groups, chosen)) {
+      const queue = shuffle(groups.flatMap((group) => group.items.map((item) => ({ item, direction: group.direction, groupId: group.id }))), rng);
+      return { modeId, seed, groups, queue };
+    }
+  }
+  throw new Error(`Unable to generate ${mode.name} board`);
+}
+export function percentileAtRun(timeSeconds, entries) { if (!entries.length) return 0.5; return entries.filter((entry) => entry.timeSeconds >= timeSeconds).length / entries.length; }
+function median(values) { if (!values.length) return 0; const sorted = [...values].sort((a, b) => a - b); const mid = Math.floor(sorted.length / 2); return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2; }
+function mean(values) { return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0; }
+function standardDeviation(values) { if (values.length < 2) return 0; const avg = mean(values); return Math.sqrt(mean(values.map((value) => (value - avg) ** 2))); }
+function trimmedMean(values, trimRatio = 0.1) { if (!values.length) return 0; const sorted = [...values].sort((a, b) => a - b); const trim = Math.min(Math.floor(sorted.length * trimRatio), Math.floor((sorted.length - 1) / 2)); return mean(sorted.slice(trim, sorted.length - trim)); }
+function quantile(sortedAsc, chanceToBeat) { if (!sortedAsc.length) return 0; const position = chanceToBeat * (sortedAsc.length - 1); const lower = Math.floor(position); const upper = Math.ceil(position); if (lower === upper) return sortedAsc[lower]; const weight = position - lower; return sortedAsc[lower] * (1 - weight) + sortedAsc[upper] * weight; }
+function midhinge(values) { if (!values.length) return 0; const sorted = [...values].sort((a, b) => a - b); return (quantile(sorted, 0.25) + quantile(sorted, 0.75)) / 2; }
+function narrowestWindowMode(values) { if (!values.length) return 0; const sorted = [...values].sort((a, b) => a - b); const size = Math.min(sorted.length, Math.max(1, Math.ceil(sorted.length * 0.35))); let bestStart = 0; let bestWidth = Infinity; for (let start = 0; start <= sorted.length - size; start += 1) { const width = sorted[start + size - 1] - sorted[start]; if (width < bestWidth) { bestWidth = width; bestStart = start; } } return median(sorted.slice(bestStart, bestStart + size)); }
+function expWeightedMean(values, growth = 1.06) { if (!values.length) return 0; let weight = 1; let total = 0; let weights = 0; for (const value of values) { total += value * weight; weights += weight; weight *= growth; } return total / weights; }
+function roundScore(value) { return Math.max(1, Number(value.toFixed(2))); }
+export function firstRoundCalibrationScores(totalTimeSeconds, itemTimes, totalItems) {
+  if (!itemTimes.length) return [];
+  const itemCount = totalItems || itemTimes.length;
+  const observedItemSeconds = itemTimes.reduce((sum, value) => sum + value, 0);
+  const animationAndOverheadPerItem = Math.max(0, totalTimeSeconds - observedItemSeconds) / itemCount;
+  const effectiveItemTimes = itemTimes.map((value) => value + animationAndOverheadPerItem);
+  const half = effectiveItemTimes.slice(Math.floor(effectiveItemTimes.length / 2));
+  const quarter = effectiveItemTimes.slice(Math.floor(effectiveItemTimes.length * 0.75));
+  const scores = [
+    ['actual_first_round', totalTimeSeconds],
+    ['second_half_pace', half.reduce((sum, value) => sum + value, 0) * 2],
+    ['last_quarter_pace', quarter.reduce((sum, value) => sum + value, 0) * 4],
+    ['exp_weighted_item_pace', expWeightedMean(effectiveItemTimes) * itemCount],
+    ['median_last_half_item_pace', median(half) * itemCount],
+    ['midhinge_item_pace', midhinge(effectiveItemTimes) * itemCount],
+    ['modal_item_pace', narrowestWindowMode(effectiveItemTimes) * itemCount],
+    ['modal_second_half_item_pace', narrowestWindowMode(half) * itemCount],
+  ].map(([source, score]) => ({ source, sources: [source], timeSeconds: roundScore(score) })).filter((entry) => entry.source === 'actual_first_round' || entry.timeSeconds <= totalTimeSeconds);
+  const byScore = new Map();
+  for (const entry of scores) {
+    const key = entry.timeSeconds.toFixed(2);
+    if (byScore.has(key)) byScore.get(key).sources.push(...entry.sources);
+    else byScore.set(key, { ...entry, sources: [...entry.sources] });
+  }
+  return [...byScore.values()].map((entry) => ({ ...entry, source: entry.source, derivedSources: entry.sources }));
+}
+function suppressDuplicateTargetTimes(targets) {
+  const availableTimes = new Set();
+  return targets.map((target) => {
+    if (!target.available) return target;
+    if (!availableTimes.has(target.timeSeconds)) {
+      availableTimes.add(target.timeSeconds);
+      return target;
+    }
+    return { ...target, available: false, unavailableReason: 'duplicate-time' };
+  });
+}
+export function estimateTargets(modeId, entries) { const mode = MODES[modeId]; const countableEntries = entries.filter((entry) => ['actual', 'rest'].includes(entry.entryType) && Number.isFinite(entry.timeSeconds)); const scoredEntries = countableEntries.map((entry, index) => ({ ...entry, runPercentile: Number.isFinite(entry.percentileAtRun) ? entry.percentileAtRun : percentileAtRun(entry.timeSeconds, countableEntries.slice(0, index)) })); const actualCount = scoredEntries.length; const recentEntries = scoredEntries.slice(-TARGET_RECENT_ENTRY_LIMIT);
+  const fallbackEven = mode.starterTargets[0].timeSeconds; const fallbackFactors = { half: 1.2, even: 1, double: 0.8, five: 0.65, ten: 0.55 }; const mistakeHistory = recentEntries.filter((entry) => Number.isFinite(entry.mistakes)).map((entry) => entry.mistakes).sort((a, b) => a - b); const mistakeLimitFor = (target) => mistakeHistory.length ? Math.max(0, Math.floor(quantile(mistakeHistory, target.chance))) : 0; if (actualCount < 5) return suppressDuplicateTargetTimes(BET_TIERS.map((target) => ({ ...target, timeSeconds: Math.max(1, Math.round(fallbackEven * fallbackFactors[target.id])), mistakeLimit: mistakeLimitFor(target), available: actualCount >= target.minHistory, actualCount }))); const sorted = recentEntries.map((entry) => entry.timeSeconds).sort((a, b) => a - b); const runPercentiles = recentEntries.map((entry) => entry.runPercentile).filter(Number.isFinite).sort((a, b) => a - b); return suppressDuplicateTargetTimes(BET_TIERS.map((target) => { const targetPercentile = runPercentiles.length ? quantile(runPercentiles, Math.max(0, Math.min(1, 1 - target.chance))) : target.chance; const timeQuantile = Math.max(0, Math.min(1, 1 - targetPercentile)); return { ...target, timeSeconds: Math.max(1, Math.round(quantile(sorted, timeQuantile))), targetPercentile, mistakeLimit: mistakeLimitFor(target), available: actualCount >= target.minHistory, actualCount }; })); }
+function realRoundEntries(entries) { return entries.filter((entry) => ['actual', 'rest'].includes(entry.entryType) && Number.isFinite(entry.timeSeconds)); }
+function heartBenchmarkEntries(entries) { return realRoundEntries(entries); }
+export function heartSafety(modeId, entries) { const actual = heartBenchmarkEntries(entries).map((entry) => entry.timeSeconds); if (!actual.length) return Infinity; if (actual.length === 1) return Math.round(actual[0] * 2); const sorted = [...actual].sort((a, b) => a - b); if (actual.length === 2) return Math.round(sorted[1]); if (actual.length === 3) return Math.round(median(sorted)); if (actual.length === 4) return Math.round(sorted[2]); return Math.round(median(sorted)); }
+function modePromptCount(modeId) { const mode = MODES[modeId]; return mode.directions.length * mode.groupsPerDirection * mode.glyphsPerGroup; }
+function ensureRestTracking(next) {
+  next.restTracking ??= { lastCompletedModeId: null, awayBlock: 0, restedBlockByMode: {} };
+  next.restTracking.restedBlockByMode ??= {};
+  next.restTracking.awayBlock ??= 0;
+  return next.restTracking;
+}
+function trimModeMemory(next, modeId) { next.gameMemory[modeId].entries = (next.gameMemory[modeId].entries ?? []).slice(-MEMORY_LIMIT); }
+function rebuildItemExtremes(stats) {
+  const times = stats.entries.filter((entry) => Number.isFinite(entry.timeSeconds)).map((entry) => entry.timeSeconds);
+  stats.fastestSeconds = times.length ? Math.min(...times) : null;
+  stats.longestSeconds = times.length ? Math.max(...times) : null;
+}
+function addRestRecordForMode(next, restedModeId, activeModeId, createdAt) {
+  next.gameMemory ??= {};
+  next.gameMemory[restedModeId] ??= { entries: [] };
+  const entries = next.gameMemory[restedModeId].entries ?? [];
+  const timedEntries = realRoundEntries(entries);
+  if (!timedEntries.length) return false;
+  const slowestTime = Math.max(...timedEntries.map((entry) => entry.timeSeconds));
+  const mistakeEntries = timedEntries.filter((entry) => Number.isFinite(entry.mistakes));
+  const highestMistakes = mistakeEntries.length ? Math.max(...mistakeEntries.map((entry) => entry.mistakes)) : 0;
+  entries.push({ timeSeconds: slowestTime, mistakes: highestMistakes, entryType: 'rest', restSource: 'mode_away_block', restedWhilePlaying: activeModeId, createdAt, percentileAtRun: percentileAtRun(slowestTime, entries) });
+  next.gameMemory[restedModeId].entries = entries.slice(-MEMORY_LIMIT);
+
+  const stats = ensureItemStats(next, restedModeId);
+  const seenItemIds = new Set();
+  const sourceItems = stats.entries
+    .filter((entry) => Number.isFinite(entry.timeSeconds))
+    .sort((a, b) => b.timeSeconds - a.timeSeconds)
+    .filter((entry) => {
+      if (entry.itemId == null) return true;
+      if (seenItemIds.has(entry.itemId)) return false;
+      seenItemIds.add(entry.itemId);
+      return true;
+    })
+    .slice(0, modePromptCount(restedModeId));
+  for (const item of sourceItems) {
+    const percentileAtLoad = itemPercentileAtRun(item.timeSeconds, stats.entries);
+    stats.entries.push({ itemId: item.itemId, timeSeconds: item.timeSeconds, createdAt, percentileAtRun: percentileAtLoad, entryType: 'rest', restSource: 'mode_away_block', restedWhilePlaying: activeModeId, sourceItemCreatedAt: item.createdAt });
+  }
+  stats.entries = stats.entries.slice(-MEMORY_LIMIT);
+  rebuildItemExtremes(stats);
+  return true;
+}
+function addDueRestRecords(next, activeModeId, createdAt) {
+  const tracking = ensureRestTracking(next);
+  if (tracking.lastCompletedModeId && tracking.lastCompletedModeId !== activeModeId) tracking.awayBlock += 1;
+  for (const restedModeId of Object.keys(MODES)) {
+    if (restedModeId === activeModeId || !next.unlockedModes?.[restedModeId]) continue;
+    const hasEntries = (next.gameMemory?.[restedModeId]?.entries ?? []).some((entry) => Number.isFinite(entry.timeSeconds));
+    if (!hasEntries || tracking.restedBlockByMode[restedModeId] === tracking.awayBlock) continue;
+    if (addRestRecordForMode(next, restedModeId, activeModeId, createdAt)) tracking.restedBlockByMode[restedModeId] = tracking.awayBlock;
+  }
+  tracking.lastCompletedModeId = activeModeId;
+}
+export function betWeightedSyntheticTimes(totalTimeSeconds, itemTimes = [], entryCount = 0) {
+  if (entryCount <= 0) return [];
+  const finiteItems = itemTimes.filter(Number.isFinite);
+  if (!finiteItems.length) return Array.from({ length: entryCount }, () => totalTimeSeconds);
+  const itemCount = finiteItems.length;
+  const totalItemSeconds = finiteItems.reduce((sum, value) => sum + value, 0);
+  const overheadPerItem = Math.max(0, totalTimeSeconds - totalItemSeconds) / itemCount;
+  const adjustedItems = finiteItems.map((value) => value + overheadPerItem).sort((a, b) => a - b);
+  const middle = (itemCount - 1) / 2;
+  const lowerMiddle = Math.floor(middle);
+  const upperMiddle = Math.ceil(middle);
+  const projections = [((adjustedItems[lowerMiddle] + adjustedItems[upperMiddle]) / 2) * itemCount];
+  for (let offset = 0; projections.length < entryCount && (upperMiddle + offset < itemCount || lowerMiddle - offset >= 0); offset += 1) {
+    const slowerIndex = upperMiddle + offset;
+    if (slowerIndex < itemCount && slowerIndex !== lowerMiddle) projections.push(adjustedItems[slowerIndex] * itemCount);
+    if (projections.length >= entryCount) break;
+    const fasterIndex = lowerMiddle - offset;
+    if (fasterIndex >= 0 && fasterIndex !== upperMiddle) projections.push(adjustedItems[fasterIndex] * itemCount);
+  }
+  while (projections.length < entryCount) projections.push(totalTimeSeconds);
+  return projections.slice(0, entryCount);
+}
+
+export function addRoundMemory(state, modeId, timeSeconds, createdAt, mistakes = 0, extraActualEntries = 0, extraMeta = {}, itemTimes = []) {
+  const next = structuredClone(state);
+  next.gameMemory ??= {};
+  next.gameMemory[modeId] ??= { entries: [] };
+  ensureRestTracking(next);
+  const entries = next.gameMemory[modeId].entries ?? [];
+  const nonRestCount = entries.filter((entry) => entry.entryType !== 'rest').length;
+  if (nonRestCount === 0 && itemTimes.length) {
+    for (const score of firstRoundCalibrationScores(timeSeconds, itemTimes, itemTimes.length)) entries.push({ timeSeconds: score.timeSeconds, mistakes, entryType: 'actual', temporary: true, calibrationSource: score.source, calibrationSources: score.sources, createdAt, percentileAtRun: percentileAtRun(score.timeSeconds, entries) });
+  } else {
+    const temporaryIndexes = entries.map((entry, index) => ({ entry, index })).filter(({ entry }) => entry.temporary);
+    if (temporaryIndexes.length) {
+      const removableTemporaryIndexes = temporaryIndexes.filter(({ entry }) => entry.calibrationSource !== 'actual_first_round');
+      const removalCandidates = removableTemporaryIndexes.length ? removableTemporaryIndexes : temporaryIndexes;
+      const removeIndex = removalCandidates.reduce((slowest, candidate) => candidate.entry.timeSeconds > slowest.entry.timeSeconds ? candidate : slowest).index;
+      entries.splice(removeIndex, 1);
+    }
+    entries.push({ timeSeconds, mistakes, entryType: 'actual', createdAt, percentileAtRun: percentileAtRun(timeSeconds, entries) });
+  }
+  const weightedTimes = betWeightedSyntheticTimes(timeSeconds, itemTimes, extraActualEntries);
+  weightedTimes.forEach((weightedTimeSeconds, index) => entries.push({ timeSeconds: weightedTimeSeconds, sourceRoundTimeSeconds: timeSeconds, mistakes, entryType: 'actual', createdAt, percentileAtRun: percentileAtRun(weightedTimeSeconds, entries), weightedByBet: true, syntheticBetWeight: true, weightedIndex: index + 1, ...extraMeta }));
+  trimModeMemory(next, modeId);
+  addDueRestRecords(next, modeId, createdAt);
+  return next;
+}
+export function createClubBet(modeId, offer, stake) { return { modeId, targetId: offer.id, targetSeconds: offer.timeSeconds, mistakeLimit: offer.mistakeLimit ?? 0, oddsMultiplier: offer.oddsMultiplier, oddsLabel: offer.oddsLabel, stake, cost: stake * CLUB_COST }; }
+export function payoutScore(state, modeId) { return MODES[modeId].baseDiamonds + (state.upgrades.spades.global ?? 0) + (state.upgrades.spades[modeId] ?? 0); }
+function spadeBase(scope) { if (scope === 'global') return 25; const size = MODES[scope]?.baseSize ?? 2; return size === 2 ? 12 : size === 3 ? 9 : 6; }
+export function spadeCost(scope, owned) { const base = spadeBase(scope); const growth = scope === 'global' ? 1.6 : 1.5; return Math.ceil(base * growth ** owned); }
+export function perItemMedianBonusCost(modeId, owned = 0) { const size = MODES[modeId]?.baseSize ?? 2; const multiplier = size === 2 ? 8 : size === 3 ? 12 : 16; return multiplier * spadeCost(modeId, owned); }
+export function sortedItemDisplayCost(modeId) { return Math.max(1, Math.floor(perItemMedianBonusCost(modeId, 0) * 0.75)); }
+export function hasModeBetHistory(state, modeId) { return (state.modeBetCounts?.[modeId] ?? 0) > 0; }
+export function hasSortedItemDisplay(state, modeId) { return Boolean(state.upgrades?.sortedItemDisplay?.[modeId]); }
+export function hasPerItemMedianBonus(state, modeId) { return (state.upgrades?.perItemMedianBonus?.[modeId] ?? 0) > 0; }
+function ensureItemStats(next, modeId) {
+  next.itemStats ??= {};
+  next.itemStats[modeId] ??= { fastestSeconds: null, longestSeconds: null, entries: [] };
+  next.itemStats[modeId].entries ??= [];
+  return next.itemStats[modeId];
+}
+export function itemPercentileAtRun(timeSeconds, entries) { if (!entries.length) return 0.5; return (entries.filter((entry) => entry.timeSeconds >= timeSeconds).length + 0.5) / (entries.length + 1); }
+export function itemTimingTargets(state, modeId) { const entries = state.itemStats?.[modeId]?.entries ?? []; if (!entries.length) return { fastestSeconds: null, medianSeconds: null, longestSeconds: null, metaMedianSeconds: null, eliteSeconds: null, metaMedianPercentile: null, count: 0 }; const times = entries.map((entry) => entry.timeSeconds); const sorted = [...times].sort((a, b) => a - b); const percentiles = entries.map((entry, index) => itemPercentileAtRun(entry.timeSeconds, entries.slice(0, index))).filter(Number.isFinite); const metaMedianPercentile = percentiles.length ? median(percentiles) : 0.5; const metaMedianSeconds = quantile(sorted, Math.max(0, Math.min(1, 1 - metaMedianPercentile))); const eliteSeconds = sorted[Math.floor(0.01 * (sorted.length - 1))]; return { fastestSeconds: Math.min(...times), medianSeconds: median(times), longestSeconds: Math.max(...times), metaMedianSeconds, eliteSeconds, metaMedianPercentile, count: entries.length }; }
+export function itemSlowHeartThreshold(state, modeId, roundSlowHeartLossTimes = []) { const entries = state.itemStats?.[modeId]?.entries ?? []; if (!entries.length) return null; const mode = MODES[modeId]; const times = entries.map((entry) => entry.timeSeconds); const sorted = [...times].sort((a, b) => a - b); const medianTime = median(sorted); const meanTime = mean(times); const trimmedMeanTime = trimmedMean(times); const q1 = quantile(sorted, 0.25); const q3 = quantile(sorted, 0.75); const iqr = q3 - q1; const midhingeTime = (q1 + q3) / 2; const sd = standardDeviation(times); const targets = itemTimingTargets(state, modeId); const safeFloor = Math.max(meanTime, medianTime, trimmedMeanTime, midhingeTime, targets.metaMedianSeconds ?? 0); const desiredSlowHits = 1.25; const itemCount = mode.directions.length * mode.groupsPerDirection * mode.glyphsPerGroup; const modeTailPercentile = quantile(sorted, Math.max(0, Math.min(1, 1 - desiredSlowHits / itemCount))); const baselineCandidates = [2 * trimmedMeanTime, q3 + 1.5 * iqr, meanTime + 2 * sd, modeTailPercentile, Math.max(...times)]; const candidates = [...baselineCandidates, ...roundSlowHeartLossTimes].filter(Number.isFinite); return Math.max(safeFloor, median(candidates)); }
+export function settleItemTiming(state, modeId, itemId, timeSeconds, createdAt = new Date().toISOString(), roundSlowHeartLossTimes = []) {
+  const next = structuredClone(state);
+  const stats = ensureItemStats(next, modeId);
+  const targets = itemTimingTargets(next, modeId);
+  const hasHistory = stats.entries.length > 0;
+  const isNewLongest = hasHistory && timeSeconds > stats.longestSeconds;
+  const isNewFastest = hasHistory && timeSeconds < stats.fastestSeconds;
+  const isEliteItem = hasHistory && Number.isFinite(targets.eliteSeconds) && timeSeconds <= targets.eliteSeconds;
+  const medianBonusDelta = Number.isFinite(targets.metaMedianSeconds) && timeSeconds <= targets.metaMedianSeconds ? (next.upgrades?.perItemMedianBonus?.[modeId] ?? 0) : 0;
+  const slowThreshold = itemSlowHeartThreshold(next, modeId, roundSlowHeartLossTimes);
+  const heartsDelta = hasHistory && Number.isFinite(slowThreshold) && timeSeconds > slowThreshold ? -1 : 0;
+  const eliteBonusDelta = isEliteItem ? payoutScore(next, modeId) : 0;
+  const diamondsDelta = eliteBonusDelta + medianBonusDelta;
+  stats.fastestSeconds = hasHistory ? Math.min(stats.fastestSeconds, timeSeconds) : timeSeconds;
+  stats.longestSeconds = hasHistory ? Math.max(stats.longestSeconds, timeSeconds) : timeSeconds;
+  const percentileAtRun = itemPercentileAtRun(timeSeconds, stats.entries);
+  stats.entries = [...stats.entries, { itemId, timeSeconds, createdAt, percentileAtRun, isNewFastest, isNewLongest, isEliteItem, eliteThreshold: targets.eliteSeconds, slowThreshold, medianBonusDelta, eliteBonusDelta }];
+  next.resources.hearts = Math.max(0, next.resources.hearts + heartsDelta);
+  next.resources.diamonds += diamondsDelta;
+  const event = { type: 'itemTiming', modeId, itemId, timeSeconds, createdAt, heartsDelta, diamondsDelta, slowThreshold, medianBonusDelta, eliteBonusDelta, isEliteItem, eliteThreshold: targets.eliteSeconds, metaMedianSeconds: targets.metaMedianSeconds, percentileAtRun, isNewFastest, isNewLongest };
+  next.eventLog = [...next.eventLog, event].slice(-50);
+  return { state: next, event };
+}
+export function buyClubBet(state, bet) { if (bet.stake <= 0) return { ...state, activeClubBet: null }; if (bet.oddsLabel === '1:2' && bet.stake % 2 !== 0) throw new Error('1:2 wagers must be paid in multiples of 2 Clubs'); if (state.resources.diamonds < bet.cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= bet.cost; next.activeClubBet = { ...bet, startingBank: state.resources.diamonds }; next.modeBetCounts ??= {}; next.modeBetCounts[bet.modeId] = (next.modeBetCounts[bet.modeId] ?? 0) + 1; return next; }
+export function canUnlockMode(state, modeId) { const mode = MODES[modeId]; if (!mode || state.unlockedModes?.[modeId]) return true; if (mode.variant === 'freeform') return [2, 3, 4].every((size) => state.unlockedModes?.[modeIdFor('standard', size)]); if (mode.variant === 'mystery') return [2, 3, 4].every((size) => state.unlockedModes?.[modeIdFor('freeform', size)]); return true; }
+export function unlockMode(state, modeId) { const mode = MODES[modeId]; if (state.unlockedModes[modeId]) return state; if (!canUnlockMode(state, modeId)) throw new Error(`${mode.name} is not available yet`); if (state.resources.diamonds < mode.unlockCost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= mode.unlockCost; next.unlockedModes[modeId] = true; return next; }
+export function buySpade(state, scope) { const cost = spadeCost(scope, state.upgrades.spades[scope] ?? 0); if (state.resources.diamonds < cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= cost; next.upgrades.spades[scope] = (next.upgrades.spades[scope] ?? 0) + 1; return next; }
+export function buyPerItemMedianBonus(state, modeId) { if (!hasModeBetHistory(state, modeId)) throw new Error('Make at least one bet in this mode first'); const owned = state.upgrades?.perItemMedianBonus?.[modeId] ?? 0; const cost = perItemMedianBonusCost(modeId, owned); if (state.resources.diamonds < cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= cost; next.upgrades ??= {}; next.upgrades.perItemMedianBonus ??= {}; next.upgrades.perItemMedianBonus[modeId] = owned + 1; return next; }
+export function buySortedItemDisplay(state, modeId) { if (MODES[modeId]?.variant !== 'standard') throw new Error('Sorted item display is for standard sort only'); if (state.upgrades?.sortedItemDisplay?.[modeId]) return state; const cost = sortedItemDisplayCost(modeId); if (state.resources.diamonds < cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= cost; next.upgrades ??= {}; next.upgrades.sortedItemDisplay ??= {}; next.upgrades.sortedItemDisplay[modeId] = true; return next; }
+function buyModeUpgrade(state, modeId, key, costFn) { const owned = modeUpgradeValue(state, key, modeId); const cost = costFn(owned); if (state.resources.diamonds < cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= cost; next.upgrades ??= {}; if (typeof next.upgrades[key] === 'number' || !next.upgrades[key]) next.upgrades[key] = Object.fromEntries(Object.keys(MODES).map((id) => [id, id === modeId ? (typeof state.upgrades?.[key] === 'number' ? state.upgrades[key] : 0) : 0])); next.upgrades[key][modeId] = owned + 1; return next; }
+export function buyAnimationSpeed(state, modeId = 'sort_2') { return buyModeUpgrade(state, modeId, 'animationSpeed', animationSpeedCost); }
+export function buyStudyTime(state, modeId = 'sort_2') { return buyModeUpgrade(state, modeId, 'studyTime', studyTimeCost); }
+export function buyPauseCount(state, modeId = 'sort_2') { return buyModeUpgrade(state, modeId, 'pauseCount', pauseCountCost); }
+export function buyPauseLength(state, modeId = 'sort_2') { return buyModeUpgrade(state, modeId, 'pauseLength', pauseLengthCost); }
+export function buyQueueVision(state, modeId = 'sort_2') { return buyModeUpgrade(state, modeId, 'queueVision', queueVisionCost); }
+export function restoreHeart(state) { if (state.resources.hearts >= state.resources.maxHearts) return state; if (state.resources.diamonds < HEART_RESTORE_COST) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= HEART_RESTORE_COST; next.resources.hearts += 1; return next; }
+export function maxHeartCost(maxHearts) { return Math.ceil(MAX_HEART_BASE_COST * 2 ** Math.max(0, maxHearts - 5)); }
+export function buyMaxHeart(state) { const cost = maxHeartCost(state.resources.maxHearts); if (state.resources.diamonds < cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= cost; next.resources.maxHearts += 1; next.resources.hearts += 1; return next; }
+export function mistakePressure(entries, mistakes) { const actualMistakes = realRoundEntries(entries).filter((entry) => Number.isFinite(entry.mistakes)).map((entry) => entry.mistakes); if (!actualMistakes.length) return { medianMistakes: null, maxMistakes: null, heartsLost: 0, highMistakeRound: false, newWorstMistakeRound: false }; const medianMistakes = median(actualMistakes); const maxMistakes = Math.max(...actualMistakes); const highMistakeRound = mistakes >= medianMistakes + 2; const newWorstMistakeRound = mistakes > maxMistakes; return { medianMistakes, maxMistakes, highMistakeRound, newWorstMistakeRound, heartsLost: (highMistakeRound ? 1 : 0) + (newWorstMistakeRound ? 1 : 0) }; }
+export function settleRound(state, modeId, timeSeconds, mistakes, seed, createdAt = new Date().toISOString(), itemTimes = []) { const entries = state.gameMemory?.[modeId]?.entries ?? []; const safety = heartSafety(modeId, entries); const actual = heartBenchmarkEntries(entries).map((entry) => entry.timeSeconds); const newWorst = actual.length > 0 && timeSeconds > Math.max(...actual); const timeHeartsLost = timeSeconds > safety ? (newWorst ? 2 : 1) : 0; const mistakeResult = mistakePressure(entries, mistakes); const heartsLost = timeHeartsLost + mistakeResult.heartsLost; const basePayout = Math.max(0, payoutScore(state, modeId) + (heartsLost ? -1 : 0)); const activeBet = state.activeClubBet?.modeId === modeId ? state.activeClubBet : null; const betMistakesOk = !activeBet || !Number.isFinite(activeBet.mistakeLimit) || mistakes <= activeBet.mistakeLimit; const betProfit = activeBet ? Math.floor(activeBet.stake * activeBet.oddsMultiplier) : 0; const betWon = Boolean(activeBet && timeSeconds <= activeBet.targetSeconds && betMistakesOk); const betWinnings = betWon ? activeBet.stake + betProfit : 0; const betConfidenceWeight = betWon && activeBet.startingBank > 0 ? Math.floor(betProfit / activeBet.startingBank) : 0; const next = addRoundMemory(state, modeId, timeSeconds, createdAt, mistakes, betConfidenceWeight, { betWeighted: true, betProfit, startingBank: activeBet?.startingBank ?? 0, betConfidenceWeight }, itemTimes); next.resources.hearts = Math.max(0, next.resources.hearts - heartsLost); next.resources.diamonds += basePayout + betWinnings; next.activeClubBet = null; next.eventLog = [...(next.eventLog ?? []), { type: 'round', modeId, timeSeconds, mistakes, seed, createdAt, diamondsDelta: basePayout + betWinnings, heartsDelta: -heartsLost, timeHeartsLost, mistakeHeartsLost: mistakeResult.heartsLost, medianMistakes: mistakeResult.medianMistakes, maxMistakes: mistakeResult.maxMistakes, betMistakeLimit: activeBet?.mistakeLimit, betMistakesOk, betProfit, startingBank: activeBet?.startingBank ?? 0, betConfidenceWeight, betWinnings }].slice(-50); return next; }
+export function streakDuration(baseMs, streak) { return Math.round(baseMs * (1 - Math.min(0.45, Math.max(0, streak) * 0.03))); }
