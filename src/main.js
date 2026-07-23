@@ -1,8 +1,8 @@
-import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, percentileAtRun, itemPercentileAtRun, createClubBet, buyClubBet, unlockMode, canUnlockMode, buySpade, buyPerItemMedianBonus, buySortedItemDisplay, restoreHeart, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, sortedItemDisplayCost, hasSortedItemDisplay, settleRound, settleItemTiming, itemTimingTargets, spadeCost, payoutScore, perItemMedianBonusCost, hasModeBetHistory, streakDuration } from './game/core.js?v=0.3.0';
+import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, itemPercentileAtRun, createClubBet, buyClubBet, unlockMode, canUnlockMode, buySpade, buyPerItemMedianBonus, buySortedItemDisplay, restoreHeart, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, sortedItemDisplayCost, hasSortedItemDisplay, settleRound, settleItemTiming, itemTimingTargets, roundReferenceCurve, spadeCost, payoutScore, perItemMedianBonusCost, hasModeBetHistory, streakDuration } from './game/core.js?v=0.3.1';
 
 const root = document.querySelector('#root');
-const APP_VERSION = 'v0.3.0';
-const SAVE_SCHEMA_VERSION = '0.3.0-local';
+const APP_VERSION = 'v0.3.1';
+const SAVE_SCHEMA_VERSION = '0.3.1-local';
 const arrows = { left: '←', right: '→', up: '↑', down: '↓' };
 let items = [];
 let selectors = [];
@@ -37,6 +37,7 @@ let roundSlowHeartLossTimes = [];
 let debugOpen = false;
 let categoryAssignments = {};
 let sortedByGroup = {};
+let itemHistoryCountAtRoundStart = 0;
 
 function fmt(seconds) {
   return `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
@@ -100,7 +101,7 @@ function loadSaved(defaultState) {
 }
 function groupByDirection(direction) { return board.groups.filter((group) => group.direction === direction); }
 function modeUpgrade(key, id = modeId) { const value = state.upgrades?.[key]; return typeof value === 'number' ? value : (value?.[id] ?? 0); }
-function currentTargets() { return estimateTargets(modeId, state.gameMemory[modeId].entries); }
+function currentTargets() { return estimateTargets(modeId, state.gameMemory[modeId].entries, state.itemStats?.[modeId]?.entries ?? []); }
 function targetAvailabilityText(target) { return target.available ? 'Available' : target.unavailableReason === 'duplicate-time' ? 'Same goal as lower payout' : `${target.actualCount}/${target.minHistory} history`; }
 function modePayout(id) { return payoutScore(state, id); }
 function escapeHtml(value) {
@@ -143,9 +144,10 @@ function debugRecordsHtml(targets, safety) {
   const entries = state.gameMemory?.[modeId]?.entries ?? [];
   const stats = itemTimingTargets(state, modeId);
   const itemEntries = state.itemStats?.[modeId]?.entries ?? [];
-  const rows = entries.map((entry, index) => `<tr><td>${index + 1}</td><td>${fmtDebugSeconds(entry.timeSeconds)}</td><td>${Number.isFinite(entry.mistakes) ? entry.mistakes : '—'}</td><td>${escapeHtml(entryTags(entry))}</td></tr>`).join('') || '<tr><td colspan="4">No round memory yet.</td></tr>';
-  const itemRows = itemEntries.map((entry, index) => `<tr><td>${index + 1}</td><td>${escapeHtml(entry.itemId ?? 'item')}</td><td>${fmtDebugSeconds(entry.timeSeconds)}</td><td>${`${Math.round(itemPercentileAtRun(entry.timeSeconds, itemEntries.slice(0, index)) * 100)}%`}</td><td>${[entry.entryType === 'rest' ? 'rest' : '', entry.restedWhilePlaying ? `away during ${entry.restedWhilePlaying}` : '', entry.isEliteItem ? 'elite' : '', entry.isNewFastest ? 'fastest' : '', entry.isNewLongest ? 'longest' : '', entry.eliteBonusDelta ? `+♦${entry.eliteBonusDelta}` : '', entry.medianBonusDelta ? `median +♦${entry.medianBonusDelta}` : ''].filter(Boolean).join(' · ') || '—'}</td></tr>`).join('') || '<tr><td colspan="5">No item timing entries yet.</td></tr>';
-  return `<section class="panel debug-panel"><h2>Debug records for ${MODES[modeId].name}</h2><p class="hint">Shows the full stored records feeding ♥ safety, ♣ odds, mistake pressure, and item-timing bonuses. Temporary calibration records are replaced one at a time by later real runs.</p><div class="debug-grid"><div><h3>Round memory (${entries.length})</h3><p>♥ safety now: <strong>${fmtDebugSeconds(safety)}</strong></p><div class="debug-scroll"><table><thead><tr><th>#</th><th>Time</th><th>Err</th><th>Used for</th></tr></thead><tbody>${rows}</tbody></table></div></div><div><h3>♣ targets</h3><ul>${targets.map((target) => `<li>${escapeHtml(target.label)}: ${fmtDebugSeconds(target.timeSeconds)} / ≤${target.mistakeLimit} errors · ${escapeHtml(targetAvailabilityText(target).toLowerCase())}</li>`).join('')}</ul><h3>Item timing (${itemEntries.length})</h3><p>Elite ${fmtDebugSeconds(stats.eliteSeconds)} · meta-median ${fmtDebugSeconds(stats.metaMedianSeconds)} · fastest ${fmtDebugSeconds(stats.fastestSeconds)} · median ${fmtDebugSeconds(stats.medianSeconds)} · longest ${fmtDebugSeconds(stats.longestSeconds)}${Number.isFinite(stats.metaMedianPercentile) ? ` · meta pct ${Math.round(stats.metaMedianPercentile * 100)}%` : ''}</p><div class="debug-scroll"><table><thead><tr><th>#</th><th>Item</th><th>Time</th><th>Prior pct</th><th>Flags</th></tr></thead><tbody>${itemRows}</tbody></table></div></div></div></section>`;
+  const reference = roundReferenceCurve(modeId, itemEntries, entries);
+  const rows = entries.map((entry, index) => `<tr><td>${index + 1}</td><td>${fmtDebugSeconds(entry.timeSeconds)}</td><td>${Number.isFinite(entry.percentileAtRun) ? `${Math.round(entry.percentileAtRun * 100)}%` : '—'}</td><td>${Number.isFinite(entry.mistakes) ? entry.mistakes : '—'}</td><td>${escapeHtml(entryTags(entry))}</td></tr>`).join('') || '<tr><td colspan="5">No round memory yet.</td></tr>';
+  const itemRows = itemEntries.map((entry, index) => `<tr><td>${index + 1}</td><td>${escapeHtml(entry.itemId ?? 'item')}</td><td>${fmtDebugSeconds(entry.timeSeconds)}</td><td>${`${Math.round((Number.isFinite(entry.percentileAtRun) ? entry.percentileAtRun : itemPercentileAtRun(entry.timeSeconds, itemEntries.slice(0, index))) * 100)}%`}</td><td>${[entry.entryType === 'rest' ? 'rest' : '', entry.restedWhilePlaying ? `away during ${entry.restedWhilePlaying}` : '', entry.isEliteItem ? 'elite' : '', entry.isNewFastest ? 'fastest' : '', entry.isNewLongest ? 'longest' : '', entry.eliteBonusDelta ? `+♦${entry.eliteBonusDelta}` : '', entry.medianBonusDelta ? `median +♦${entry.medianBonusDelta}` : ''].filter(Boolean).join(' · ') || '—'}</td></tr>`).join('') || '<tr><td colspan="5">No item timing entries yet.</td></tr>';
+  return `<section class="panel debug-panel"><h2>Debug records for ${MODES[modeId].name}</h2><p class="hint">Shows the full stored records feeding ♥ safety, ♣ odds, mistake pressure, and item-timing bonuses. Temporary calibration records are replaced one at a time by later real runs.</p><div class="debug-grid"><div><h3>Round memory (${entries.length})</h3><p>♥ safety now: <strong>${fmtDebugSeconds(safety)}</strong></p><div class="debug-scroll"><table><thead><tr><th>#</th><th>Time</th><th>Pct</th><th>Err</th><th>Used for</th></tr></thead><tbody>${rows}</tbody></table></div></div><div><h3>♣ targets</h3><p>Reference curve: ${reference.windowCount} points from ${reference.realItemCount} real item records ×${reference.replicationFactor || 0}; overhead ${fmtDebugSeconds(reference.overheadSeconds)}${reference.times.length ? `; range ${fmtDebugSeconds(reference.times[0])}–${fmtDebugSeconds(reference.times.at(-1))}` : ''}.</p><ul>${targets.map((target) => `<li>${escapeHtml(target.label)}: ${fmtDebugSeconds(target.timeSeconds)} / ≤${target.mistakeLimit} errors · ${escapeHtml(targetAvailabilityText(target).toLowerCase())}</li>`).join('')}</ul><h3>Item timing (${itemEntries.length})</h3><p>Elite ${fmtDebugSeconds(stats.eliteSeconds)} · meta-median ${fmtDebugSeconds(stats.metaMedianSeconds)} · fastest ${fmtDebugSeconds(stats.fastestSeconds)} · median ${fmtDebugSeconds(stats.medianSeconds)} · longest ${fmtDebugSeconds(stats.longestSeconds)}${Number.isFinite(stats.metaMedianPercentile) ? ` · meta pct ${Math.round(stats.metaMedianPercentile * 100)}%` : ''}</p><div class="debug-scroll"><table><thead><tr><th>#</th><th>Item</th><th>Time</th><th>Prior pct</th><th>Flags</th></tr></thead><tbody>${itemRows}</tbody></table></div></div></div></section>`;
 }
 function timerPct(targetSeconds) {
   if (!targetSeconds || !promptStartedAt) return 0;
@@ -224,6 +226,7 @@ function startTicker() {
 function resetPromptClock() { promptStartedAt = Date.now(); }
 function startRound() {
   inRound = true;
+  itemHistoryCountAtRoundStart = state.itemStats?.[modeId]?.entries?.length ?? 0;
   lastSummary = null;
   feedback = 'Full-screen round started. Sort every glyph as fast as you can.';
   pausesRemaining = modeUpgrade('pauseCount');
@@ -333,11 +336,11 @@ function finishRound() {
   const final = Math.max(1, Number(finalElapsed.toFixed(2)));
   stopTimer();
   const before = state;
-  const priorMemory = before.gameMemory?.[modeId]?.entries ?? [];
   const activeBet = before.activeClubBet;
-  const percentile = percentileAtRun(final, priorMemory);
-  const nextState = settleRound(before, modeId, final, mistakes, board.seed, new Date().toISOString(), roundItemTimes);
+  const completedAt = new Date().toISOString();
+  const nextState = settleRound(before, modeId, final, mistakes, board.seed, completedAt, roundItemTimes, itemHistoryCountAtRoundStart);
   const event = nextState.eventLog.at(-1);
+  const percentile = nextState.gameMemory?.[modeId]?.entries?.findLast((entry) => entry.playedRound && entry.createdAt === completedAt)?.percentileAtRun ?? 0.5;
   state = nextState;
   save();
   lastSummary = {
@@ -487,7 +490,7 @@ function render() {
       ${debugHtml}
       <section class="panel mode-panel"><h2>Modes</h2><div class="mode-grid">${modeList.map((candidate) => `<button data-mode="${candidate.id}" class="${candidate.id === modeId ? 'selected' : ''}"><strong>${candidate.name}</strong><span>♠ ${modePayout(candidate.id)} · ♦ ${modePayout(candidate.id)}</span><span>${state.unlockedModes[candidate.id] ? 'Select' : canUnlockMode(state, candidate.id) ? `Unlock ♦${candidate.unlockCost}` : 'Locked'}</span></button>`).join('')}</div></section>
       <section class="lobby-layout"><section class="panel"><h2>Ready: ${mode.name}</h2><p>${board.queue.length} glyphs queued. Active directions: ${mode.directions.map((direction) => arrows[direction]).join(' ')}</p>${queueStripHtml()}<button id="start-round" class="primary-action">Start full-screen round</button><button id="new-board">New board</button><p class="feedback" role="status">${feedback}</p></section>
-      <section class="panel"><h2>♣ wager</h2><p class="hint">Harder times pay more. Locked propositions need more actual history in this mode. When goals tie, only the lowest payout is offered.</p><div class="target-list">${targets.map((offer) => `<button data-target="${offer.id}" class="${offer.id === selectedTarget ? 'selected' : ''}" ${offer.available ? '' : 'disabled'}><strong>${offer.label}</strong><span>Beat ${fmt(offer.timeSeconds)} / ≤${offer.mistakeLimit} errors</span><span>${offer.oddsLabel}</span><small>${escapeHtml(targetAvailabilityText(offer))}</small></button>`).join('')}</div><label class="stake-row">♣<input id="stake" type="number" min="${selectedTarget === 'half' ? 2 : 1}" step="${selectedTarget === 'half' ? 2 : 1}" value="${stake}"></label><button id="buy-bet" ${targets.find((offer) => offer.id === selectedTarget)?.available && !(selectedTarget === 'half' && stake % 2 !== 0) ? '' : 'disabled'}>Buy bet for ♦${stake}</button></section>
+      <section class="panel"><h2>♣ wager</h2><p class="hint">Harder times pay more. Locked propositions need more actual history in this mode. When goals tie, only the lowest payout is offered.</p><div class="target-list">${targets.map((offer) => `<button data-target="${offer.id}" class="${offer.id === selectedTarget ? 'selected' : ''}" ${offer.available ? '' : 'disabled'}><strong>${offer.label}</strong><span>Beat ${fmtDebugSeconds(offer.timeSeconds)} / ≤${offer.mistakeLimit} errors</span><span>${offer.oddsLabel}</span><small>${escapeHtml(targetAvailabilityText(offer))}</small></button>`).join('')}</div><label class="stake-row">♣<input id="stake" type="number" min="${selectedTarget === 'half' ? 2 : 1}" step="${selectedTarget === 'half' ? 2 : 1}" value="${stake}"></label><button id="buy-bet" ${targets.find((offer) => offer.id === selectedTarget)?.available && !(selectedTarget === 'half' && stake % 2 !== 0) ? '' : 'disabled'}>Buy bet for ♦${stake}</button></section>
       <section class="panel shop"><h2>♠ shop</h2><p class="hint">Current ${mode.name}: ♠ ${modePayout(modeId)} · ♦ before ♥ penalties.</p><button id="restore-heart">Restore ♥ ♦5</button><button id="buy-max-heart">+1 Max ♥ ♦${maxHeartCost(state.resources.maxHearts)}</button><button id="buy-global">+1 global ♠ ♦${spadeCost('global', state.upgrades.spades.global)}</button><button id="buy-mode">+1 mode ♠ ♦${spadeCost(modeId, state.upgrades.spades[modeId])}</button><button id="buy-item-median" ${hasModeBetHistory(state, modeId) ? '' : 'disabled'}>Meta-median item bonus Lv.${medianBonusLevel}: buy +♦${nextMedianBonus} per item target ♦${perItemMedianBonusCost(modeId, medianBonusLevel)}</button><small>${hasModeBetHistory(state, modeId) ? `Current item-target bonus: +♦${medianBonusLevel}; next upgrade pays +♦${nextMedianBonus} per item that beats the meta-median.` : 'Locked until you buy one ♣ bet in this mode.'}</small><button id="buy-study">+1s Study Time Lv.${modeUpgrade('studyTime')} ♦${studyTimeCost(modeUpgrade('studyTime'))}</button><button id="buy-pause-count">+1 Pause/Round Lv.${modeUpgrade('pauseCount')} ♦${pauseCountCost(modeUpgrade('pauseCount'))}</button><button id="buy-pause-length">+1s Pause Length Lv.${modeUpgrade('pauseLength')} ♦${pauseLengthCost(modeUpgrade('pauseLength'))}</button><button id="buy-queue-vision">Reveal +1 Queue Glyph Lv.${modeUpgrade('queueVision')} ♦${queueVisionCost(modeUpgrade('queueVision'))}</button><button id="buy-speed">Faster glyphs Lv.${modeUpgrade('animationSpeed')} ♦${animationSpeedCost(modeUpgrade('animationSpeed'))}</button>${mode.variant === 'standard' ? `<button id="buy-sorted-display" ${hasSortedItemDisplay(state, modeId) ? 'disabled' : ''}>Show sorted items ${hasSortedItemDisplay(state, modeId) ? 'owned' : `♦${sortedItemDisplayCost(modeId)}`}</button>` : ''}<button disabled>Choose/rearrange categories soon</button><button id="reset-save">Reset save</button></section></section>
     </main>`;
   root.querySelectorAll('[data-dispatch]').forEach((button) => button.addEventListener('click', () => dispatch(button.dataset.dispatch)));

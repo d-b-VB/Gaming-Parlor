@@ -39,8 +39,6 @@ export const BET_TIERS = [
   { id: 'ten', label: 'Tenfold', chance: 1 / 11, oddsMultiplier: 10, minHistory: 20, oddsLabel: '10:1' },
 ];
 export const STORAGE_KEY = 'gaming-parlor-state-v1';
-export const MEMORY_LIMIT = 2000;
-const TARGET_RECENT_ENTRY_LIMIT = 100;
 const CLUB_COST = 1;
 const HEART_RESTORE_COST = 5;
 const MAX_HEART_BASE_COST = 20;
@@ -135,15 +133,31 @@ function suppressDuplicateTargetTimes(targets) {
   const availableTimes = new Set();
   return targets.map((target) => {
     if (!target.available) return target;
-    if (!availableTimes.has(target.timeSeconds)) {
-      availableTimes.add(target.timeSeconds);
+    const displayedTime = target.timeSeconds.toFixed(2);
+    if (!availableTimes.has(displayedTime)) {
+      availableTimes.add(displayedTime);
       return target;
     }
     return { ...target, available: false, unavailableReason: 'duplicate-time' };
   });
 }
-export function estimateTargets(modeId, entries) { const mode = MODES[modeId]; const countableEntries = entries.filter((entry) => ['actual', 'rest'].includes(entry.entryType) && Number.isFinite(entry.timeSeconds)); const scoredEntries = countableEntries.map((entry, index) => ({ ...entry, runPercentile: Number.isFinite(entry.percentileAtRun) ? entry.percentileAtRun : percentileAtRun(entry.timeSeconds, countableEntries.slice(0, index)) })); const actualCount = scoredEntries.length; const recentEntries = scoredEntries.slice(-TARGET_RECENT_ENTRY_LIMIT);
-  const fallbackEven = mode.starterTargets[0].timeSeconds; const fallbackFactors = { half: 1.2, even: 1, double: 0.8, five: 0.65, ten: 0.55 }; const mistakeHistory = recentEntries.filter((entry) => Number.isFinite(entry.mistakes)).map((entry) => entry.mistakes).sort((a, b) => a - b); const mistakeLimitFor = (target) => mistakeHistory.length ? Math.max(0, Math.floor(quantile(mistakeHistory, target.chance))) : 0; if (actualCount < 5) return suppressDuplicateTargetTimes(BET_TIERS.map((target) => ({ ...target, timeSeconds: Math.max(1, Math.round(fallbackEven * fallbackFactors[target.id])), mistakeLimit: mistakeLimitFor(target), available: actualCount >= target.minHistory, actualCount }))); const sorted = recentEntries.map((entry) => entry.timeSeconds).sort((a, b) => a - b); const runPercentiles = recentEntries.map((entry) => entry.runPercentile).filter(Number.isFinite).sort((a, b) => a - b); return suppressDuplicateTargetTimes(BET_TIERS.map((target) => { const targetPercentile = runPercentiles.length ? quantile(runPercentiles, Math.max(0, Math.min(1, 1 - target.chance))) : target.chance; const timeQuantile = Math.max(0, Math.min(1, 1 - targetPercentile)); return { ...target, timeSeconds: Math.max(1, Math.round(quantile(sorted, timeQuantile))), targetPercentile, mistakeLimit: mistakeLimitFor(target), available: actualCount >= target.minHistory, actualCount }; })); }
+export function roundReferenceCurve(modeId, itemEntries = [], roundEntries = [], fallbackOverheadSeconds = null) {
+  const itemCount = modePromptCount(modeId);
+  const realItemTimes = itemEntries.filter((entry) => entry.entryType !== 'rest' && Number.isFinite(entry.timeSeconds)).map((entry) => entry.timeSeconds).sort((a, b) => a - b);
+  if (!realItemTimes.length) return { times: [], realItemCount: 0, replicationFactor: 0, windowCount: 0, overheadSeconds: 0 };
+  const replicationFactor = Math.max(1, Math.ceil((itemCount + 99) / realItemTimes.length));
+  const expanded = realItemTimes.flatMap((time) => Array(replicationFactor).fill(time));
+  const overheadHistory = roundEntries.filter((entry) => entry.playedRound && Number.isFinite(entry.roundOverheadSeconds)).map((entry) => entry.roundOverheadSeconds);
+  const overheadSeconds = overheadHistory.length ? median(overheadHistory) : Math.max(0, fallbackOverheadSeconds ?? 0);
+  const prefix = [0];
+  for (const time of expanded) prefix.push(prefix.at(-1) + time);
+  const times = [];
+  for (let start = 0; start + itemCount <= expanded.length; start += 1) times.push(roundScore(prefix[start + itemCount] - prefix[start] + overheadSeconds));
+  return { times, realItemCount: realItemTimes.length, replicationFactor, windowCount: times.length, overheadSeconds };
+}
+function scoreAgainstCurve(timeSeconds, curve, fallbackEntries = []) { return curve.times.length ? percentileAtRun(timeSeconds, curve.times.map((time) => ({ timeSeconds: time }))) : percentileAtRun(timeSeconds, fallbackEntries); }
+export function estimateTargets(modeId, entries, itemEntries = []) { const mode = MODES[modeId]; const countableEntries = entries.filter((entry) => ['actual', 'rest'].includes(entry.entryType) && Number.isFinite(entry.timeSeconds)); const scoredEntries = countableEntries.map((entry, index) => ({ ...entry, runPercentile: Number.isFinite(entry.percentileAtRun) ? entry.percentileAtRun : percentileAtRun(entry.timeSeconds, countableEntries.slice(0, index)) })); const actualCount = scoredEntries.length;
+  const fallbackEven = mode.starterTargets[0].timeSeconds; const fallbackFactors = { half: 1.2, even: 1, double: 0.8, five: 0.65, ten: 0.55 }; const mistakeHistory = scoredEntries.filter((entry) => Number.isFinite(entry.mistakes)).map((entry) => entry.mistakes).sort((a, b) => a - b); const mistakeLimitFor = (target) => mistakeHistory.length ? Math.max(0, Math.floor(quantile(mistakeHistory, target.chance))) : 0; if (actualCount < 5) return suppressDuplicateTargetTimes(BET_TIERS.map((target) => ({ ...target, timeSeconds: Math.max(1, roundScore(fallbackEven * fallbackFactors[target.id])), mistakeLimit: mistakeLimitFor(target), available: actualCount >= target.minHistory, actualCount }))); const curve = roundReferenceCurve(modeId, itemEntries, countableEntries); const conversionTimes = curve.times.length ? curve.times : scoredEntries.map((entry) => entry.timeSeconds).sort((a, b) => a - b); const runPercentiles = scoredEntries.map((entry) => entry.runPercentile).filter(Number.isFinite).sort((a, b) => a - b); return suppressDuplicateTargetTimes(BET_TIERS.map((target) => { const targetPercentile = runPercentiles.length ? quantile(runPercentiles, Math.max(0, Math.min(1, 1 - target.chance))) : target.chance; const timeQuantile = Math.max(0, Math.min(1, 1 - targetPercentile)); return { ...target, timeSeconds: Math.max(1, roundScore(quantile(conversionTimes, timeQuantile))), targetPercentile, mistakeLimit: mistakeLimitFor(target), available: actualCount >= target.minHistory, actualCount, referenceCurvePoints: curve.windowCount }; })); }
 function realRoundEntries(entries) { return entries.filter((entry) => ['actual', 'rest'].includes(entry.entryType) && Number.isFinite(entry.timeSeconds)); }
 function heartBenchmarkEntries(entries) { return realRoundEntries(entries); }
 export function heartSafety(modeId, entries) { const actual = heartBenchmarkEntries(entries).map((entry) => entry.timeSeconds); if (!actual.length) return Infinity; if (actual.length === 1) return Math.round(actual[0] * 2); const sorted = [...actual].sort((a, b) => a - b); if (actual.length === 2) return Math.round(sorted[1]); if (actual.length === 3) return Math.round(median(sorted)); if (actual.length === 4) return Math.round(sorted[2]); return Math.round(median(sorted)); }
@@ -154,7 +168,6 @@ function ensureRestTracking(next) {
   next.restTracking.awayBlock ??= 0;
   return next.restTracking;
 }
-function trimModeMemory(next, modeId) { next.gameMemory[modeId].entries = (next.gameMemory[modeId].entries ?? []).slice(-MEMORY_LIMIT); }
 function rebuildItemExtremes(stats) {
   const times = stats.entries.filter((entry) => Number.isFinite(entry.timeSeconds)).map((entry) => entry.timeSeconds);
   stats.fastestSeconds = times.length ? Math.min(...times) : null;
@@ -169,10 +182,11 @@ function addRestRecordForMode(next, restedModeId, activeModeId, createdAt) {
   const slowestTime = Math.max(...timedEntries.map((entry) => entry.timeSeconds));
   const mistakeEntries = timedEntries.filter((entry) => Number.isFinite(entry.mistakes));
   const highestMistakes = mistakeEntries.length ? Math.max(...mistakeEntries.map((entry) => entry.mistakes)) : 0;
-  entries.push({ timeSeconds: slowestTime, mistakes: highestMistakes, entryType: 'rest', restSource: 'mode_away_block', restedWhilePlaying: activeModeId, createdAt, percentileAtRun: percentileAtRun(slowestTime, entries) });
-  next.gameMemory[restedModeId].entries = entries.slice(-MEMORY_LIMIT);
-
   const stats = ensureItemStats(next, restedModeId);
+  const curve = roundReferenceCurve(restedModeId, stats.entries, entries);
+  entries.push({ timeSeconds: slowestTime, mistakes: highestMistakes, entryType: 'rest', restSource: 'mode_away_block', restedWhilePlaying: activeModeId, createdAt, percentileAtRun: scoreAgainstCurve(slowestTime, curve, entries) });
+  next.gameMemory[restedModeId].entries = entries;
+
   const seenItemIds = new Set();
   const sourceItems = stats.entries
     .filter((entry) => Number.isFinite(entry.timeSeconds))
@@ -188,7 +202,6 @@ function addRestRecordForMode(next, restedModeId, activeModeId, createdAt) {
     const percentileAtLoad = itemPercentileAtRun(item.timeSeconds, stats.entries);
     stats.entries.push({ itemId: item.itemId, timeSeconds: item.timeSeconds, createdAt, percentileAtRun: percentileAtLoad, entryType: 'rest', restSource: 'mode_away_block', restedWhilePlaying: activeModeId, sourceItemCreatedAt: item.createdAt });
   }
-  stats.entries = stats.entries.slice(-MEMORY_LIMIT);
   rebuildItemExtremes(stats);
   return true;
 }
@@ -226,15 +239,25 @@ export function betWeightedSyntheticTimes(totalTimeSeconds, itemTimes = [], entr
   return projections.slice(0, entryCount);
 }
 
-export function addRoundMemory(state, modeId, timeSeconds, createdAt, mistakes = 0, extraActualEntries = 0, extraMeta = {}, itemTimes = []) {
+export function addRoundMemory(state, modeId, timeSeconds, createdAt, mistakes = 0, extraActualEntries = 0, extraMeta = {}, itemTimes = [], itemHistoryCountAtRoundStart = null) {
   const next = structuredClone(state);
   next.gameMemory ??= {};
   next.gameMemory[modeId] ??= { entries: [] };
   ensureRestTracking(next);
   const entries = next.gameMemory[modeId].entries ?? [];
+  const allItemEntries = next.itemStats?.[modeId]?.entries ?? [];
+  const priorItemEntries = Number.isInteger(itemHistoryCountAtRoundStart) ? allItemEntries.slice(0, itemHistoryCountAtRoundStart) : allItemEntries;
+  const finiteItemTimes = itemTimes.filter(Number.isFinite);
+  const roundOverheadSeconds = Math.max(0, timeSeconds - finiteItemTimes.reduce((sum, value) => sum + value, 0));
+  let scoringCurve = roundReferenceCurve(modeId, priorItemEntries, entries);
+  if (!scoringCurve.times.length && finiteItemTimes.length) {
+    const bootstrapItems = finiteItemTimes.map((itemTime, index) => ({ itemId: `bootstrap-${index}`, timeSeconds: itemTime }));
+    scoringCurve = roundReferenceCurve(modeId, bootstrapItems, entries, roundOverheadSeconds);
+  }
+  const score = (candidateTime) => scoreAgainstCurve(candidateTime, scoringCurve, entries);
   const nonRestCount = entries.filter((entry) => entry.entryType !== 'rest').length;
   if (nonRestCount === 0 && itemTimes.length) {
-    for (const score of firstRoundCalibrationScores(timeSeconds, itemTimes, itemTimes.length)) entries.push({ timeSeconds: score.timeSeconds, mistakes, entryType: 'actual', temporary: true, calibrationSource: score.source, calibrationSources: score.sources, createdAt, percentileAtRun: percentileAtRun(score.timeSeconds, entries) });
+    for (const calibration of firstRoundCalibrationScores(timeSeconds, itemTimes, itemTimes.length)) entries.push({ timeSeconds: calibration.timeSeconds, mistakes, entryType: 'actual', temporary: true, calibrationSource: calibration.source, calibrationSources: calibration.sources, createdAt, percentileAtRun: score(calibration.timeSeconds), playedRound: calibration.source === 'actual_first_round', roundOverheadSeconds: calibration.source === 'actual_first_round' ? roundOverheadSeconds : undefined });
   } else {
     const temporaryIndexes = entries.map((entry, index) => ({ entry, index })).filter(({ entry }) => entry.temporary);
     if (temporaryIndexes.length) {
@@ -243,11 +266,10 @@ export function addRoundMemory(state, modeId, timeSeconds, createdAt, mistakes =
       const removeIndex = removalCandidates.reduce((slowest, candidate) => candidate.entry.timeSeconds > slowest.entry.timeSeconds ? candidate : slowest).index;
       entries.splice(removeIndex, 1);
     }
-    entries.push({ timeSeconds, mistakes, entryType: 'actual', createdAt, percentileAtRun: percentileAtRun(timeSeconds, entries) });
+    entries.push({ timeSeconds, mistakes, entryType: 'actual', createdAt, percentileAtRun: score(timeSeconds), playedRound: true, roundOverheadSeconds });
   }
   const weightedTimes = betWeightedSyntheticTimes(timeSeconds, itemTimes, extraActualEntries);
-  weightedTimes.forEach((weightedTimeSeconds, index) => entries.push({ timeSeconds: weightedTimeSeconds, sourceRoundTimeSeconds: timeSeconds, mistakes, entryType: 'actual', createdAt, percentileAtRun: percentileAtRun(weightedTimeSeconds, entries), weightedByBet: true, syntheticBetWeight: true, weightedIndex: index + 1, ...extraMeta }));
-  trimModeMemory(next, modeId);
+  weightedTimes.forEach((weightedTimeSeconds, index) => entries.push({ timeSeconds: weightedTimeSeconds, sourceRoundTimeSeconds: timeSeconds, mistakes, entryType: 'actual', createdAt, percentileAtRun: score(weightedTimeSeconds), weightedByBet: true, syntheticBetWeight: true, weightedIndex: index + 1, ...extraMeta }));
   addDueRestRecords(next, modeId, createdAt);
   return next;
 }
@@ -267,7 +289,7 @@ function ensureItemStats(next, modeId) {
   return next.itemStats[modeId];
 }
 export function itemPercentileAtRun(timeSeconds, entries) { if (!entries.length) return 0.5; return (entries.filter((entry) => entry.timeSeconds >= timeSeconds).length + 0.5) / (entries.length + 1); }
-export function itemTimingTargets(state, modeId) { const entries = state.itemStats?.[modeId]?.entries ?? []; if (!entries.length) return { fastestSeconds: null, medianSeconds: null, longestSeconds: null, metaMedianSeconds: null, eliteSeconds: null, metaMedianPercentile: null, count: 0 }; const times = entries.map((entry) => entry.timeSeconds); const sorted = [...times].sort((a, b) => a - b); const percentiles = entries.map((entry, index) => itemPercentileAtRun(entry.timeSeconds, entries.slice(0, index))).filter(Number.isFinite); const metaMedianPercentile = percentiles.length ? median(percentiles) : 0.5; const metaMedianSeconds = quantile(sorted, Math.max(0, Math.min(1, 1 - metaMedianPercentile))); const eliteSeconds = sorted[Math.floor(0.01 * (sorted.length - 1))]; return { fastestSeconds: Math.min(...times), medianSeconds: median(times), longestSeconds: Math.max(...times), metaMedianSeconds, eliteSeconds, metaMedianPercentile, count: entries.length }; }
+export function itemTimingTargets(state, modeId) { const entries = state.itemStats?.[modeId]?.entries ?? []; if (!entries.length) return { fastestSeconds: null, medianSeconds: null, longestSeconds: null, metaMedianSeconds: null, eliteSeconds: null, metaMedianPercentile: null, count: 0 }; const times = entries.map((entry) => entry.timeSeconds); const sorted = [...times].sort((a, b) => a - b); const percentiles = entries.map((entry, index) => Number.isFinite(entry.percentileAtRun) ? entry.percentileAtRun : itemPercentileAtRun(entry.timeSeconds, entries.slice(0, index))).filter(Number.isFinite); const metaMedianPercentile = percentiles.length ? median(percentiles) : 0.5; const metaMedianSeconds = quantile(sorted, Math.max(0, Math.min(1, 1 - metaMedianPercentile))); const eliteSeconds = sorted[Math.floor(0.01 * (sorted.length - 1))]; return { fastestSeconds: Math.min(...times), medianSeconds: median(times), longestSeconds: Math.max(...times), metaMedianSeconds, eliteSeconds, metaMedianPercentile, count: entries.length }; }
 export function itemSlowHeartThreshold(state, modeId, roundSlowHeartLossTimes = []) { const entries = state.itemStats?.[modeId]?.entries ?? []; if (!entries.length) return null; const mode = MODES[modeId]; const times = entries.map((entry) => entry.timeSeconds); const sorted = [...times].sort((a, b) => a - b); const medianTime = median(sorted); const meanTime = mean(times); const trimmedMeanTime = trimmedMean(times); const q1 = quantile(sorted, 0.25); const q3 = quantile(sorted, 0.75); const iqr = q3 - q1; const midhingeTime = (q1 + q3) / 2; const sd = standardDeviation(times); const targets = itemTimingTargets(state, modeId); const safeFloor = Math.max(meanTime, medianTime, trimmedMeanTime, midhingeTime, targets.metaMedianSeconds ?? 0); const desiredSlowHits = 1.25; const itemCount = mode.directions.length * mode.groupsPerDirection * mode.glyphsPerGroup; const modeTailPercentile = quantile(sorted, Math.max(0, Math.min(1, 1 - desiredSlowHits / itemCount))); const baselineCandidates = [2 * trimmedMeanTime, q3 + 1.5 * iqr, meanTime + 2 * sd, modeTailPercentile, Math.max(...times)]; const candidates = [...baselineCandidates, ...roundSlowHeartLossTimes].filter(Number.isFinite); return Math.max(safeFloor, median(candidates)); }
 export function settleItemTiming(state, modeId, itemId, timeSeconds, createdAt = new Date().toISOString(), roundSlowHeartLossTimes = []) {
   const next = structuredClone(state);
@@ -289,7 +311,7 @@ export function settleItemTiming(state, modeId, itemId, timeSeconds, createdAt =
   next.resources.hearts = Math.max(0, next.resources.hearts + heartsDelta);
   next.resources.diamonds += diamondsDelta;
   const event = { type: 'itemTiming', modeId, itemId, timeSeconds, createdAt, heartsDelta, diamondsDelta, slowThreshold, medianBonusDelta, eliteBonusDelta, isEliteItem, eliteThreshold: targets.eliteSeconds, metaMedianSeconds: targets.metaMedianSeconds, percentileAtRun, isNewFastest, isNewLongest };
-  next.eventLog = [...next.eventLog, event].slice(-50);
+  next.eventLog = [...next.eventLog, event];
   return { state: next, event };
 }
 export function buyClubBet(state, bet) { if (bet.stake <= 0) return { ...state, activeClubBet: null }; if (bet.oddsLabel === '1:2' && bet.stake % 2 !== 0) throw new Error('1:2 wagers must be paid in multiples of 2 Clubs'); if (state.resources.diamonds < bet.cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= bet.cost; next.activeClubBet = { ...bet, startingBank: state.resources.diamonds }; next.modeBetCounts ??= {}; next.modeBetCounts[bet.modeId] = (next.modeBetCounts[bet.modeId] ?? 0) + 1; return next; }
@@ -308,5 +330,5 @@ export function restoreHeart(state) { if (state.resources.hearts >= state.resour
 export function maxHeartCost(maxHearts) { return Math.ceil(MAX_HEART_BASE_COST * 2 ** Math.max(0, maxHearts - 5)); }
 export function buyMaxHeart(state) { const cost = maxHeartCost(state.resources.maxHearts); if (state.resources.diamonds < cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= cost; next.resources.maxHearts += 1; next.resources.hearts += 1; return next; }
 export function mistakePressure(entries, mistakes) { const actualMistakes = realRoundEntries(entries).filter((entry) => Number.isFinite(entry.mistakes)).map((entry) => entry.mistakes); if (!actualMistakes.length) return { medianMistakes: null, maxMistakes: null, heartsLost: 0, highMistakeRound: false, newWorstMistakeRound: false }; const medianMistakes = median(actualMistakes); const maxMistakes = Math.max(...actualMistakes); const highMistakeRound = mistakes >= medianMistakes + 2; const newWorstMistakeRound = mistakes > maxMistakes; return { medianMistakes, maxMistakes, highMistakeRound, newWorstMistakeRound, heartsLost: (highMistakeRound ? 1 : 0) + (newWorstMistakeRound ? 1 : 0) }; }
-export function settleRound(state, modeId, timeSeconds, mistakes, seed, createdAt = new Date().toISOString(), itemTimes = []) { const entries = state.gameMemory?.[modeId]?.entries ?? []; const safety = heartSafety(modeId, entries); const actual = heartBenchmarkEntries(entries).map((entry) => entry.timeSeconds); const newWorst = actual.length > 0 && timeSeconds > Math.max(...actual); const timeHeartsLost = timeSeconds > safety ? (newWorst ? 2 : 1) : 0; const mistakeResult = mistakePressure(entries, mistakes); const heartsLost = timeHeartsLost + mistakeResult.heartsLost; const basePayout = Math.max(0, payoutScore(state, modeId) + (heartsLost ? -1 : 0)); const activeBet = state.activeClubBet?.modeId === modeId ? state.activeClubBet : null; const betMistakesOk = !activeBet || !Number.isFinite(activeBet.mistakeLimit) || mistakes <= activeBet.mistakeLimit; const betProfit = activeBet ? Math.floor(activeBet.stake * activeBet.oddsMultiplier) : 0; const betWon = Boolean(activeBet && timeSeconds <= activeBet.targetSeconds && betMistakesOk); const betWinnings = betWon ? activeBet.stake + betProfit : 0; const betConfidenceWeight = betWon && activeBet.startingBank > 0 ? Math.floor(betProfit / activeBet.startingBank) : 0; const next = addRoundMemory(state, modeId, timeSeconds, createdAt, mistakes, betConfidenceWeight, { betWeighted: true, betProfit, startingBank: activeBet?.startingBank ?? 0, betConfidenceWeight }, itemTimes); next.resources.hearts = Math.max(0, next.resources.hearts - heartsLost); next.resources.diamonds += basePayout + betWinnings; next.activeClubBet = null; next.eventLog = [...(next.eventLog ?? []), { type: 'round', modeId, timeSeconds, mistakes, seed, createdAt, diamondsDelta: basePayout + betWinnings, heartsDelta: -heartsLost, timeHeartsLost, mistakeHeartsLost: mistakeResult.heartsLost, medianMistakes: mistakeResult.medianMistakes, maxMistakes: mistakeResult.maxMistakes, betMistakeLimit: activeBet?.mistakeLimit, betMistakesOk, betProfit, startingBank: activeBet?.startingBank ?? 0, betConfidenceWeight, betWinnings }].slice(-50); return next; }
+export function settleRound(state, modeId, timeSeconds, mistakes, seed, createdAt = new Date().toISOString(), itemTimes = [], itemHistoryCountAtRoundStart = null) { const entries = state.gameMemory?.[modeId]?.entries ?? []; const safety = heartSafety(modeId, entries); const actual = heartBenchmarkEntries(entries).map((entry) => entry.timeSeconds); const newWorst = actual.length > 0 && timeSeconds > Math.max(...actual); const timeHeartsLost = timeSeconds > safety ? (newWorst ? 2 : 1) : 0; const mistakeResult = mistakePressure(entries, mistakes); const heartsLost = timeHeartsLost + mistakeResult.heartsLost; const basePayout = Math.max(0, payoutScore(state, modeId) + (heartsLost ? -1 : 0)); const activeBet = state.activeClubBet?.modeId === modeId ? state.activeClubBet : null; const betMistakesOk = !activeBet || !Number.isFinite(activeBet.mistakeLimit) || mistakes <= activeBet.mistakeLimit; const betProfit = activeBet ? Math.floor(activeBet.stake * activeBet.oddsMultiplier) : 0; const betWon = Boolean(activeBet && timeSeconds <= activeBet.targetSeconds && betMistakesOk); const betWinnings = betWon ? activeBet.stake + betProfit : 0; const betConfidenceWeight = betWon && activeBet.startingBank > 0 ? Math.floor(betProfit / activeBet.startingBank) : 0; const next = addRoundMemory(state, modeId, timeSeconds, createdAt, mistakes, betConfidenceWeight, { betWeighted: true, betProfit, startingBank: activeBet?.startingBank ?? 0, betConfidenceWeight }, itemTimes, itemHistoryCountAtRoundStart); next.resources.hearts = Math.max(0, next.resources.hearts - heartsLost); next.resources.diamonds += basePayout + betWinnings; next.activeClubBet = null; next.eventLog = [...(next.eventLog ?? []), { type: 'round', modeId, timeSeconds, mistakes, seed, createdAt, diamondsDelta: basePayout + betWinnings, heartsDelta: -heartsLost, timeHeartsLost, mistakeHeartsLost: mistakeResult.heartsLost, medianMistakes: mistakeResult.medianMistakes, maxMistakes: mistakeResult.maxMistakes, betMistakeLimit: activeBet?.mistakeLimit, betMistakesOk, betProfit, startingBank: activeBet?.startingBank ?? 0, betConfidenceWeight, betWinnings }]; return next; }
 export function streakDuration(baseMs, streak) { return Math.round(baseMs * (1 - Math.min(0.45, Math.max(0, streak) * 0.03))); }

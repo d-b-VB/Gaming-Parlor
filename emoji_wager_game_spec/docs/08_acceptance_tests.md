@@ -52,7 +52,7 @@
 ## Economy, betting, and memory
 
 - Completion time is recorded as an actual memory entry for the selected mode.
-- Memory is not capped at 20 entries; the prototype retains long histories up to a high storage safety cap.
+- Round memory, item timing memory, and event history are never trimmed; all history remains available.
 - Mistake count is recorded on actual memory entries for the selected mode.
 - A round with at least 2 more mistakes than the prior median mistake count loses 1 Heart.
 - A round with more mistakes than the prior maximum mistake count loses 1 additional Heart.
@@ -64,8 +64,8 @@
 - Per-item payout upgrades use the speed corresponding to the median prior percentile-at-run value, not a fixed literal 50th-percentile time.
 - The center prompt shows item timing countdown clocks for fastest/elite and meta-median item records once item history exists, and does not show the red slowest timer.
 - The run's percentile against prior memory is recorded or derivable.
-- Target offers are generated from recent rest-adjusted performance percentile estimates or starter defaults.
-- Target estimates use recent meta-percentile performance windows so old data does not prevent the odds from reflecting player improvement.
+- Target offers are generated from full-history, curve-scored performance percentile estimates or starter defaults.
+- A current high-resolution curve built from all real item timings translates historical performance percentiles back into target times; item rests and wager multiples do not enter that curve.
 - Every Club target tier converts exactly fair break-even odds into a performance-percentile target with `chance = 1 / (oddsMultiplier + 1)`: 1:1 uses the median prior percentile, 1:2 uses a 2/3 break-even chance and therefore an easier lower percentile, and higher-profit bets use harder higher percentiles.
 - Target offers include a maximum mistake count rounded down toward zero mistakes when fractional.
 - A selected Club bet stores target time, odds, and stake.

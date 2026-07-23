@@ -16,7 +16,7 @@ Persist all player state to `localStorage`:
 - Other upgrade purchases.
 - Unlocked sorting modes.
 - Game memories per mode.
-- Individual-item timing stats per mode, including fastest item time, longest item time, and recent item timing entries.
+- Individual-item timing stats per mode, including fastest item time, longest item time, and complete item timing history.
 - Event log of completed rounds.
 
 The exact memory structure is an implementation concern, but it must support actual entries, rest entries, percentile-at-run tracking, probability-style target estimates, and item-level timing pressure events.

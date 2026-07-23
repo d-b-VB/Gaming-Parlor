@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { BET_TIERS, generateBoard, matchesSelector, estimateTargets, heartSafety, createClubBet, buyClubBet, canUnlockMode, settleRound, settleItemTiming, itemTimingTargets, itemPercentileAtRun, itemSlowHeartThreshold, firstRoundCalibrationScores, mistakePressure, unlockMode, buySpade, buyPerItemMedianBonus, buySortedItemDisplay, sortedItemDisplayCost, hasSortedItemDisplay, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, spadeCost, payoutScore, perItemMedianBonusCost, hasPerItemMedianBonus, streakDuration, betWeightedSyntheticTimes } from '../src/game/core.js';
+import { BET_TIERS, generateBoard, matchesSelector, estimateTargets, heartSafety, createClubBet, buyClubBet, canUnlockMode, settleRound, settleItemTiming, itemTimingTargets, itemPercentileAtRun, itemSlowHeartThreshold, firstRoundCalibrationScores, mistakePressure, unlockMode, buySpade, buyPerItemMedianBonus, buySortedItemDisplay, sortedItemDisplayCost, hasSortedItemDisplay, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, spadeCost, payoutScore, perItemMedianBonusCost, hasPerItemMedianBonus, streakDuration, betWeightedSyntheticTimes, roundReferenceCurve } from '../src/game/core.js';
 
 const items = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/items.json', import.meta.url))).items;
 const baseSelectors = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/category_selectors.json', import.meta.url))).selectors;
@@ -362,14 +362,78 @@ test('memory keeps long history and bet wins add profit-weighted entries', () =>
   assert.ok(weightedEntries[1].timeSeconds > weightedEntries[0].timeSeconds);
   assert.ok(weightedEntries[2].timeSeconds < weightedEntries[0].timeSeconds);
   assert.ok(weightedEntries.every((entry) => Number.isFinite(entry.percentileAtRun)));
+  const bootstrapCurve = roundReferenceCurve('sort_2', itemTimes.map((timeSeconds) => ({ timeSeconds })), state.gameMemory.sort_2.entries, 0);
+  assert.deepEqual(weightedEntries.map((entry) => entry.percentileAtRun), weightedEntries.map((entry) => bootstrapCurve.times.filter((time) => time >= entry.timeSeconds).length / bootstrapCurve.times.length));
 });
 
-test('target estimates use recent performance windows rather than all past speeds', () => {
+test('round and item timing histories are never trimmed', () => {
+  let state = structuredClone(defaultState);
+  state.eventLog = Array.from({ length: 50 }, (_, index) => ({ type: 'old-event', index }));
+  state.gameMemory.sort_2.entries = Array.from({ length: 2000 }, (_, index) => ({ timeSeconds: 100 + index, mistakes: 0, entryType: 'actual', createdAt: `round-${index}` }));
+  state = settleRound(state, 'sort_2', 50, 0, 'forever-round', 'forever-round');
+  assert.equal(state.gameMemory.sort_2.entries.length, 2001);
+  assert.equal(state.eventLog.length, 51);
+  state.itemStats.sort_2.entries = Array.from({ length: 2000 }, (_, index) => ({ itemId: `item-${index}`, timeSeconds: 1 + index / 100, createdAt: `item-${index}` }));
+  state.itemStats.sort_2.fastestSeconds = 1;
+  state.itemStats.sort_2.longestSeconds = 20.99;
+  const itemResult = settleItemTiming(state, 'sort_2', 'item-forever', 1.5, 'item-forever');
+  assert.equal(itemResult.state.itemStats.sort_2.entries.length, 2001);
+  assert.equal(itemResult.state.itemStats.sort_2.entries[0].itemId, 'item-0');
+  assert.equal(itemResult.state.eventLog.length, 52);
+});
+
+test('target estimates retain all historical performance rather than using a recent window', () => {
   const oldSlow = Array.from({ length: 150 }, (_, index) => ({ timeSeconds: 100 + index, mistakes: 4, entryType: 'actual', createdAt: `slow${index}` }));
   const recentFast = Array.from({ length: 100 }, (_, index) => ({ timeSeconds: 20 + (index % 5), mistakes: index % 2, entryType: 'actual', createdAt: `fast${index}` }));
-  const targets = estimateTargets('sort_2', [...oldSlow, ...recentFast]);
-  assert.ok(targets.find((target) => target.id === 'even').timeSeconds < 30);
-  assert.ok(targets.find((target) => target.id === 'ten').mistakeLimit <= 1);
+  const allHistoryTargets = estimateTargets('sort_2', [...oldSlow, ...recentFast]);
+  const recentOnlyTargets = estimateTargets('sort_2', recentFast);
+  assert.ok(allHistoryTargets.find((target) => target.id === 'even').timeSeconds > recentOnlyTargets.find((target) => target.id === 'even').timeSeconds);
+  assert.ok(allHistoryTargets.find((target) => target.id === 'ten').mistakeLimit >= recentOnlyTargets.find((target) => target.id === 'ten').mistakeLimit);
+});
+
+test('reference curves use real items only, retain all items, and provide at least 100 points', () => {
+  const items = Array.from({ length: 16 }, (_, index) => ({ itemId: `real-${index}`, timeSeconds: index + 1 }));
+  const rests = Array.from({ length: 16 }, (_, index) => ({ itemId: `rest-${index}`, timeSeconds: 100 + index, entryType: 'rest' }));
+  const rounds = [{ timeSeconds: 200, entryType: 'actual', playedRound: true, roundOverheadSeconds: 12 }];
+  const firstCurve = roundReferenceCurve('sort_2', [...items, ...rests], rounds);
+  assert.equal(firstCurve.realItemCount, 16);
+  assert.equal(firstCurve.replicationFactor, 8);
+  assert.equal(firstCurve.windowCount, 113);
+  assert.equal(firstCurve.overheadSeconds, 12);
+  const longHistory = Array.from({ length: 160 }, (_, index) => ({ itemId: `long-${index}`, timeSeconds: 1 + index / 100 }));
+  const longCurve = roundReferenceCurve('sort_2', longHistory, rounds);
+  assert.equal(longCurve.realItemCount, 160);
+  assert.equal(longCurve.replicationFactor, 1);
+  assert.equal(longCurve.windowCount, 145);
+});
+
+test('current reference curve translates stored performance percentiles into precise wager times', () => {
+  const history = Array.from({ length: 30 }, (_, index) => ({
+    timeSeconds: 80 - index,
+    percentileAtRun: (index + 1) / 31,
+    mistakes: 0,
+    entryType: 'actual',
+    playedRound: true,
+    roundOverheadSeconds: 10,
+  }));
+  const itemHistory = Array.from({ length: 160 }, (_, index) => ({ itemId: `curve-${index}`, timeSeconds: 0.5 + index / 100 }));
+  const targets = estimateTargets('sort_2', history, itemHistory);
+  assert.ok(targets.every((target) => target.referenceCurvePoints === 145));
+  assert.notEqual(targets.find((target) => target.id === 'five').timeSeconds, targets.find((target) => target.id === 'ten').timeSeconds);
+  assert.ok(targets.find((target) => target.id === 'ten').timeSeconds < targets.find((target) => target.id === 'five').timeSeconds);
+});
+
+test('a completed round is scored against the item curve captured before that round', () => {
+  const state = structuredClone(defaultState);
+  state.gameMemory.sort_2.entries = [{ timeSeconds: 16, mistakes: 0, entryType: 'actual', playedRound: true, roundOverheadSeconds: 0, percentileAtRun: 0.5, createdAt: 'prior-round' }];
+  state.itemStats.sort_2.entries = [
+    ...Array.from({ length: 16 }, (_, index) => ({ itemId: `prior-${index}`, timeSeconds: 1, createdAt: `prior-${index}` })),
+    ...Array.from({ length: 16 }, (_, index) => ({ itemId: `current-${index}`, timeSeconds: 100, createdAt: `current-${index}` })),
+  ];
+  const next = settleRound(state, 'sort_2', 1600, 0, 'current-round', 'current-round', Array(16).fill(100), 16);
+  const stored = next.gameMemory.sort_2.entries.find((entry) => entry.playedRound && entry.createdAt === 'current-round');
+  assert.equal(stored.percentileAtRun, 0);
+  assert.equal(stored.roundOverheadSeconds, 0);
 });
 
 

@@ -6,7 +6,7 @@ For sorting, lower time is better.
 
 ## Game memory
 
-Each sorting mode keeps a long performance memory.  The prototype may use a high safety cap such as 2,000 entries per mode for localStorage practicality, but gameplay odds should not be designed around a tiny fixed memory such as 20 entries.
+Each sorting mode keeps its complete performance memory.  Round records, item timing records, and event history are never trimmed, and target calculations use the full statistical history.
 
 Each memory entry should include enough information to support future probability estimates, for example:
 
@@ -17,7 +17,7 @@ Each memory entry should include enough information to support future probabilit
 - `percentileAtRun`, if available after the run is scored against the prior memory.
 - round metadata such as mistakes, seed, selected Club target, and active upgrades when useful.
 
-The exact persisted structure is an implementation concern, but it must support probability-style target estimation from recent rest-adjusted performance percentiles rather than a hard-coded 25th percentile Club line or a speed target averaged across all historical data.
+The exact persisted structure is an implementation concern, but it must support probability-style target estimation from the full history of curve-scored, rest- and wager-adjusted performance percentiles rather than a hard-coded 25th percentile Club line.
 
 Actual entries come from completed rounds.  Rest entries are artificial easing entries applied to unlocked modes with existing records while the player completes full rounds in other modes.
 
@@ -25,12 +25,12 @@ Actual entries come from completed rounds.  Rest entries are artificial easing e
 
 When the player completes game mode `G` with time `T`:
 
-1. Score `T` against `G`'s pre-round memory and record the percentile outcome for the run.
+1. Score `T` against `G`'s pre-round item-derived reference curve and record the percentile outcome for the run.
 2. Add an `actual` memory entry with time `T` to game `G`.
 3. If this completion begins or continues an away block for other unlocked modes with existing timed records, add at most one `rest` entry per away block to each such non-active mode.  For example, a block of several 3-way rounds after 2-way play gives 2-way one rest, not one rest per 3-way round.
 4. A round-level rest uses the rested mode's slowest current round time and highest current mistake count, counting any timed actual, temporary calibration, or prior rest entry that is still present and excluding bet-weighted duplicates.
 5. An item-level rest also copies up to the rested mode's 16/24/32 slowest item timing records for 2-/3-/4-way sort, allowing each item id at most once in that rest set.  This uniqueness rule applies even when prior rests are among the slowest records, preventing stacked rests from filling a set with descendants of one unusually slow item.  Preserve item ids when present, mark the new entries as `rest`, and compute each percentile at the time the rest is loaded against the current item timing history.
-6. Keep long memory history, trimming only to a high storage safety cap if needed.
+6. Keep all round and item timing history permanently; do not use a recent-entry window or trim old statistical records.
 
 ## Item timing pressure
 
@@ -79,7 +79,7 @@ For the first prototype, generate five pre-round target offers with harder times
 - **5:1** long-shot proposition.
 - **10:1** extreme proposition.
 
-Lower target times must have higher payouts.  A proposition should only become available once that mode has enough timed history, including first-round pseudo-scores, rests, and bet-weighted duplicate entries, to statistically justify showing the odds.  The UI may show unavailable propositions as locked, with the required history count.  Betting targets should use meta-percentile performance with exactly fair break-even chance levels from the displayed profit odds: `chance = 1 / (oddsMultiplier + 1)`.  Record each round's percentile-at-run, choose the percentile implied by that fair chance level (1:1 uses the median percentile, 1:2 uses a 2/3 break-even chance and therefore an easier lower percentile, and higher-profit bets use harder higher percentiles), then convert that percentile back into a current target time.  Because improving players often beat the raw median more than half the time, even conservative Club targets can be faster than the Heart safety median.  If two or more offers resolve to the same displayed whole-second target, only the lowest-payout offer at that time is available; the higher-payout duplicates remain visible but locked.  The UI should frame these as estimates, not guarantees.
+Lower target times must have higher payouts.  A proposition should only become available once that mode has enough timed history, including first-round pseudo-scores, rests, and bet-weighted entries, to statistically justify showing the odds.  The UI may show unavailable propositions as locked, with the required history count.  Betting targets should use meta-percentile performance with exactly fair break-even chance levels from the displayed profit odds: `chance = 1 / (oddsMultiplier + 1)`.  Build each mode's current reference curve from every real item timing record, excluding item rests and wager multiples.  Sort those item times, uniformly repeat every time during early history only enough to generate at least 100 windows, and sum every overlapping 16/24/32-item window.  Add the median non-item overhead observed across all genuinely played rounds; round rests and wager multiples do not alter this curve.  Score each actual round, round rest, calibration score, and bet-weighted entry against the curve current when that entry is inserted, preserving that percentile forever.  Choose the historical performance percentile implied by the fair chance level (1:1 uses the median performance percentile, 1:2 uses a 2/3 break-even chance and therefore an easier lower percentile, and higher-profit bets use harder higher percentiles), then translate that percentile through the current high-resolution reference curve.  Use all stored percentile history, never only a recent window.  If two or more offers still resolve to the same displayed hundredth-second target, only the lowest-payout offer at that time is available; the higher-payout duplicates remain visible but locked.  The UI should frame these as estimates, not guarantees.
 
 ## Heart safety threshold
 
@@ -151,7 +151,7 @@ else:
   diamondWinnings = 0
 ```
 
-The Club purchase cost is paid before the round.  On a winning bet, return the stake plus the odds profit.  For the 1:2 proposition, only accept stakes in multiples of 2; for example, a 4-Club stake returns the 4-Club stake plus 2 Diamonds of profit when it wins.  The odds should increase as the target becomes harder to beat.  Mistake targets should be estimated from prior mistake counts for the same mode, including rests and bet-weighted synthetic entries.  Easier odds may allow more mistakes, while harder odds should trend toward zero mistakes.  If an estimate lands between two mistake counts, round down toward zero so the player must meet the stricter mistake target.  On a winning bet, compute net bet profit, divide it by the player's starting bank before the stake purchase, round down, and add that many extra actual memory entries for the winning performance and mistakes.  These bet-weighted entries should not be identical duplicates: keep the actual round as the central real entry, then generate synthetic whole-round scores from that round's overhead-adjusted item times, starting with the median item projection and alternating next-slower / next-faster item projections.  Calculate percentile-at-run for those synthetic entries in insertion order.  This makes high-bankroll, high-odds wins count as stronger evidence of true performance without creating flat repeated-value plateaus that collapse multiple Club targets to the same time.  Rest entries should persist in the target-estimation window as a counterweight to those fast weighted wins, so rotating away from a mode can still cool expectations.
+The Club purchase cost is paid before the round.  On a winning bet, return the stake plus the odds profit.  For the 1:2 proposition, only accept stakes in multiples of 2; for example, a 4-Club stake returns the 4-Club stake plus 2 Diamonds of profit when it wins.  The odds should increase as the target becomes harder to beat.  Mistake targets should be estimated from the full prior mistake history for the same mode, including rests and bet-weighted synthetic entries.  Easier odds may allow more mistakes, while harder odds should trend toward zero mistakes.  If an estimate lands between two mistake counts, round down toward zero so the player must meet the stricter mistake target.  On a winning bet, compute net bet profit, divide it by the player's starting bank before the stake purchase, round down, and add that many extra actual memory entries for the winning performance and mistakes.  These bet-weighted entries should not be identical duplicates: keep the actual round as the central real entry, then generate synthetic whole-round scores from that round's overhead-adjusted item times, starting with the median item projection and alternating next-slower / next-faster item projections.  Score the actual round and every weighted entry against the same pre-round reference curve rather than allowing the wager multiples to redefine their own benchmark.  This makes high-bankroll, high-odds wins count as stronger evidence of reproducible performance while a later ordinary run is still judged against real item-speed history.  Round rests likewise receive low percentile scores without changing the curve used to judge the next actual run.
 
 ## Purchases and upgrades
 
