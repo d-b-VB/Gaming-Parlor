@@ -1,8 +1,8 @@
-import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, itemPercentileAtRun, createClubBet, buyClubBet, unlockMode, canUnlockMode, buySpade, buyPerItemMedianBonus, buySortedItemDisplay, restoreHeart, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, sortedItemDisplayCost, hasSortedItemDisplay, settleRound, settleItemTiming, itemTimingTargets, roundReferenceCurve, spadeCost, payoutScore, perItemMedianBonusCost, hasModeBetHistory, streakDuration } from './game/core.js?v=0.3.1';
+import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, itemPercentileAtRun, createClubBet, buyClubBet, unlockMode, canUnlockMode, isModeVisible, buySpade, buyPerItemMedianBonus, buySortedItemDisplay, restoreHeart, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, buyMultiSelect, multiSelectCost, multiSelectCapacity, sortedItemDisplayCost, hasSortedItemDisplay, settleRound, settleItemTiming, itemTimingTargets, roundReferenceCurve, spadeCost, payoutScore, perItemMedianBonusCost, hasModeBetHistory, streakDuration } from './game/core.js?v=0.4.0';
 
 const root = document.querySelector('#root');
-const APP_VERSION = 'v0.3.1';
-const SAVE_SCHEMA_VERSION = '0.3.1-local';
+const APP_VERSION = 'v0.4.0';
+const SAVE_SCHEMA_VERSION = '0.4.0-local';
 const arrows = { left: '←', right: '→', up: '↑', down: '↓' };
 let items = [];
 let selectors = [];
@@ -38,6 +38,7 @@ let debugOpen = false;
 let categoryAssignments = {};
 let sortedByGroup = {};
 let itemHistoryCountAtRoundStart = 0;
+let selectedItemIds = new Set();
 
 function fmt(seconds) {
   return `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
@@ -55,7 +56,9 @@ function makeLocalSaveId() {
 function normalizeSave(candidate, defaultState) {
   const next = structuredClone(candidate || defaultState);
   next.itemStats ??= {};
+  next.unlockedModes ??= {};
   for (const id of Object.keys(MODES)) {
+    next.unlockedModes[id] ??= id === 'sort_2';
     next.itemStats[id] ??= { fastestSeconds: null, longestSeconds: null, entries: [] };
     next.itemStats[id].entries ??= [];
     next.gameMemory ??= {};
@@ -68,7 +71,7 @@ function normalizeSave(candidate, defaultState) {
   next.upgrades.perItemMedianBonus ??= {};
   next.upgrades.sortedItemDisplay ??= {};
   next.modeBetCounts ??= {};
-  for (const key of ['animationSpeed', 'studyTime', 'pauseCount', 'pauseLength', 'queueVision']) {
+  for (const key of ['animationSpeed', 'studyTime', 'pauseCount', 'pauseLength', 'queueVision', 'multiSelect']) {
     const prior = typeof next.upgrades[key] === 'number' ? next.upgrades[key] : 0;
     if (typeof next.upgrades[key] !== 'object' || next.upgrades[key] === null) next.upgrades[key] = {};
     for (const id of Object.keys(MODES)) next.upgrades[key][id] ??= id === 'sort_2' ? prior : 0;
@@ -122,6 +125,7 @@ function heartsHtml() {
   return `<span class="hearts" aria-label="${state.resources.hearts} of ${state.resources.maxHearts} hearts">${Array.from({ length: state.resources.maxHearts }, (_, index) => `<span class="heart ${index < state.resources.hearts ? 'full' : 'empty'}">${index < state.resources.hearts ? '♥' : '♥'}</span>`).join('')}</span>`;
 }
 function queueStripHtml() {
+  if (MODES[modeId].interaction === 'multi') return `<div class="batch-status">Selected ${selectedItemIds.size}/${multiSelectCapacity(state, modeId)} · ${queue.length} left</div>`;
   const visibleAhead = modeUpgrade('queueVision');
   return `<div class="queue-strip" style="--queue-total:${board.queue.length}" aria-label="Prompt queue">${queue.map((prompt, index) => {
     const revealed = index === 0 || index <= visibleAhead || prompt.revealed;
@@ -200,6 +204,7 @@ function startBoard(nextMode = modeId) {
   roundSlowHeartLossTimes = [];
   categoryAssignments = {};
   sortedByGroup = {};
+  selectedItemIds = new Set();
   feedback = 'Board ready. Buy ♣ if you want odds, then start the full-screen round.';
   stopTimer();
   render();
@@ -393,7 +398,9 @@ function recordSortedPrompt(prompt, direction, decision) {
 }
 function groupSlotHtml(group, showExamples) {
   const sorted = sortedByGroup[group.id] ?? [];
-  const content = showExamples ? group.items.map((item) => glyphHtml(item)).join('') : sorted.map((item) => glyphHtml(item)).join('');
+  const examples = showExamples ? group.items.map((item) => glyphHtml(item)).join('') : '';
+  const sortedItems = sorted.map((item) => glyphHtml(item)).join('');
+  const content = `${examples}${showExamples && !hasSortedItemDisplay(state, modeId) ? '' : sortedItems}`;
   return `<span class="glyph-group ${content ? '' : 'mystery-group'}">${content || '◆ ◆ ◆ ◆'}</span>`;
 }
 function groupsForZone(direction) {
@@ -408,8 +415,76 @@ function sideZoneHtml(direction) {
   const slots = groupsForZone(direction).map((group) => group.open ? '<span class="glyph-group mystery-group">◆ ◆ ◆ ◆</span>' : groupSlotHtml(group, showExamples)).join('');
   return `<button class="zone zone-${direction}" data-dispatch="${direction}"><span class="direction">${arrows[direction]}</span><span class="groups vertical-groups">${slots}</span></button>`;
 }
+function pileStacks() {
+  const looseItems = queue.filter((prompt) => !selectedItemIds.has(prompt.item.id));
+  const stackCount = Math.max(1, Math.min(8, Math.ceil(Math.sqrt(looseItems.length))));
+  const stacks = Array.from({ length: stackCount }, () => []);
+  looseItems.forEach((prompt, index) => stacks[index % stackCount].push(prompt));
+  return stacks;
+}
+function multiPileHtml() {
+  const stacks = pileStacks();
+  const capacity = multiSelectCapacity(state, modeId);
+  const held = queue.filter((prompt) => selectedItemIds.has(prompt.item.id));
+  return `<div class="held-items" aria-label="Selected items">${held.map((prompt) => `<button class="pile-item held selected" data-select-item="${escapeHtml(prompt.item.id)}" aria-pressed="true">${glyphHtml(prompt.item)}</button>`).join('')}</div><div class="item-pile" style="--pile-columns:${stacks.length}" aria-label="All remaining items">${stacks.map((stack, stackIndex) => stack.map((prompt, depth) => {
+    const isTop = depth === stack.length - 1;
+    return `<button class="pile-item ${isTop ? 'top' : 'covered'}" data-select-item="${escapeHtml(prompt.item.id)}" ${isTop ? '' : 'disabled'} style="--stack:${stackIndex};--depth:${depth};--pile-x:${(depth % 3) * 3}px;--pile-rotate:${((depth % 5) - 2) * 2}deg;z-index:${depth + 1}" aria-pressed="false">${glyphHtml(prompt.item)}</button>`;
+  }).join('')).join('')}</div><span class="pile-caption">Pick up to ${capacity}, then choose a direction</span>`;
+}
+function multiBatchDecision(prompts, direction) {
+  const mode = MODES[modeId];
+  if (mode.variant !== 'freeform') return { isCorrect: prompts.every((prompt) => prompt.direction === direction), assignments: {} };
+  const assignments = {};
+  const newGroups = new Set();
+  for (const prompt of prompts) {
+    const assigned = categoryAssignments[prompt.groupId];
+    if (assigned && assigned !== direction) return { isCorrect: false, assignments: {} };
+    if (!assigned) newGroups.add(prompt.groupId);
+  }
+  const available = mode.groupsPerDirection - assignedGroupsForDirection(direction).length;
+  if (newGroups.size > available) return { isCorrect: false, assignments: {} };
+  newGroups.forEach((groupId) => { assignments[groupId] = direction; });
+  return { isCorrect: true, assignments };
+}
+async function dispatchMulti(direction) {
+  const prompts = queue.filter((prompt) => selectedItemIds.has(prompt.item.id));
+  if (!prompts.length) { feedback = 'Select at least one top item first.'; render(); return; }
+  if (studying) { studying = false; studyEndsAt = null; ensureTimer(); resetPromptClock(); }
+  ensureTimer();
+  const decision = multiBatchDecision(prompts, direction);
+  const batchSeconds = promptStartedAt ? Math.max(0.01, Number(((Date.now() - promptStartedAt) / 1000).toFixed(2))) : 0;
+  motion = { busy: true };
+  feedback = decision.isCorrect ? `${prompts.length} items flying ${arrows[direction]}…` : 'The batch did not all belong there. Everything returns to the pile.';
+  render();
+  await Promise.all(prompts.map((prompt) => animateGlyphTravel(glyphHtml(prompt.item), direction, decision.isCorrect)));
+  if (decision.isCorrect) {
+    Object.assign(categoryAssignments, decision.assignments);
+    const effectiveItemSeconds = Math.max(0.01, Number((batchSeconds / prompts.length).toFixed(2)));
+    for (const prompt of prompts) {
+      recordSortedPrompt(prompt, direction, { assignDirection: decision.assignments[prompt.groupId] });
+      const result = settleItemTiming(state, modeId, prompt.item.id, effectiveItemSeconds, new Date().toISOString(), roundSlowHeartLossTimes);
+      state = result.state;
+      if (result.event.heartsDelta < 0) { itemHeartLosses += Math.abs(result.event.heartsDelta); roundSlowHeartLossTimes.push(effectiveItemSeconds); }
+      if (result.event.diamondsDelta > 0) itemDiamondBonuses += result.event.diamondsDelta;
+      if (result.event.isNewFastest || result.event.isNewLongest) itemRecordCount += 1;
+      roundItemTimes.push(effectiveItemSeconds);
+    }
+    queue = queue.filter((prompt) => !selectedItemIds.has(prompt.item.id));
+    streak += prompts.length;
+    save();
+    feedback = `${prompts.length} items sorted in ${batchSeconds.toFixed(2)}s (${effectiveItemSeconds.toFixed(2)}s each).`;
+  } else {
+    mistakes += 1;
+    streak = 0;
+  }
+  selectedItemIds.clear();
+  motion = null;
+  resetPromptClock();
+  if (queue.length === 0) finishRound(); else render();
+}
 async function dispatch(direction) {
   const mode = MODES[modeId];
+  if (mode.interaction === 'multi') { if (!motion && !paused && inRound && mode.directions.includes(direction)) await dispatchMulti(direction); return; }
   if (motion || paused || !inRound || !queue[0] || !mode.directions.includes(direction)) return;
   if (studying) {
     studying = false;
@@ -467,6 +542,7 @@ function buyBet() {
 function render() {
   const mode = MODES[modeId];
   const targets = currentTargets();
+  if (!targets.find((target) => target.id === selectedTarget)?.available) selectedTarget = targets.find((target) => target.available)?.id ?? selectedTarget;
   const safety = heartSafety(modeId, state.gameMemory[modeId].entries);
   const current = queue[0];
   const progress = board.queue.length - queue.length;
@@ -474,8 +550,11 @@ function render() {
   const pauseLeft = paused ? Math.max(0, (pauseEndsAt - Date.now()) / 1000) : 0;
   const medianBonusLevel = state.upgrades.perItemMedianBonus[modeId] ?? 0;
   const nextMedianBonus = medianBonusLevel + 1;
+  const centerHtml = mode.interaction === 'multi'
+    ? `<div class="center-card multi-center ${motion ? 'busy' : ''}">${current ? itemTimerHtml() : ''}${current ? multiPileHtml() : '<span class="prompt">🏁</span>'}</div>`
+    : `<div class="center-card ${motion ? 'busy' : ''}">${current ? itemTimerHtml() : ''}<span class="prompt ${motion ? 'ghost-prompt' : ''}">${current ? glyphHtml(current.item) : '🏁'}</span><span>${current ? `${progress}/${board.queue.length} sorted` : 'Round finished'}</span></div>`;
   const boardHtml = `<div class="play-hud"><div class="status-row"><span>⏱ ${elapsed.toFixed(1)}s</span><span>${heartsHtml()}</span><span>Queue ${queue.length}/${board.queue.length}</span><span>Streak ${streak}</span><span>Study ${studying ? studyLeft.toFixed(1) : '—'}</span><span>Pause ${paused ? pauseLeft.toFixed(1) : pausesRemaining}</span><button id="pause-round" ${inRound && !studying && !paused && pausesRemaining > 0 ? '' : 'disabled'}>Pause</button><span>Item ♦${itemDiamondBonuses} / ♥-${itemHeartLosses}</span></div>${barsHtml(safety, state.activeClubBet, inRound && queue.length === 1)}</div>
-      <div class="sort-board framed-board mode-${mode.directions.length}">${mode.directions.map(sideZoneHtml).join('')}<div class="center-card ${motion ? 'busy' : ''}">${current ? itemTimerHtml() : ''}<span class="prompt ${motion ? 'ghost-prompt' : ''}">${current ? glyphHtml(current.item) : '🏁'}</span><span>${current ? `${progress}/${board.queue.length} sorted` : 'Round finished'}</span></div></div><p class="feedback" role="status">${feedback}</p>`;
+      <div class="sort-board framed-board mode-${mode.directions.length} ${mode.interaction === 'multi' ? 'multi-board' : ''}">${mode.directions.map(sideZoneHtml).join('')}${centerHtml}</div><p class="feedback" role="status">${feedback}</p>`;
   const debugHtml = debugRecordsHtml(targets, safety);
   const summaryHtml = lastSummary ? `<section class="panel post-round"><h2>Round summary</h2><div class="summary-grid"><span>Mode</span><strong>${lastSummary.modeName}</strong><span>Time</span><strong>${lastSummary.timeSeconds.toFixed(2)}s</strong><span>Percentile score</span><strong>${Math.round(lastSummary.percentile * 100)}%</strong><span>Mistakes</span><strong>${lastSummary.mistakes}</strong><span>♦ payout</span><strong>♦ ${lastSummary.diamondsDelta}</strong><span>Item speed bonus</span><strong>♦ ${lastSummary.itemDiamondBonuses}</strong><span>♥ change</span><strong>${lastSummary.heartsDelta} round / -${lastSummary.itemHeartLosses} item</strong><span>Mistake pressure</span><strong>${lastSummary.mistakeHeartsLost ? `-${lastSummary.mistakeHeartsLost} ♥` : 'Safe'}${Number.isFinite(lastSummary.medianMistakes) ? ` · median ${lastSummary.medianMistakes}` : ''}</strong><span>Item records</span><strong>${lastSummary.itemRecordCount}</strong><span>Bet result</span><strong>${lastSummary.betTarget ? `${lastSummary.betWon ? 'Won' : 'Lost'} vs ${fmt(lastSummary.betTarget)} / ≤${lastSummary.betMistakeLimit} errors (${lastSummary.betWinnings ? `♦ ${lastSummary.betWinnings}, +${lastSummary.betConfidenceWeight} memory` : 'no payout'})` : 'No bet'}</strong></div><button id="continue-lobby" class="primary-action">Continue</button></section>` : '';
   root.innerHTML = inRound ? `
@@ -487,15 +566,24 @@ function render() {
       <div class="version-banner"><span>Emoji Wager Sort ${APP_VERSION}</span><span>Between rounds</span><button id="toggle-debug" class="debug-toggle">${debugOpen ? 'Hide debug records' : 'Show debug records'}</button></div>
       <header class="hero"><div><p class="eyebrow">Gaming Parlor</p><h1>Emoji Wager Sort</h1><p>Set your mode, shop, and bet here. When the round starts, sorting takes the whole screen.</p><p class="save-scope">Save ${escapeHtml(state.saveMeta.localSaveId)} is local to this browser profile. If another device looks identical, it is probably still on the seeded starter stats unless you imported or synced site data outside the game.</p></div><div class="resources"><span>${heartsHtml()}</span><span>♦ ${state.resources.diamonds}</span><span>♠ ${modePayout(modeId)} · ♦ ${modePayout(modeId)}</span></div></header>
       ${summaryHtml}
+      <section class="play-launch panel"><p class="eyebrow">Ready now</p><h2>${mode.name}</h2><p>${board.queue.length} items · ${mode.directions.map((direction) => arrows[direction]).join(' ')}</p><button id="start-round" class="primary-action giant-play">PLAY</button><p class="feedback" role="status">${feedback}</p></section>
+      <section class="control-drawers">
+        <details class="panel"><summary>Game Modes</summary><div class="mode-grid">${modeList.filter((candidate) => isModeVisible(state, candidate.id)).map((candidate) => `<button data-mode="${candidate.id}" class="${candidate.id === modeId ? 'selected' : ''}"><strong>${candidate.name}</strong><span>♠ ${modePayout(candidate.id)} · ♦ ${modePayout(candidate.id)}</span><span>${state.unlockedModes[candidate.id] ? 'Select' : `Unlock ♦${candidate.unlockCost}`}</span></button>`).join('')}</div><button id="new-board">New board</button></details>
+        <details class="panel"><summary>♣ Wagers</summary>${targets.some((offer) => offer.available) ? `<div class="target-list">${targets.filter((offer) => offer.available).map((offer) => `<button data-target="${offer.id}" class="${offer.id === selectedTarget ? 'selected' : ''}"><strong>${offer.label}</strong><span>Beat ${fmtDebugSeconds(offer.timeSeconds)} / ≤${offer.mistakeLimit} errors</span><span>${offer.oddsLabel}</span></button>`).join('')}</div><label class="stake-row">♣<input id="stake" type="number" min="${selectedTarget === 'half' ? 2 : 1}" step="${selectedTarget === 'half' ? 2 : 1}" value="${stake}"></label><button id="buy-bet" ${targets.find((offer) => offer.id === selectedTarget)?.available && !(selectedTarget === 'half' && stake % 2 !== 0) ? '' : 'disabled'}>Buy bet for ♦${stake}</button>` : '<p>Complete more rounds in this mode to reveal wagers.</p>'}</details>
+        <details class="panel"><summary>♠ Upgrades</summary><div class="shop"><p class="hint">Current ${mode.name}: ♠ ${modePayout(modeId)} · ♦ before ♥ penalties.</p>${state.resources.hearts < state.resources.maxHearts ? '<button id="restore-heart">Restore ♥ ♦5</button>' : ''}<button id="buy-max-heart">+1 Max ♥ ♦${maxHeartCost(state.resources.maxHearts)}</button><button id="buy-global">+1 global ♠ ♦${spadeCost('global', state.upgrades.spades.global)}</button><button id="buy-mode">+1 mode ♠ ♦${spadeCost(modeId, state.upgrades.spades[modeId])}</button>${hasModeBetHistory(state, modeId) ? `<button id="buy-item-median">Meta-median item bonus Lv.${medianBonusLevel}: buy +♦${nextMedianBonus} per item target ♦${perItemMedianBonusCost(modeId, medianBonusLevel)}</button>` : ''}<button id="buy-study">+1s Study Time Lv.${modeUpgrade('studyTime')} ♦${studyTimeCost(modeUpgrade('studyTime'))}</button><button id="buy-pause-count">+1 Pause/Round Lv.${modeUpgrade('pauseCount')} ♦${pauseCountCost(modeUpgrade('pauseCount'))}</button><button id="buy-pause-length">+1s Pause Length Lv.${modeUpgrade('pauseLength')} ♦${pauseLengthCost(modeUpgrade('pauseLength'))}</button>${mode.interaction === 'single' ? `<button id="buy-queue-vision">Reveal +1 Queue Glyph Lv.${modeUpgrade('queueVision')} ♦${queueVisionCost(modeUpgrade('queueVision'))}</button>` : `<button id="buy-multi-select">Hold ${multiSelectCapacity(state, modeId) + 1} items ♦${multiSelectCost(modeUpgrade('multiSelect'))}</button>`}<button id="buy-speed">Faster glyphs Lv.${modeUpgrade('animationSpeed')} ♦${animationSpeedCost(modeUpgrade('animationSpeed'))}</button>${mode.variant === 'standard' && mode.interaction === 'single' && !hasSortedItemDisplay(state, modeId) ? `<button id="buy-sorted-display">Show sorted items ♦${sortedItemDisplayCost(modeId)}</button>` : ''}<button id="reset-save">Reset save</button></div></details>
+      </section>
       ${debugHtml}
-      <section class="panel mode-panel"><h2>Modes</h2><div class="mode-grid">${modeList.map((candidate) => `<button data-mode="${candidate.id}" class="${candidate.id === modeId ? 'selected' : ''}"><strong>${candidate.name}</strong><span>♠ ${modePayout(candidate.id)} · ♦ ${modePayout(candidate.id)}</span><span>${state.unlockedModes[candidate.id] ? 'Select' : canUnlockMode(state, candidate.id) ? `Unlock ♦${candidate.unlockCost}` : 'Locked'}</span></button>`).join('')}</div></section>
-      <section class="lobby-layout"><section class="panel"><h2>Ready: ${mode.name}</h2><p>${board.queue.length} glyphs queued. Active directions: ${mode.directions.map((direction) => arrows[direction]).join(' ')}</p>${queueStripHtml()}<button id="start-round" class="primary-action">Start full-screen round</button><button id="new-board">New board</button><p class="feedback" role="status">${feedback}</p></section>
-      <section class="panel"><h2>♣ wager</h2><p class="hint">Harder times pay more. Locked propositions need more actual history in this mode. When goals tie, only the lowest payout is offered.</p><div class="target-list">${targets.map((offer) => `<button data-target="${offer.id}" class="${offer.id === selectedTarget ? 'selected' : ''}" ${offer.available ? '' : 'disabled'}><strong>${offer.label}</strong><span>Beat ${fmtDebugSeconds(offer.timeSeconds)} / ≤${offer.mistakeLimit} errors</span><span>${offer.oddsLabel}</span><small>${escapeHtml(targetAvailabilityText(offer))}</small></button>`).join('')}</div><label class="stake-row">♣<input id="stake" type="number" min="${selectedTarget === 'half' ? 2 : 1}" step="${selectedTarget === 'half' ? 2 : 1}" value="${stake}"></label><button id="buy-bet" ${targets.find((offer) => offer.id === selectedTarget)?.available && !(selectedTarget === 'half' && stake % 2 !== 0) ? '' : 'disabled'}>Buy bet for ♦${stake}</button></section>
-      <section class="panel shop"><h2>♠ shop</h2><p class="hint">Current ${mode.name}: ♠ ${modePayout(modeId)} · ♦ before ♥ penalties.</p><button id="restore-heart">Restore ♥ ♦5</button><button id="buy-max-heart">+1 Max ♥ ♦${maxHeartCost(state.resources.maxHearts)}</button><button id="buy-global">+1 global ♠ ♦${spadeCost('global', state.upgrades.spades.global)}</button><button id="buy-mode">+1 mode ♠ ♦${spadeCost(modeId, state.upgrades.spades[modeId])}</button><button id="buy-item-median" ${hasModeBetHistory(state, modeId) ? '' : 'disabled'}>Meta-median item bonus Lv.${medianBonusLevel}: buy +♦${nextMedianBonus} per item target ♦${perItemMedianBonusCost(modeId, medianBonusLevel)}</button><small>${hasModeBetHistory(state, modeId) ? `Current item-target bonus: +♦${medianBonusLevel}; next upgrade pays +♦${nextMedianBonus} per item that beats the meta-median.` : 'Locked until you buy one ♣ bet in this mode.'}</small><button id="buy-study">+1s Study Time Lv.${modeUpgrade('studyTime')} ♦${studyTimeCost(modeUpgrade('studyTime'))}</button><button id="buy-pause-count">+1 Pause/Round Lv.${modeUpgrade('pauseCount')} ♦${pauseCountCost(modeUpgrade('pauseCount'))}</button><button id="buy-pause-length">+1s Pause Length Lv.${modeUpgrade('pauseLength')} ♦${pauseLengthCost(modeUpgrade('pauseLength'))}</button><button id="buy-queue-vision">Reveal +1 Queue Glyph Lv.${modeUpgrade('queueVision')} ♦${queueVisionCost(modeUpgrade('queueVision'))}</button><button id="buy-speed">Faster glyphs Lv.${modeUpgrade('animationSpeed')} ♦${animationSpeedCost(modeUpgrade('animationSpeed'))}</button>${mode.variant === 'standard' ? `<button id="buy-sorted-display" ${hasSortedItemDisplay(state, modeId) ? 'disabled' : ''}>Show sorted items ${hasSortedItemDisplay(state, modeId) ? 'owned' : `♦${sortedItemDisplayCost(modeId)}`}</button>` : ''}<button disabled>Choose/rearrange categories soon</button><button id="reset-save">Reset save</button></section></section>
     </main>`;
   root.querySelectorAll('[data-dispatch]').forEach((button) => button.addEventListener('click', () => dispatch(button.dataset.dispatch)));
   root.querySelectorAll('[data-mode]').forEach((button) => button.addEventListener('click', () => { const id = button.dataset.mode; if (state.unlockedModes[id]) startBoard(id); else tryAction(() => unlockMode(state, id)); }));
   root.querySelectorAll('[data-target]').forEach((button) => button.addEventListener('click', () => { selectedTarget = button.dataset.target; if (selectedTarget === 'half' && stake % 2 !== 0) stake += 1; render(); }));
+  root.querySelectorAll('[data-select-item]').forEach((button) => button.addEventListener('click', () => {
+    const itemId = button.dataset.selectItem;
+    if (selectedItemIds.has(itemId)) selectedItemIds.delete(itemId);
+    else if (selectedItemIds.size < multiSelectCapacity(state, modeId)) selectedItemIds.add(itemId);
+    else feedback = `Your hand can hold ${multiSelectCapacity(state, modeId)} items.`;
+    render();
+  }));
   root.querySelector('#stake')?.addEventListener('input', (event) => { stake = Math.max(1, Number(event.target.value || 1)); });
   root.querySelector('#buy-bet')?.addEventListener('click', buyBet);
   root.querySelector('#toggle-debug')?.addEventListener('click', () => { debugOpen = !debugOpen; render(); });
@@ -508,6 +596,7 @@ function render() {
   root.querySelector('#buy-pause-count')?.addEventListener('click', () => tryAction(() => buyPauseCount(state, modeId)));
   root.querySelector('#buy-pause-length')?.addEventListener('click', () => tryAction(() => buyPauseLength(state, modeId)));
   root.querySelector('#buy-queue-vision')?.addEventListener('click', () => tryAction(() => buyQueueVision(state, modeId)));
+  root.querySelector('#buy-multi-select')?.addEventListener('click', () => tryAction(() => buyMultiSelect(state, modeId)));
   root.querySelector('#buy-speed')?.addEventListener('click', () => tryAction(() => buyAnimationSpeed(state, modeId)));
   root.querySelector('#buy-sorted-display')?.addEventListener('click', () => tryAction(() => buySortedItemDisplay(state, modeId)));
   root.querySelector('#pause-round')?.addEventListener('click', activatePause);

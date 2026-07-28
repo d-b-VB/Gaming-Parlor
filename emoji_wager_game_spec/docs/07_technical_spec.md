@@ -80,7 +80,7 @@ Use unit tests for pure logic:
 - Cross-cutting overlay selectors, including explicit `itemIds` selectors.
 - Color exact/contains/excludes behavior.
 - Mode config validation.
-- Board generation uniqueness for all nine Standard, Freeform, and Mystery 2/3/4-way games.
+- Board generation uniqueness for all eighteen single-item and Multi-Item Standard, Freeform, and Mystery 2/3/4-way games.
 - Target estimation and percentile-at-run calculation.
 - Memory updates, including rest entries across unlocked away-mode blocks.
 - Individual item timing updates, including elite-percentile Diamond bonuses, percentile-at-run meta-median item payouts, and hidden slow-item Heart losses that soften from current-round failure candidates.

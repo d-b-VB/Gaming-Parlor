@@ -31,8 +31,8 @@ The overlay uses explicit `itemIds` so large category passes can be reviewed as 
 
 ## `category_expansion_overlays.json`
 
-Single-file curated expansion overlay for the large category pass.  It adds face bridge categories, diagonal/quiet/social categories, and the agreed top vignette categories as explicit `itemIds` so the update can be reviewed as one compact data change instead of many individual item-tag edits.  Runtime loaders append these selectors after `category_selectors.json` and `cross_cutting_categories.json`.
+Single-file curated expansion overlay for the large category pass. It adds face bridges, diagonal/quiet/social categories, vignettes, and a strictly physical-shell category as explicit `itemIds` so the update can be reviewed as one compact data change instead of many individual item-tag edits. Runtime loaders append these selectors after `category_selectors.json` and `cross_cutting_categories.json`.
 
 ## `default_state.json`
 
-Starter resource, unlock, upgrade, and memory state for local-only prototypes.  2-way sort starts unlocked; 3-way and 4-way sort start locked and must be purchased with Diamonds.
+Starter resource, unlock, upgrade, and memory state for local-only prototypes. Single-item Standard 2-way starts unlocked; later games are progressively revealed and purchased with Diamonds.

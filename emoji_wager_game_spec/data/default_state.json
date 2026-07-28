@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "0.3.0",
+  "schemaVersion": "0.4.0",
   "resources": {
     "hearts": 5,
     "maxHearts": 5,
@@ -14,7 +14,16 @@
     "freeform_4": false,
     "mystery_2": false,
     "mystery_3": false,
-    "mystery_4": false
+    "mystery_4": false,
+    "multi_sort_2": false,
+    "multi_sort_3": false,
+    "multi_sort_4": false,
+    "multi_freeform_2": false,
+    "multi_freeform_3": false,
+    "multi_freeform_4": false,
+    "multi_mystery_2": false,
+    "multi_mystery_3": false,
+    "multi_mystery_4": false
   },
   "upgrades": {
     "spades": {
@@ -27,7 +36,16 @@
       "freeform_4": 0,
       "mystery_2": 0,
       "mystery_3": 0,
-      "mystery_4": 0
+      "mystery_4": 0,
+      "multi_sort_2": 0,
+      "multi_sort_3": 0,
+      "multi_sort_4": 0,
+      "multi_freeform_2": 0,
+      "multi_freeform_3": 0,
+      "multi_freeform_4": 0,
+      "multi_mystery_2": 0,
+      "multi_mystery_3": 0,
+      "multi_mystery_4": 0
     },
     "animationSpeed": {
       "sort_2": 0,
@@ -38,7 +56,16 @@
       "freeform_4": 0,
       "mystery_2": 0,
       "mystery_3": 0,
-      "mystery_4": 0
+      "mystery_4": 0,
+      "multi_sort_2": 0,
+      "multi_sort_3": 0,
+      "multi_sort_4": 0,
+      "multi_freeform_2": 0,
+      "multi_freeform_3": 0,
+      "multi_freeform_4": 0,
+      "multi_mystery_2": 0,
+      "multi_mystery_3": 0,
+      "multi_mystery_4": 0
     },
     "categoryChoice": 0,
     "categoryRearrange": 0,
@@ -51,7 +78,16 @@
       "freeform_4": 0,
       "mystery_2": 0,
       "mystery_3": 0,
-      "mystery_4": 0
+      "mystery_4": 0,
+      "multi_sort_2": 0,
+      "multi_sort_3": 0,
+      "multi_sort_4": 0,
+      "multi_freeform_2": 0,
+      "multi_freeform_3": 0,
+      "multi_freeform_4": 0,
+      "multi_mystery_2": 0,
+      "multi_mystery_3": 0,
+      "multi_mystery_4": 0
     },
     "sortedItemDisplay": {
       "sort_2": false,
@@ -62,7 +98,16 @@
       "freeform_4": false,
       "mystery_2": false,
       "mystery_3": false,
-      "mystery_4": false
+      "mystery_4": false,
+      "multi_sort_2": false,
+      "multi_sort_3": false,
+      "multi_sort_4": false,
+      "multi_freeform_2": false,
+      "multi_freeform_3": false,
+      "multi_freeform_4": false,
+      "multi_mystery_2": false,
+      "multi_mystery_3": false,
+      "multi_mystery_4": false
     },
     "studyTime": {
       "sort_2": 0,
@@ -73,7 +118,16 @@
       "freeform_4": 0,
       "mystery_2": 0,
       "mystery_3": 0,
-      "mystery_4": 0
+      "mystery_4": 0,
+      "multi_sort_2": 0,
+      "multi_sort_3": 0,
+      "multi_sort_4": 0,
+      "multi_freeform_2": 0,
+      "multi_freeform_3": 0,
+      "multi_freeform_4": 0,
+      "multi_mystery_2": 0,
+      "multi_mystery_3": 0,
+      "multi_mystery_4": 0
     },
     "pauseCount": {
       "sort_2": 0,
@@ -84,7 +138,16 @@
       "freeform_4": 0,
       "mystery_2": 0,
       "mystery_3": 0,
-      "mystery_4": 0
+      "mystery_4": 0,
+      "multi_sort_2": 0,
+      "multi_sort_3": 0,
+      "multi_sort_4": 0,
+      "multi_freeform_2": 0,
+      "multi_freeform_3": 0,
+      "multi_freeform_4": 0,
+      "multi_mystery_2": 0,
+      "multi_mystery_3": 0,
+      "multi_mystery_4": 0
     },
     "pauseLength": {
       "sort_2": 0,
@@ -95,7 +158,16 @@
       "freeform_4": 0,
       "mystery_2": 0,
       "mystery_3": 0,
-      "mystery_4": 0
+      "mystery_4": 0,
+      "multi_sort_2": 0,
+      "multi_sort_3": 0,
+      "multi_sort_4": 0,
+      "multi_freeform_2": 0,
+      "multi_freeform_3": 0,
+      "multi_freeform_4": 0,
+      "multi_mystery_2": 0,
+      "multi_mystery_3": 0,
+      "multi_mystery_4": 0
     },
     "queueVision": {
       "sort_2": 0,
@@ -106,7 +178,36 @@
       "freeform_4": 0,
       "mystery_2": 0,
       "mystery_3": 0,
-      "mystery_4": 0
+      "mystery_4": 0,
+      "multi_sort_2": 0,
+      "multi_sort_3": 0,
+      "multi_sort_4": 0,
+      "multi_freeform_2": 0,
+      "multi_freeform_3": 0,
+      "multi_freeform_4": 0,
+      "multi_mystery_2": 0,
+      "multi_mystery_3": 0,
+      "multi_mystery_4": 0
+    },
+    "multiSelect": {
+      "sort_2": 0,
+      "sort_3": 0,
+      "sort_4": 0,
+      "freeform_2": 0,
+      "freeform_3": 0,
+      "freeform_4": 0,
+      "mystery_2": 0,
+      "mystery_3": 0,
+      "mystery_4": 0,
+      "multi_sort_2": 0,
+      "multi_sort_3": 0,
+      "multi_sort_4": 0,
+      "multi_freeform_2": 0,
+      "multi_freeform_3": 0,
+      "multi_freeform_4": 0,
+      "multi_mystery_2": 0,
+      "multi_mystery_3": 0,
+      "multi_mystery_4": 0
     }
   },
   "gameMemory": {
@@ -135,6 +236,33 @@
       "entries": []
     },
     "mystery_4": {
+      "entries": []
+    },
+    "multi_sort_2": {
+      "entries": []
+    },
+    "multi_sort_3": {
+      "entries": []
+    },
+    "multi_sort_4": {
+      "entries": []
+    },
+    "multi_freeform_2": {
+      "entries": []
+    },
+    "multi_freeform_3": {
+      "entries": []
+    },
+    "multi_freeform_4": {
+      "entries": []
+    },
+    "multi_mystery_2": {
+      "entries": []
+    },
+    "multi_mystery_3": {
+      "entries": []
+    },
+    "multi_mystery_4": {
       "entries": []
     }
   },
@@ -185,6 +313,51 @@
       "fastestSeconds": null,
       "longestSeconds": null,
       "entries": []
+    },
+    "multi_sort_2": {
+      "fastestSeconds": null,
+      "longestSeconds": null,
+      "entries": []
+    },
+    "multi_sort_3": {
+      "fastestSeconds": null,
+      "longestSeconds": null,
+      "entries": []
+    },
+    "multi_sort_4": {
+      "fastestSeconds": null,
+      "longestSeconds": null,
+      "entries": []
+    },
+    "multi_freeform_2": {
+      "fastestSeconds": null,
+      "longestSeconds": null,
+      "entries": []
+    },
+    "multi_freeform_3": {
+      "fastestSeconds": null,
+      "longestSeconds": null,
+      "entries": []
+    },
+    "multi_freeform_4": {
+      "fastestSeconds": null,
+      "longestSeconds": null,
+      "entries": []
+    },
+    "multi_mystery_2": {
+      "fastestSeconds": null,
+      "longestSeconds": null,
+      "entries": []
+    },
+    "multi_mystery_3": {
+      "fastestSeconds": null,
+      "longestSeconds": null,
+      "entries": []
+    },
+    "multi_mystery_4": {
+      "fastestSeconds": null,
+      "longestSeconds": null,
+      "entries": []
     }
   },
   "modeBetCounts": {
@@ -196,7 +369,16 @@
     "freeform_4": 0,
     "mystery_2": 0,
     "mystery_3": 0,
-    "mystery_4": 0
+    "mystery_4": 0,
+    "multi_sort_2": 0,
+    "multi_sort_3": 0,
+    "multi_sort_4": 0,
+    "multi_freeform_2": 0,
+    "multi_freeform_3": 0,
+    "multi_freeform_4": 0,
+    "multi_mystery_2": 0,
+    "multi_mystery_3": 0,
+    "multi_mystery_4": 0
   },
   "restTracking": {
     "lastCompletedModeId": null,

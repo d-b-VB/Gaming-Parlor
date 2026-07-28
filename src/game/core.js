@@ -8,28 +8,29 @@ const VARIANTS = {
   freeform: { label: 'Freeform ', payoutMultiplier: 2, unlockMultiplier: 2 },
   mystery: { label: 'Mystery ', payoutMultiplier: 4, unlockMultiplier: 4 },
 };
-function modeIdFor(variant, size) { return variant === 'standard' ? `sort_${size}` : `${variant}_${size}`; }
-function buildMode(variant, size) {
+function modeIdFor(variant, size, interaction = 'single') { const base = variant === 'standard' ? `sort_${size}` : `${variant}_${size}`; return interaction === 'multi' ? `multi_${base}` : base; }
+function buildMode(variant, size, interaction = 'single') {
   const base = BASE_MODE_CONFIGS[size];
-  const id = modeIdFor(variant, size);
+  const id = modeIdFor(variant, size, interaction);
   return {
     id,
     variant,
+    interaction,
     baseSize: size,
-    name: `${VARIANTS[variant].label}${size}-Way Sort`,
+    name: `${interaction === 'multi' ? 'Multi-Item ' : ''}${VARIANTS[variant].label}${size}-Way Sort`,
     directions: base.directions,
     groupsPerDirection: 2,
     glyphsPerGroup: 4,
-    unlockCost: variant === 'standard' ? base.unlockCost : base.unlockCost + (variant === 'freeform' ? 20 : 40),
-    baseDiamonds: base.standardDiamonds * VARIANTS[variant].payoutMultiplier,
+    unlockCost: (variant === 'standard' ? base.unlockCost : base.unlockCost + (variant === 'freeform' ? 20 : 40)) + (interaction === 'multi' ? 20 : 0),
+    baseDiamonds: base.standardDiamonds * VARIANTS[variant].payoutMultiplier * (interaction === 'multi' ? 2 : 1),
     heartSafetySeconds: base.heartSafetySeconds,
     starterTargets: [{ id: 'even', label: 'Even', chance: 0.5, timeSeconds: base.starterEven, oddsMultiplier: 1, minHistory: 5, oddsLabel: '1:1' }],
   };
 }
-export const MODES = Object.fromEntries(['standard', 'freeform', 'mystery'].flatMap((variant) => [2, 3, 4].map((size) => {
-  const mode = buildMode(variant, size);
+export const MODES = Object.fromEntries(['single', 'multi'].flatMap((interaction) => ['standard', 'freeform', 'mystery'].flatMap((variant) => [2, 3, 4].map((size) => {
+  const mode = buildMode(variant, size, interaction);
   return [mode.id, mode];
-})));
+}))));
 export const modeList = Object.values(MODES);
 export const BET_TIERS = [
   { id: 'half', label: 'Conservative', chance: 1 / 1.5, oddsMultiplier: 0.5, minHistory: 5, oddsLabel: '1:2' },
@@ -49,6 +50,8 @@ export function studyTimeCost(owned) { return Math.ceil(8 * 1.45 ** owned); }
 export function pauseCountCost(owned) { return Math.ceil(120 * 2.25 ** owned); }
 export function pauseLengthCost(owned) { return Math.ceil(60 * 1.9 ** owned); }
 export function queueVisionCost(owned) { return Math.ceil(35 * 1.8 ** owned); }
+export function multiSelectCost(owned) { return Math.ceil(18 * 1.7 ** owned); }
+export function multiSelectCapacity(state, modeId) { return Math.min(modePromptCount(modeId), 2 + modeUpgradeValue(state, 'multiSelect', modeId)); }
 export function hashSeed(seed) { let h = 2166136261; for (let i = 0; i < seed.length; i += 1) { h ^= seed.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
 export function createRng(seed) { let state = hashSeed(seed) || 1; return () => { state |= 0; state = (state + 0x6d2b79f5) | 0; let t = Math.imul(state ^ (state >>> 15), 1 | state); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 export function shuffle(items, rng) { const result = [...items]; for (let i = result.length - 1; i > 0; i -= 1) { const j = Math.floor(rng() * (i + 1)); [result[i], result[j]] = [result[j], result[i]]; } return result; }
@@ -315,17 +318,27 @@ export function settleItemTiming(state, modeId, itemId, timeSeconds, createdAt =
   return { state: next, event };
 }
 export function buyClubBet(state, bet) { if (bet.stake <= 0) return { ...state, activeClubBet: null }; if (bet.oddsLabel === '1:2' && bet.stake % 2 !== 0) throw new Error('1:2 wagers must be paid in multiples of 2 Clubs'); if (state.resources.diamonds < bet.cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= bet.cost; next.activeClubBet = { ...bet, startingBank: state.resources.diamonds }; next.modeBetCounts ??= {}; next.modeBetCounts[bet.modeId] = (next.modeBetCounts[bet.modeId] ?? 0) + 1; return next; }
-export function canUnlockMode(state, modeId) { const mode = MODES[modeId]; if (!mode || state.unlockedModes?.[modeId]) return true; if (mode.variant === 'freeform') return [2, 3, 4].every((size) => state.unlockedModes?.[modeIdFor('standard', size)]); if (mode.variant === 'mystery') return [2, 3, 4].every((size) => state.unlockedModes?.[modeIdFor('freeform', size)]); return true; }
+function prerequisiteModeId(mode) {
+  if (!mode || mode.id === 'sort_2') return null;
+  if (mode.baseSize > 2) return modeIdFor(mode.variant, mode.baseSize - 1, mode.interaction);
+  if (mode.interaction === 'multi' && mode.variant === 'standard') return 'sort_4';
+  if (mode.variant === 'freeform') return modeIdFor('standard', 4, mode.interaction);
+  if (mode.variant === 'mystery') return modeIdFor('freeform', 4, mode.interaction);
+  return null;
+}
+export function canUnlockMode(state, modeId) { const mode = MODES[modeId]; if (!mode) return false; if (state.unlockedModes?.[modeId]) return true; const prerequisite = prerequisiteModeId(mode); return prerequisite === null || Boolean(state.unlockedModes?.[prerequisite]); }
+export function isModeVisible(state, modeId) { return Boolean(state.unlockedModes?.[modeId]) || canUnlockMode(state, modeId); }
 export function unlockMode(state, modeId) { const mode = MODES[modeId]; if (state.unlockedModes[modeId]) return state; if (!canUnlockMode(state, modeId)) throw new Error(`${mode.name} is not available yet`); if (state.resources.diamonds < mode.unlockCost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= mode.unlockCost; next.unlockedModes[modeId] = true; return next; }
 export function buySpade(state, scope) { const cost = spadeCost(scope, state.upgrades.spades[scope] ?? 0); if (state.resources.diamonds < cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= cost; next.upgrades.spades[scope] = (next.upgrades.spades[scope] ?? 0) + 1; return next; }
 export function buyPerItemMedianBonus(state, modeId) { if (!hasModeBetHistory(state, modeId)) throw new Error('Make at least one bet in this mode first'); const owned = state.upgrades?.perItemMedianBonus?.[modeId] ?? 0; const cost = perItemMedianBonusCost(modeId, owned); if (state.resources.diamonds < cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= cost; next.upgrades ??= {}; next.upgrades.perItemMedianBonus ??= {}; next.upgrades.perItemMedianBonus[modeId] = owned + 1; return next; }
-export function buySortedItemDisplay(state, modeId) { if (MODES[modeId]?.variant !== 'standard') throw new Error('Sorted item display is for standard sort only'); if (state.upgrades?.sortedItemDisplay?.[modeId]) return state; const cost = sortedItemDisplayCost(modeId); if (state.resources.diamonds < cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= cost; next.upgrades ??= {}; next.upgrades.sortedItemDisplay ??= {}; next.upgrades.sortedItemDisplay[modeId] = true; return next; }
+export function buySortedItemDisplay(state, modeId) { if (MODES[modeId]?.variant !== 'standard' || MODES[modeId]?.interaction !== 'single') throw new Error('Sorted item display is for single-item standard sort only'); if (state.upgrades?.sortedItemDisplay?.[modeId]) return state; const cost = sortedItemDisplayCost(modeId); if (state.resources.diamonds < cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= cost; next.upgrades ??= {}; next.upgrades.sortedItemDisplay ??= {}; next.upgrades.sortedItemDisplay[modeId] = true; return next; }
 function buyModeUpgrade(state, modeId, key, costFn) { const owned = modeUpgradeValue(state, key, modeId); const cost = costFn(owned); if (state.resources.diamonds < cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= cost; next.upgrades ??= {}; if (typeof next.upgrades[key] === 'number' || !next.upgrades[key]) next.upgrades[key] = Object.fromEntries(Object.keys(MODES).map((id) => [id, id === modeId ? (typeof state.upgrades?.[key] === 'number' ? state.upgrades[key] : 0) : 0])); next.upgrades[key][modeId] = owned + 1; return next; }
 export function buyAnimationSpeed(state, modeId = 'sort_2') { return buyModeUpgrade(state, modeId, 'animationSpeed', animationSpeedCost); }
 export function buyStudyTime(state, modeId = 'sort_2') { return buyModeUpgrade(state, modeId, 'studyTime', studyTimeCost); }
 export function buyPauseCount(state, modeId = 'sort_2') { return buyModeUpgrade(state, modeId, 'pauseCount', pauseCountCost); }
 export function buyPauseLength(state, modeId = 'sort_2') { return buyModeUpgrade(state, modeId, 'pauseLength', pauseLengthCost); }
 export function buyQueueVision(state, modeId = 'sort_2') { return buyModeUpgrade(state, modeId, 'queueVision', queueVisionCost); }
+export function buyMultiSelect(state, modeId) { if (MODES[modeId]?.interaction !== 'multi') throw new Error('Batch capacity is for Multi-Item modes only'); return buyModeUpgrade(state, modeId, 'multiSelect', multiSelectCost); }
 export function restoreHeart(state) { if (state.resources.hearts >= state.resources.maxHearts) return state; if (state.resources.diamonds < HEART_RESTORE_COST) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= HEART_RESTORE_COST; next.resources.hearts += 1; return next; }
 export function maxHeartCost(maxHearts) { return Math.ceil(MAX_HEART_BASE_COST * 2 ** Math.max(0, maxHearts - 5)); }
 export function buyMaxHeart(state) { const cost = maxHeartCost(state.resources.maxHearts); if (state.resources.diamonds < cost) throw new Error('Not enough Diamonds'); const next = structuredClone(state); next.resources.diamonds -= cost; next.resources.maxHearts += 1; next.resources.hearts += 1; return next; }

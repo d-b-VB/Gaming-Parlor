@@ -96,8 +96,9 @@
 
 - Editing the Club stake input does not rerender the whole screen or jump focus back to the top.
 - The main play UI shows only target glyphs for the active groups in the first prototype.
-- The mode selector shows all nine Standard, Freeform, and Mystery 2/3/4-way games.
+- The mode selector progressively reveals all eighteen single-item and Multi-Item Standard, Freeform, and Mystery 2/3/4-way games; unaffordable available modes stay visible and unavailable modes do not.
 - The shop exposes Heart restore, mode unlocks, Spade payout upgrades, per-game animation speed, per-game study time, per-game pauses, per-game queue-visibility upgrades, and Standard sorted-item display upgrades.
+- Multi-Item rounds show all remaining items in overlapping piles, expose only top items for selection, lift selected items to reveal lower ones, and resolve a selected batch atomically.
 
 ## Non-goals
 

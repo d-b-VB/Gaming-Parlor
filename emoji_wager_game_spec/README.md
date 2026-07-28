@@ -2,13 +2,13 @@
 
 This repository is a Codex-ready specification package for a browser-based, single-player, abstract skill-and-wager game.
 
-The first implemented family of minigames should be **emoji sorting** with three modes:
+The first implemented family of minigames is **emoji sorting** with 2-way, 3-way, and 4-way sizes:
 
 - **2-way sort**: the starter mode and the only mode accessible at the beginning.
 - **3-way sort**: locked at first and purchased with Diamonds.
 - **4-way sort**: locked at first and purchased with Diamonds.
 
-In every sorting mode, the player sees visible groups of glyphs and one prompt glyph in the center at a time.  The player dispatches each prompt with keyboard directions or directional clicks/taps.  Completion time is the score, and lower is better.
+Each size supports Standard, Freeform, and Mystery rules in both single-item and Multi-Item interaction styles. Single-item games show one prompt at a time; Multi-Item games show all remaining prompts in selectable piles. The player dispatches with keyboard directions or directional clicks/taps. Completion time is the score, and lower is better.
 
 The game has four suit concepts:
 

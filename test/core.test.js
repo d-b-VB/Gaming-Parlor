@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { BET_TIERS, generateBoard, matchesSelector, estimateTargets, heartSafety, createClubBet, buyClubBet, canUnlockMode, settleRound, settleItemTiming, itemTimingTargets, itemPercentileAtRun, itemSlowHeartThreshold, firstRoundCalibrationScores, mistakePressure, unlockMode, buySpade, buyPerItemMedianBonus, buySortedItemDisplay, sortedItemDisplayCost, hasSortedItemDisplay, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, spadeCost, payoutScore, perItemMedianBonusCost, hasPerItemMedianBonus, streakDuration, betWeightedSyntheticTimes, roundReferenceCurve } from '../src/game/core.js';
+import { BET_TIERS, modeList, generateBoard, matchesSelector, estimateTargets, heartSafety, createClubBet, buyClubBet, canUnlockMode, isModeVisible, settleRound, settleItemTiming, itemTimingTargets, itemPercentileAtRun, itemSlowHeartThreshold, firstRoundCalibrationScores, mistakePressure, unlockMode, buySpade, buyPerItemMedianBonus, buySortedItemDisplay, sortedItemDisplayCost, hasSortedItemDisplay, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, buyMultiSelect, multiSelectCapacity, multiSelectCost, spadeCost, payoutScore, perItemMedianBonusCost, hasPerItemMedianBonus, streakDuration, betWeightedSyntheticTimes, roundReferenceCurve } from '../src/game/core.js';
 
 const items = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/items.json', import.meta.url))).items;
 const baseSelectors = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/category_selectors.json', import.meta.url))).selectors;
@@ -78,6 +78,16 @@ test('category expansion overlay covers discussed face bridges and vignettes', (
   assert.ok(categoriesFor('emoji:closed_lock_with_key').includes('cx_keys_and_keyboards'));
 });
 
+test('literal shells category contains only things with physical shells', () => {
+  const shells = expansionSelectors.find((selector) => selector.id === 'cx_literal_shells');
+  assert.ok(shells);
+  assert.deepEqual(shells.selector.itemIds, [
+    'emoji:snail', 'emoji:turtle', 'emoji:oyster', 'emoji:egg', 'emoji:nest_with_eggs',
+    'emoji:beetle', 'emoji:lady_beetle', 'emoji:peanuts', 'emoji:chestnut', 'emoji:coconut',
+  ]);
+  assert.equal(shells.selector.itemIds.some((id) => id.includes('shell_symbol')), false);
+});
+
 test('category expansion gives every face a non-face-dominated bridge category', () => {
   const byId = Object.fromEntries(items.map((item) => [item.id, item]));
   const faceIds = items.filter((item) => item.tags.includes('face')).map((item) => item.id);
@@ -125,8 +135,11 @@ test('expanded tags keep biological and object categories literal', () => {
 
 
 test('board generation creates valid unique boards for each mode', () => {
-  const expectations = { sort_2: [4, 16], sort_3: [6, 24], sort_4: [8, 32], freeform_2: [4, 16], freeform_3: [6, 24], freeform_4: [8, 32], mystery_2: [4, 16], mystery_3: [6, 24], mystery_4: [8, 32] };
-  for (const [modeId, [groups, prompts]] of Object.entries(expectations)) {
+  assert.equal(modeList.length, 18);
+  for (const mode of modeList) {
+    const modeId = mode.id;
+    const groups = mode.baseSize * 2;
+    const prompts = groups * 4;
     const board = generateBoard(modeId, `seed-${modeId}`, items, selectors);
     assert.equal(board.groups.length, groups);
     assert.equal(board.queue.length, prompts);
@@ -156,20 +169,31 @@ test('board generation is reproducible from a stored seed', () => {
 
 test('variant modes are distinct games with gated unlocks and escalating payouts', () => {
   let state = structuredClone(defaultState);
-  assert.equal(Object.keys(defaultState.gameMemory).length, 9);
+  assert.equal(Object.keys(defaultState.gameMemory).length, 18);
   assert.equal(payoutScore(state, 'sort_2'), 2);
   assert.equal(payoutScore(state, 'freeform_2'), 4);
   assert.equal(payoutScore(state, 'mystery_2'), 8);
+  assert.equal(payoutScore(state, 'multi_sort_2'), 4);
+  assert.equal(payoutScore(state, 'multi_freeform_2'), 8);
+  assert.equal(payoutScore(state, 'multi_mystery_2'), 16);
   assert.equal(canUnlockMode(state, 'freeform_2'), false);
+  assert.equal(isModeVisible(state, 'sort_3'), true);
+  assert.equal(isModeVisible(state, 'sort_4'), false);
+  assert.equal(isModeVisible(state, 'multi_sort_2'), false);
   state.resources.diamonds = 1000;
   state = unlockMode(state, 'sort_3');
+  assert.equal(isModeVisible(state, 'sort_4'), true);
   state = unlockMode(state, 'sort_4');
   assert.equal(canUnlockMode(state, 'freeform_2'), true);
-  state = unlockMode(state, 'freeform_4');
+  assert.equal(canUnlockMode(state, 'multi_sort_2'), true);
+  assert.throws(() => unlockMode(state, 'freeform_4'), /not available/);
   assert.equal(canUnlockMode(state, 'mystery_2'), false);
   state = unlockMode(state, 'freeform_2');
   state = unlockMode(state, 'freeform_3');
+  state = unlockMode(state, 'freeform_4');
   assert.equal(canUnlockMode(state, 'mystery_2'), true);
+  state = unlockMode(state, 'multi_sort_2');
+  assert.equal(canUnlockMode(state, 'multi_sort_3'), true);
   state = unlockMode(state, 'mystery_2');
   assert.equal(state.unlockedModes.mystery_2, true);
 });
@@ -187,7 +211,19 @@ test('per-game upgrades and standard sorted-item display are mode-scoped', () =>
   state = buySortedItemDisplay(state, 'sort_2');
   assert.equal(hasSortedItemDisplay(state, 'sort_2'), true);
   assert.throws(() => buySortedItemDisplay(state, 'freeform_2'), /standard sort/);
+  assert.throws(() => buySortedItemDisplay(state, 'multi_sort_2'), /single-item standard sort/);
   assert.ok(sortedItemDisplayCost('sort_2') < perItemMedianBonusCost('sort_2'));
+});
+
+test('multi-item hand capacity starts at two and upgrades per game', () => {
+  let state = structuredClone(defaultState);
+  state.resources.diamonds = 1000;
+  assert.equal(multiSelectCapacity(state, 'multi_sort_2'), 2);
+  assert.equal(multiSelectCost(0), 18);
+  state = buyMultiSelect(state, 'multi_sort_2');
+  assert.equal(multiSelectCapacity(state, 'multi_sort_2'), 3);
+  assert.equal(multiSelectCapacity(state, 'multi_freeform_2'), 2);
+  assert.throws(() => buyMultiSelect(state, 'sort_2'), /Multi-Item/);
 });
 
 test('economy handles unlocks, club bets, spades, memory, and winnings', () => {

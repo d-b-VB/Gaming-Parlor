@@ -1433,6 +1433,26 @@
       },
       "minimumItems": 4,
       "eligibleCount": 11
+    },
+    {
+      "id": "cx_literal_shells",
+      "label": "Literal Shells",
+      "selector": {
+        "itemIds": [
+          "emoji:snail",
+          "emoji:turtle",
+          "emoji:oyster",
+          "emoji:egg",
+          "emoji:nest_with_eggs",
+          "emoji:beetle",
+          "emoji:lady_beetle",
+          "emoji:peanuts",
+          "emoji:chestnut",
+          "emoji:coconut"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 10
     }
   ]
 }

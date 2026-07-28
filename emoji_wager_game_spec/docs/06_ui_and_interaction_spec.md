@@ -91,6 +91,8 @@ Heart loss:
 
 ## Shop display
 
+Between rounds, a large central **PLAY** button is the primary action. Game modes, wagers, and upgrades live in separate collapsible panels, while debug records remain at the bottom. Locked content is hidden until its prerequisite is owned; an available purchase remains visible even when the player cannot currently afford it.
+
 The first shop can be simple and functional.  It should include:
 
 - Restore 1 Heart.
@@ -105,6 +107,7 @@ The first shop can be simple and functional.  It should include:
 - Buy per-game pause-count and pause-length upgrades.
 - Buy per-game queue-visibility upgrades.
 - Buy Standard-only sorted-item display upgrades per base size.
+- Buy per-game Multi-Item hand-capacity upgrades.
 
 Future upgrade slots may be visible but disabled for category choice and category rearrangement.
 
