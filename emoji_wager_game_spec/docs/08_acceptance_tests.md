@@ -99,6 +99,8 @@
 - The mode selector progressively reveals all eighteen single-item and Multi-Item Standard, Freeform, and Mystery 2/3/4-way games; unaffordable available modes stay visible and unavailable modes do not.
 - The shop exposes Heart restore, mode unlocks, Spade payout upgrades, per-game animation speed, per-game study time, per-game pauses, per-game queue-visibility upgrades, and Standard sorted-item display upgrades.
 - Multi-Item rounds show all remaining items in overlapping piles, expose only top items for selection, lift selected items to reveal lower ones, and resolve a selected batch atomically.
+- Multi-Item piles vary item X/Y position, rotation, and depth while keeping every remaining item rendered from the beginning.
+- The bottom debug control reveals a smooth reference-curve graph and marks the historical run meta-median percentile and corresponding current time.
 
 ## Non-goals
 

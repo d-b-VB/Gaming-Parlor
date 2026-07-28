@@ -21,7 +21,7 @@ Mystery Sort has predetermined category directions, but the category example gly
 
 ## Multi-Item interaction
 
-Multi-Item games show every remaining item in a compact, messy pile. Only uncovered top items are selectable. Selecting an item lifts it into the player's hand and exposes the item below it; selecting a held item returns it to the pile. The hand starts at two items and has a separate capacity upgrade in every Multi-Item game.
+Multi-Item games render every remaining item from the beginning, scattered across both horizontal and vertical axes with varied rotation, depth, and shadows to resemble a three-dimensional tabletop pile. Items may overlap, but only the top item at an occupied position is selectable. Selecting it lifts it into the player's hand and exposes the item below it; selecting a held item returns it to the pile. The hand starts at two items and has a separate capacity upgrade in every Multi-Item game.
 
 After selecting one or more items, the player chooses a direction. The batch sorts only when every held item belongs in that direction. If any item is wrong, the whole batch returns to the pile, one mistake is recorded, and no hidden category is revealed. A correct Freeform batch may establish multiple previously unassigned categories when the chosen direction has enough open category slots.
 

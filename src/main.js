@@ -1,8 +1,8 @@
-import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, itemPercentileAtRun, createClubBet, buyClubBet, unlockMode, canUnlockMode, isModeVisible, buySpade, buyPerItemMedianBonus, buySortedItemDisplay, restoreHeart, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, buyMultiSelect, multiSelectCost, multiSelectCapacity, sortedItemDisplayCost, hasSortedItemDisplay, settleRound, settleItemTiming, itemTimingTargets, roundReferenceCurve, spadeCost, payoutScore, perItemMedianBonusCost, hasModeBetHistory, streakDuration } from './game/core.js?v=0.4.0';
+import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, itemPercentileAtRun, createClubBet, buyClubBet, unlockMode, canUnlockMode, isModeVisible, buySpade, buyPerItemMedianBonus, buySortedItemDisplay, restoreHeart, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, buyMultiSelect, multiSelectCost, multiSelectCapacity, sortedItemDisplayCost, hasSortedItemDisplay, settleRound, settleItemTiming, itemTimingTargets, roundReferenceCurve, spadeCost, payoutScore, perItemMedianBonusCost, hasModeBetHistory, streakDuration } from './game/core.js?v=0.4.1';
 
 const root = document.querySelector('#root');
-const APP_VERSION = 'v0.4.0';
-const SAVE_SCHEMA_VERSION = '0.4.0-local';
+const APP_VERSION = 'v0.4.1';
+const SAVE_SCHEMA_VERSION = '0.4.1-local';
 const arrows = { left: '←', right: '→', up: '↑', down: '↓' };
 let items = [];
 let selectors = [];
@@ -151,7 +151,26 @@ function debugRecordsHtml(targets, safety) {
   const reference = roundReferenceCurve(modeId, itemEntries, entries);
   const rows = entries.map((entry, index) => `<tr><td>${index + 1}</td><td>${fmtDebugSeconds(entry.timeSeconds)}</td><td>${Number.isFinite(entry.percentileAtRun) ? `${Math.round(entry.percentileAtRun * 100)}%` : '—'}</td><td>${Number.isFinite(entry.mistakes) ? entry.mistakes : '—'}</td><td>${escapeHtml(entryTags(entry))}</td></tr>`).join('') || '<tr><td colspan="5">No round memory yet.</td></tr>';
   const itemRows = itemEntries.map((entry, index) => `<tr><td>${index + 1}</td><td>${escapeHtml(entry.itemId ?? 'item')}</td><td>${fmtDebugSeconds(entry.timeSeconds)}</td><td>${`${Math.round((Number.isFinite(entry.percentileAtRun) ? entry.percentileAtRun : itemPercentileAtRun(entry.timeSeconds, itemEntries.slice(0, index))) * 100)}%`}</td><td>${[entry.entryType === 'rest' ? 'rest' : '', entry.restedWhilePlaying ? `away during ${entry.restedWhilePlaying}` : '', entry.isEliteItem ? 'elite' : '', entry.isNewFastest ? 'fastest' : '', entry.isNewLongest ? 'longest' : '', entry.eliteBonusDelta ? `+♦${entry.eliteBonusDelta}` : '', entry.medianBonusDelta ? `median +♦${entry.medianBonusDelta}` : ''].filter(Boolean).join(' · ') || '—'}</td></tr>`).join('') || '<tr><td colspan="5">No item timing entries yet.</td></tr>';
-  return `<section class="panel debug-panel"><h2>Debug records for ${MODES[modeId].name}</h2><p class="hint">Shows the full stored records feeding ♥ safety, ♣ odds, mistake pressure, and item-timing bonuses. Temporary calibration records are replaced one at a time by later real runs.</p><div class="debug-grid"><div><h3>Round memory (${entries.length})</h3><p>♥ safety now: <strong>${fmtDebugSeconds(safety)}</strong></p><div class="debug-scroll"><table><thead><tr><th>#</th><th>Time</th><th>Pct</th><th>Err</th><th>Used for</th></tr></thead><tbody>${rows}</tbody></table></div></div><div><h3>♣ targets</h3><p>Reference curve: ${reference.windowCount} points from ${reference.realItemCount} real item records ×${reference.replicationFactor || 0}; overhead ${fmtDebugSeconds(reference.overheadSeconds)}${reference.times.length ? `; range ${fmtDebugSeconds(reference.times[0])}–${fmtDebugSeconds(reference.times.at(-1))}` : ''}.</p><ul>${targets.map((target) => `<li>${escapeHtml(target.label)}: ${fmtDebugSeconds(target.timeSeconds)} / ≤${target.mistakeLimit} errors · ${escapeHtml(targetAvailabilityText(target).toLowerCase())}</li>`).join('')}</ul><h3>Item timing (${itemEntries.length})</h3><p>Elite ${fmtDebugSeconds(stats.eliteSeconds)} · meta-median ${fmtDebugSeconds(stats.metaMedianSeconds)} · fastest ${fmtDebugSeconds(stats.fastestSeconds)} · median ${fmtDebugSeconds(stats.medianSeconds)} · longest ${fmtDebugSeconds(stats.longestSeconds)}${Number.isFinite(stats.metaMedianPercentile) ? ` · meta pct ${Math.round(stats.metaMedianPercentile * 100)}%` : ''}</p><div class="debug-scroll"><table><thead><tr><th>#</th><th>Item</th><th>Time</th><th>Prior pct</th><th>Flags</th></tr></thead><tbody>${itemRows}</tbody></table></div></div></div></section>`;
+  return `<section class="panel debug-panel"><h2>Debug records for ${MODES[modeId].name}</h2><p class="hint">Shows the full stored records feeding ♥ safety, ♣ odds, mistake pressure, and item-timing bonuses. Temporary calibration records are replaced one at a time by later real runs.</p>${referenceCurveGraphHtml(reference, targets)}<div class="debug-grid"><div><h3>Round memory (${entries.length})</h3><p>♥ safety now: <strong>${fmtDebugSeconds(safety)}</strong></p><div class="debug-scroll"><table><thead><tr><th>#</th><th>Time</th><th>Pct</th><th>Err</th><th>Used for</th></tr></thead><tbody>${rows}</tbody></table></div></div><div><h3>♣ targets</h3><p>Reference curve: ${reference.windowCount} points from ${reference.realItemCount} real item records ×${reference.replicationFactor || 0}; overhead ${fmtDebugSeconds(reference.overheadSeconds)}${reference.times.length ? `; range ${fmtDebugSeconds(reference.times[0])}–${fmtDebugSeconds(reference.times.at(-1))}` : ''}.</p><ul>${targets.map((target) => `<li>${escapeHtml(target.label)}: ${fmtDebugSeconds(target.timeSeconds)} / ≤${target.mistakeLimit} errors · ${escapeHtml(targetAvailabilityText(target).toLowerCase())}</li>`).join('')}</ul><h3>Item timing (${itemEntries.length})</h3><p>Elite ${fmtDebugSeconds(stats.eliteSeconds)} · meta-median ${fmtDebugSeconds(stats.metaMedianSeconds)} · fastest ${fmtDebugSeconds(stats.fastestSeconds)} · median ${fmtDebugSeconds(stats.medianSeconds)} · longest ${fmtDebugSeconds(stats.longestSeconds)}${Number.isFinite(stats.metaMedianPercentile) ? ` · meta pct ${Math.round(stats.metaMedianPercentile * 100)}%` : ''}</p><div class="debug-scroll"><table><thead><tr><th>#</th><th>Item</th><th>Time</th><th>Prior pct</th><th>Flags</th></tr></thead><tbody>${itemRows}</tbody></table></div></div></div></section>`;
+}
+function referenceCurveGraphHtml(reference, targets) {
+  if (reference.times.length < 2) return '<div class="reference-chart empty">Complete rounds to build the smooth reference curve.</div>';
+  const times = reference.times;
+  const fastest = times[0];
+  const slowest = times.at(-1);
+  const range = Math.max(0.01, slowest - fastest);
+  const pointCount = Math.min(80, times.length);
+  const points = Array.from({ length: pointCount }, (_, index) => {
+    const performance = index / (pointCount - 1);
+    const sourceIndex = Math.round((1 - performance) * (times.length - 1));
+    const x = 8 + performance * 88;
+    const y = 8 + ((times[sourceIndex] - fastest) / range) * 76;
+    return `${x.toFixed(2)},${y.toFixed(2)}`;
+  }).join(' ');
+  const meta = targets.find((target) => target.id === 'even' && Number.isFinite(target.targetPercentile));
+  const metaX = meta ? 8 + meta.targetPercentile * 88 : null;
+  const metaY = meta ? 8 + ((meta.timeSeconds - fastest) / range) * 76 : null;
+  return `<figure class="reference-chart"><figcaption><strong>Smooth whole-round reference curve</strong><span>Slower ← performance percentile → Faster</span></figcaption><svg viewBox="0 0 100 100" role="img" aria-label="Whole-round time by performance percentile"><line class="chart-axis" x1="8" y1="84" x2="96" y2="84"/><line class="chart-axis" x1="8" y1="8" x2="8" y2="84"/><polyline class="curve-line" points="${points}"/>${meta ? `<line class="meta-guide" x1="${metaX}" y1="8" x2="${metaX}" y2="84"/><circle class="meta-point" cx="${metaX}" cy="${Math.max(8, Math.min(84, metaY))}" r="2.4"/>` : ''}<text x="8" y="94">0%</text><text x="88" y="94">100%</text><text x="10" y="13">${fmt(fastest)}</text><text x="10" y="81">${fmt(slowest)}</text></svg>${meta ? `<p>Run meta-median: <strong>${Math.round(meta.targetPercentile * 100)}th percentile</strong> · ${fmtDebugSeconds(meta.timeSeconds)}</p>` : '<p>Run meta-median appears after enough round history.</p>'}</figure>`;
 }
 function timerPct(targetSeconds) {
   if (!targetSeconds || !promptStartedAt) return 0;
@@ -415,21 +434,32 @@ function sideZoneHtml(direction) {
   const slots = groupsForZone(direction).map((group) => group.open ? '<span class="glyph-group mystery-group">◆ ◆ ◆ ◆</span>' : groupSlotHtml(group, showExamples)).join('');
   return `<button class="zone zone-${direction}" data-dispatch="${direction}"><span class="direction">${arrows[direction]}</span><span class="groups vertical-groups">${slots}</span></button>`;
 }
-function pileStacks() {
-  const looseItems = queue.filter((prompt) => !selectedItemIds.has(prompt.item.id));
-  const stackCount = Math.max(1, Math.min(8, Math.ceil(Math.sqrt(looseItems.length))));
-  const stacks = Array.from({ length: stackCount }, () => []);
-  looseItems.forEach((prompt, index) => stacks[index % stackCount].push(prompt));
-  return stacks;
+function pileLayout() {
+  const slotCount = Math.min(16, board.queue.length);
+  const columns = 4;
+  return board.queue.map((prompt, index) => {
+    const slot = index % slotCount;
+    const depth = Math.floor(index / slotCount);
+    const row = Math.floor(slot / columns);
+    const column = slot % columns;
+    const hash = Array.from(prompt.item.id).reduce((value, char) => (value * 31 + char.charCodeAt(0)) >>> 0, 7);
+    const jitterX = (hash % 13) - 6;
+    const jitterY = (Math.floor(hash / 13) % 13) - 6;
+    return { prompt, slot, depth, left: 14 + column * 24 + jitterX, top: 14 + row * 23 + jitterY, rotate: (Math.floor(hash / 169) % 25) - 12 };
+  });
 }
 function multiPileHtml() {
-  const stacks = pileStacks();
+  const layout = pileLayout();
   const capacity = multiSelectCapacity(state, modeId);
   const held = queue.filter((prompt) => selectedItemIds.has(prompt.item.id));
-  return `<div class="held-items" aria-label="Selected items">${held.map((prompt) => `<button class="pile-item held selected" data-select-item="${escapeHtml(prompt.item.id)}" aria-pressed="true">${glyphHtml(prompt.item)}</button>`).join('')}</div><div class="item-pile" style="--pile-columns:${stacks.length}" aria-label="All remaining items">${stacks.map((stack, stackIndex) => stack.map((prompt, depth) => {
-    const isTop = depth === stack.length - 1;
-    return `<button class="pile-item ${isTop ? 'top' : 'covered'}" data-select-item="${escapeHtml(prompt.item.id)}" ${isTop ? '' : 'disabled'} style="--stack:${stackIndex};--depth:${depth};--pile-x:${(depth % 3) * 3}px;--pile-rotate:${((depth % 5) - 2) * 2}deg;z-index:${depth + 1}" aria-pressed="false">${glyphHtml(prompt.item)}</button>`;
-  }).join('')).join('')}</div><span class="pile-caption">Pick up to ${capacity}, then choose a direction</span>`;
+  const remainingIds = new Set(queue.map((prompt) => prompt.item.id).filter((id) => !selectedItemIds.has(id)));
+  const topDepthBySlot = new Map();
+  layout.forEach((entry) => { if (remainingIds.has(entry.prompt.item.id)) topDepthBySlot.set(entry.slot, Math.max(topDepthBySlot.get(entry.slot) ?? -1, entry.depth)); });
+  const loose = layout.filter((entry) => remainingIds.has(entry.prompt.item.id));
+  return `<div class="held-items" aria-label="Selected items">${held.map((prompt) => `<button class="pile-item held selected" data-select-item="${escapeHtml(prompt.item.id)}" aria-pressed="true" title="Return ${escapeHtml(prompt.item.name)} to pile">${glyphHtml(prompt.item)}</button>`).join('')}</div><div class="item-pile" aria-label="All remaining items spread across the table">${loose.map((entry) => {
+    const isTop = entry.depth === topDepthBySlot.get(entry.slot);
+    return `<button class="pile-item ${isTop ? 'top' : 'covered'}" data-select-item="${escapeHtml(entry.prompt.item.id)}" ${isTop ? '' : 'disabled'} style="--pile-left:${entry.left}%;--pile-top:${entry.top}%;--pile-rotate:${entry.rotate}deg;--pile-x:${entry.depth * 3}px;--pile-y:${entry.depth * -4}px;--pile-shadow-y:${4 + entry.depth * 3}px;--pile-shadow-blur:${8 + entry.depth * 4}px;z-index:${entry.depth + 1}" aria-pressed="false" title="${isTop ? `Pick up ${escapeHtml(entry.prompt.item.name)}` : `${escapeHtml(entry.prompt.item.name)} is under another item`}">${glyphHtml(entry.prompt.item)}</button>`;
+  }).join('')}</div><span class="pile-caption">Pick up to ${capacity}; tapping one exposes anything underneath</span>`;
 }
 function multiBatchDecision(prompts, direction) {
   const mode = MODES[modeId];
@@ -563,7 +593,7 @@ function render() {
       ${boardHtml}
     </main>` : `
     <main class="app-shell">
-      <div class="version-banner"><span>Emoji Wager Sort ${APP_VERSION}</span><span>Between rounds</span><button id="toggle-debug" class="debug-toggle">${debugOpen ? 'Hide debug records' : 'Show debug records'}</button></div>
+      <div class="version-banner"><span>Emoji Wager Sort ${APP_VERSION}</span><span>Between rounds</span></div>
       <header class="hero"><div><p class="eyebrow">Gaming Parlor</p><h1>Emoji Wager Sort</h1><p>Set your mode, shop, and bet here. When the round starts, sorting takes the whole screen.</p><p class="save-scope">Save ${escapeHtml(state.saveMeta.localSaveId)} is local to this browser profile. If another device looks identical, it is probably still on the seeded starter stats unless you imported or synced site data outside the game.</p></div><div class="resources"><span>${heartsHtml()}</span><span>♦ ${state.resources.diamonds}</span><span>♠ ${modePayout(modeId)} · ♦ ${modePayout(modeId)}</span></div></header>
       ${summaryHtml}
       <section class="play-launch panel"><p class="eyebrow">Ready now</p><h2>${mode.name}</h2><p>${board.queue.length} items · ${mode.directions.map((direction) => arrows[direction]).join(' ')}</p><button id="start-round" class="primary-action giant-play">PLAY</button><p class="feedback" role="status">${feedback}</p></section>
@@ -573,6 +603,7 @@ function render() {
         <details class="panel"><summary>♠ Upgrades</summary><div class="shop"><p class="hint">Current ${mode.name}: ♠ ${modePayout(modeId)} · ♦ before ♥ penalties.</p>${state.resources.hearts < state.resources.maxHearts ? '<button id="restore-heart">Restore ♥ ♦5</button>' : ''}<button id="buy-max-heart">+1 Max ♥ ♦${maxHeartCost(state.resources.maxHearts)}</button><button id="buy-global">+1 global ♠ ♦${spadeCost('global', state.upgrades.spades.global)}</button><button id="buy-mode">+1 mode ♠ ♦${spadeCost(modeId, state.upgrades.spades[modeId])}</button>${hasModeBetHistory(state, modeId) ? `<button id="buy-item-median">Meta-median item bonus Lv.${medianBonusLevel}: buy +♦${nextMedianBonus} per item target ♦${perItemMedianBonusCost(modeId, medianBonusLevel)}</button>` : ''}<button id="buy-study">+1s Study Time Lv.${modeUpgrade('studyTime')} ♦${studyTimeCost(modeUpgrade('studyTime'))}</button><button id="buy-pause-count">+1 Pause/Round Lv.${modeUpgrade('pauseCount')} ♦${pauseCountCost(modeUpgrade('pauseCount'))}</button><button id="buy-pause-length">+1s Pause Length Lv.${modeUpgrade('pauseLength')} ♦${pauseLengthCost(modeUpgrade('pauseLength'))}</button>${mode.interaction === 'single' ? `<button id="buy-queue-vision">Reveal +1 Queue Glyph Lv.${modeUpgrade('queueVision')} ♦${queueVisionCost(modeUpgrade('queueVision'))}</button>` : `<button id="buy-multi-select">Hold ${multiSelectCapacity(state, modeId) + 1} items ♦${multiSelectCost(modeUpgrade('multiSelect'))}</button>`}<button id="buy-speed">Faster glyphs Lv.${modeUpgrade('animationSpeed')} ♦${animationSpeedCost(modeUpgrade('animationSpeed'))}</button>${mode.variant === 'standard' && mode.interaction === 'single' && !hasSortedItemDisplay(state, modeId) ? `<button id="buy-sorted-display">Show sorted items ♦${sortedItemDisplayCost(modeId)}</button>` : ''}<button id="reset-save">Reset save</button></div></details>
       </section>
       ${debugHtml}
+      <div class="debug-controls"><button id="toggle-debug" class="debug-toggle">${debugOpen ? 'Hide debug records' : 'Show debug records'}</button></div>
     </main>`;
   root.querySelectorAll('[data-dispatch]').forEach((button) => button.addEventListener('click', () => dispatch(button.dataset.dispatch)));
   root.querySelectorAll('[data-mode]').forEach((button) => button.addEventListener('click', () => { const id = button.dataset.mode; if (state.unlockedModes[id]) startBoard(id); else tryAction(() => unlockMode(state, id)); }));
