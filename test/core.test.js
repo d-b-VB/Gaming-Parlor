@@ -9,6 +9,7 @@ const overlaySelectors = JSON.parse(await readFile(new URL('../emoji_wager_game_
 const expansionSelectors = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/category_expansion_overlays.json', import.meta.url))).selectors;
 const selectors = [...baseSelectors, ...overlaySelectors, ...expansionSelectors];
 const defaultState = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/default_state.json', import.meta.url)));
+const mainSource = await readFile(new URL('../src/main.js', import.meta.url), 'utf8');
 
 test('catalog is expanded enough for strong prototype coverage', () => {
   assert.ok(items.length >= 603);
@@ -224,6 +225,13 @@ test('multi-item hand capacity starts at two and upgrades per game', () => {
   assert.equal(multiSelectCapacity(state, 'multi_sort_2'), 3);
   assert.equal(multiSelectCapacity(state, 'multi_freeform_2'), 2);
   assert.throws(() => buyMultiSelect(state, 'sort_2'), /Multi-Item/);
+});
+
+test('live timer updates do not replace multi-item controls between pointer down and click', () => {
+  const tickerBody = mainSource.slice(mainSource.indexOf('function startTicker()'), mainSource.indexOf('function resetPromptClock()'));
+  assert.match(tickerBody, /updateLiveDisplay\(\)/);
+  assert.doesNotMatch(tickerBody, /render\(\)/);
+  assert.match(mainSource, /addEventListener\('pointerdown'/);
 });
 
 test('economy handles unlocks, club bets, spades, memory, and winnings', () => {

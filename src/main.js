@@ -1,8 +1,8 @@
-import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, itemPercentileAtRun, createClubBet, buyClubBet, unlockMode, canUnlockMode, isModeVisible, buySpade, buyPerItemMedianBonus, buySortedItemDisplay, restoreHeart, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, buyMultiSelect, multiSelectCost, multiSelectCapacity, sortedItemDisplayCost, hasSortedItemDisplay, settleRound, settleItemTiming, itemTimingTargets, roundReferenceCurve, spadeCost, payoutScore, perItemMedianBonusCost, hasModeBetHistory, streakDuration } from './game/core.js?v=0.4.1';
+import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, itemPercentileAtRun, createClubBet, buyClubBet, unlockMode, canUnlockMode, isModeVisible, buySpade, buyPerItemMedianBonus, buySortedItemDisplay, restoreHeart, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, buyMultiSelect, multiSelectCost, multiSelectCapacity, sortedItemDisplayCost, hasSortedItemDisplay, settleRound, settleItemTiming, itemTimingTargets, roundReferenceCurve, spadeCost, payoutScore, perItemMedianBonusCost, hasModeBetHistory, streakDuration } from './game/core.js?v=0.4.2';
 
 const root = document.querySelector('#root');
-const APP_VERSION = 'v0.4.1';
-const SAVE_SCHEMA_VERSION = '0.4.1-local';
+const APP_VERSION = 'v0.4.2';
+const SAVE_SCHEMA_VERSION = '0.4.2-local';
 const arrows = { left: '←', right: '→', up: '↑', down: '↓' };
 let items = [];
 let selectors = [];
@@ -184,7 +184,7 @@ function itemTimerHtml() {
     ['Elite', targets.eliteSeconds ?? targets.fastestSeconds, 'fast'],
     ['Target', targets.metaMedianSeconds ?? targets.medianSeconds, 'median'],
   ];
-  return `<span class="item-timer-stack" aria-label="Item timing clocks">${rows.map(([label, seconds, cls]) => `<span class="item-clock ${cls}" title="${label}: ${seconds.toFixed(2)}s" style="--pct:${timerPct(seconds)}"><span>${label[0]}</span></span>`).join('')}</span>`;
+  return `<span class="item-timer-stack" aria-label="Item timing clocks">${rows.map(([label, seconds, cls]) => `<span class="item-clock ${cls}" data-timer-seconds="${seconds}" title="${label}: ${seconds.toFixed(2)}s" style="--pct:${timerPct(seconds)}"><span>${label[0]}</span></span>`).join('')}</span>`;
 }
 function barsHtml(safety, activeBet, hideTimers = false) {
   if (hideTimers) return `<div class="timer-stack"><div class="timer-label muted"><span>Final item</span><span>Timers hidden</span></div>${queueStripHtml()}</div>`;
@@ -192,8 +192,8 @@ function barsHtml(safety, activeBet, hideTimers = false) {
   const heartPct = hasHeartLimit ? Math.max(0, Math.min(100, ((safety - elapsed) / Math.max(1, safety)) * 100)) : 100;
   const betTarget = activeBet?.targetSeconds;
   const betPct = betTarget ? Math.max(0, Math.min(100, ((betTarget - elapsed) / Math.max(1, betTarget)) * 100)) : 0;
-  const heartLabel = hasHeartLimit ? `<span>${heartsHtml()} ♥ safe ${fmt(Math.max(0, safety - elapsed))}</span><span>${fmt(safety)}</span>` : `<span>${heartsHtml()} First run: no ♥ timer</span><span>Take your time</span>`;
-  return `<div class="timer-stack"><div class="timer-label">${heartLabel}</div><div class="timer-bar heart-bar ${hasHeartLimit ? '' : 'untimed'}"><span style="width:${heartPct}%"></span></div>${activeBet ? `<div class="timer-label"><span>♣ alive ${fmt(Math.max(0, activeBet.targetSeconds - elapsed))}</span><span>${activeBet.oddsLabel || `${activeBet.oddsMultiplier}:1`} / ${fmt(activeBet.targetSeconds)} / ≤${activeBet.mistakeLimit} errors</span></div><div class="timer-bar bet-bar"><span style="width:${betPct}%"></span></div>` : '<div class="timer-label muted"><span>♣ none</span><span>Buy between rounds</span></div><div class="timer-bar bet-bar empty"><span style="width:0%"></span></div>'}${queueStripHtml()}</div>`;
+  const heartLabel = hasHeartLimit ? `<span>${heartsHtml()} ♥ safe <span id="heart-time-live">${fmt(Math.max(0, safety - elapsed))}</span></span><span>${fmt(safety)}</span>` : `<span>${heartsHtml()} First run: no ♥ timer</span><span>Take your time</span>`;
+  return `<div class="timer-stack"><div class="timer-label">${heartLabel}</div><div class="timer-bar heart-bar ${hasHeartLimit ? '' : 'untimed'}"><span id="heart-bar-live" style="width:${heartPct}%"></span></div>${activeBet ? `<div class="timer-label"><span>♣ alive <span id="bet-time-live">${fmt(Math.max(0, activeBet.targetSeconds - elapsed))}</span></span><span>${activeBet.oddsLabel || `${activeBet.oddsMultiplier}:1`} / ${fmt(activeBet.targetSeconds)} / ≤${activeBet.mistakeLimit} errors</span></div><div class="timer-bar bet-bar"><span id="bet-bar-live" style="width:${betPct}%"></span></div>` : '<div class="timer-label muted"><span>♣ none</span><span>Buy between rounds</span></div><div class="timer-bar bet-bar empty"><span style="width:0%"></span></div>'}${queueStripHtml()}</div>`;
 }
 function stopTimer() { if (timerId) window.clearInterval(timerId); timerId = null; }
 function startBoard(nextMode = modeId) {
@@ -244,8 +244,26 @@ function startTicker() {
     }
     if (paused && Date.now() >= pauseEndsAt) endPause();
     if (startedAt) elapsed = (Date.now() - startedAt - pausedAccumMs - (paused ? Date.now() - pauseStartedAt : 0)) / 1000;
-    render();
+    updateLiveDisplay();
   }, 100);
+}
+function updateLiveDisplay() {
+  const setText = (selector, value) => { const node = root.querySelector(selector); if (node) node.textContent = value; };
+  setText('#elapsed-live', `${elapsed.toFixed(1)}s`);
+  setText('#study-live', studying ? Math.max(0, (studyEndsAt - Date.now()) / 1000).toFixed(1) : '—');
+  setText('#pause-live', paused ? Math.max(0, (pauseEndsAt - Date.now()) / 1000).toFixed(1) : pausesRemaining);
+  const safety = heartSafety(modeId, state.gameMemory[modeId].entries);
+  const heartBar = root.querySelector('#heart-bar-live');
+  if (heartBar && Number.isFinite(safety)) heartBar.style.width = `${Math.max(0, Math.min(100, ((safety - elapsed) / Math.max(1, safety)) * 100))}%`;
+  setText('#heart-time-live', fmt(Math.max(0, safety - elapsed)));
+  const betTarget = state.activeClubBet?.targetSeconds;
+  const betBar = root.querySelector('#bet-bar-live');
+  if (betBar && betTarget) betBar.style.width = `${Math.max(0, Math.min(100, ((betTarget - elapsed) / Math.max(1, betTarget)) * 100))}%`;
+  if (betTarget) setText('#bet-time-live', fmt(Math.max(0, betTarget - elapsed)));
+  setText('.play-shell .feedback', feedback);
+  root.querySelectorAll('[data-timer-seconds]').forEach((node) => { node.style.setProperty('--pct', timerPct(Number(node.dataset.timerSeconds))); });
+  const pauseButton = root.querySelector('#pause-round');
+  if (pauseButton) pauseButton.disabled = !(inRound && !studying && !paused && pausesRemaining > 0);
 }
 function resetPromptClock() { promptStartedAt = Date.now(); }
 function startRound() {
@@ -583,7 +601,7 @@ function render() {
   const centerHtml = mode.interaction === 'multi'
     ? `<div class="center-card multi-center ${motion ? 'busy' : ''}">${current ? itemTimerHtml() : ''}${current ? multiPileHtml() : '<span class="prompt">🏁</span>'}</div>`
     : `<div class="center-card ${motion ? 'busy' : ''}">${current ? itemTimerHtml() : ''}<span class="prompt ${motion ? 'ghost-prompt' : ''}">${current ? glyphHtml(current.item) : '🏁'}</span><span>${current ? `${progress}/${board.queue.length} sorted` : 'Round finished'}</span></div>`;
-  const boardHtml = `<div class="play-hud"><div class="status-row"><span>⏱ ${elapsed.toFixed(1)}s</span><span>${heartsHtml()}</span><span>Queue ${queue.length}/${board.queue.length}</span><span>Streak ${streak}</span><span>Study ${studying ? studyLeft.toFixed(1) : '—'}</span><span>Pause ${paused ? pauseLeft.toFixed(1) : pausesRemaining}</span><button id="pause-round" ${inRound && !studying && !paused && pausesRemaining > 0 ? '' : 'disabled'}>Pause</button><span>Item ♦${itemDiamondBonuses} / ♥-${itemHeartLosses}</span></div>${barsHtml(safety, state.activeClubBet, inRound && queue.length === 1)}</div>
+  const boardHtml = `<div class="play-hud"><div class="status-row"><span>⏱ <span id="elapsed-live">${elapsed.toFixed(1)}s</span></span><span>${heartsHtml()}</span><span>Queue ${queue.length}/${board.queue.length}</span><span>Streak ${streak}</span><span>Study <span id="study-live">${studying ? studyLeft.toFixed(1) : '—'}</span></span><span>Pause <span id="pause-live">${paused ? pauseLeft.toFixed(1) : pausesRemaining}</span></span><button id="pause-round" ${inRound && !studying && !paused && pausesRemaining > 0 ? '' : 'disabled'}>Pause</button><span>Item ♦${itemDiamondBonuses} / ♥-${itemHeartLosses}</span></div>${barsHtml(safety, state.activeClubBet, inRound && queue.length === 1)}</div>
       <div class="sort-board framed-board mode-${mode.directions.length} ${mode.interaction === 'multi' ? 'multi-board' : ''}">${mode.directions.map(sideZoneHtml).join('')}${centerHtml}</div><p class="feedback" role="status">${feedback}</p>`;
   const debugHtml = debugRecordsHtml(targets, safety);
   const summaryHtml = lastSummary ? `<section class="panel post-round"><h2>Round summary</h2><div class="summary-grid"><span>Mode</span><strong>${lastSummary.modeName}</strong><span>Time</span><strong>${lastSummary.timeSeconds.toFixed(2)}s</strong><span>Percentile score</span><strong>${Math.round(lastSummary.percentile * 100)}%</strong><span>Mistakes</span><strong>${lastSummary.mistakes}</strong><span>♦ payout</span><strong>♦ ${lastSummary.diamondsDelta}</strong><span>Item speed bonus</span><strong>♦ ${lastSummary.itemDiamondBonuses}</strong><span>♥ change</span><strong>${lastSummary.heartsDelta} round / -${lastSummary.itemHeartLosses} item</strong><span>Mistake pressure</span><strong>${lastSummary.mistakeHeartsLost ? `-${lastSummary.mistakeHeartsLost} ♥` : 'Safe'}${Number.isFinite(lastSummary.medianMistakes) ? ` · median ${lastSummary.medianMistakes}` : ''}</strong><span>Item records</span><strong>${lastSummary.itemRecordCount}</strong><span>Bet result</span><strong>${lastSummary.betTarget ? `${lastSummary.betWon ? 'Won' : 'Lost'} vs ${fmt(lastSummary.betTarget)} / ≤${lastSummary.betMistakeLimit} errors (${lastSummary.betWinnings ? `♦ ${lastSummary.betWinnings}, +${lastSummary.betConfidenceWeight} memory` : 'no payout'})` : 'No bet'}</strong></div><button id="continue-lobby" class="primary-action">Continue</button></section>` : '';
@@ -608,13 +626,17 @@ function render() {
   root.querySelectorAll('[data-dispatch]').forEach((button) => button.addEventListener('click', () => dispatch(button.dataset.dispatch)));
   root.querySelectorAll('[data-mode]').forEach((button) => button.addEventListener('click', () => { const id = button.dataset.mode; if (state.unlockedModes[id]) startBoard(id); else tryAction(() => unlockMode(state, id)); }));
   root.querySelectorAll('[data-target]').forEach((button) => button.addEventListener('click', () => { selectedTarget = button.dataset.target; if (selectedTarget === 'half' && stake % 2 !== 0) stake += 1; render(); }));
-  root.querySelectorAll('[data-select-item]').forEach((button) => button.addEventListener('click', () => {
+  root.querySelectorAll('[data-select-item]').forEach((button) => {
+    const selectItem = () => {
     const itemId = button.dataset.selectItem;
     if (selectedItemIds.has(itemId)) selectedItemIds.delete(itemId);
     else if (selectedItemIds.size < multiSelectCapacity(state, modeId)) selectedItemIds.add(itemId);
     else feedback = `Your hand can hold ${multiSelectCapacity(state, modeId)} items.`;
     render();
-  }));
+    };
+    button.addEventListener('pointerdown', (event) => { event.preventDefault(); selectItem(); });
+    button.addEventListener('click', (event) => { if (event.detail === 0) selectItem(); });
+  });
   root.querySelector('#stake')?.addEventListener('input', (event) => { stake = Math.max(1, Number(event.target.value || 1)); });
   root.querySelector('#buy-bet')?.addEventListener('click', buyBet);
   root.querySelector('#toggle-debug')?.addEventListener('click', () => { debugOpen = !debugOpen; render(); });

@@ -495,10 +495,9 @@ input { width: 100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1
 .play-shell .multi-board { grid-template-columns: minmax(3rem, 0.7fr) minmax(14rem, 2.6fr) minmax(3rem, 0.7fr); }
 .held-items { min-height: 3.4rem; width: 100%; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 0.25rem; padding: 0.25rem; border-radius: 12px; background: rgba(82,227,154,0.12); }
 .item-pile { position: relative; width: 100%; min-height: min(32vh, 17rem); padding: 0.25rem; isolation: isolate; perspective: 700px; }
-.pile-item { position: absolute; left: var(--pile-left); top: var(--pile-top); width: clamp(2.5rem, 7.2vmin, 4.25rem); height: clamp(2.5rem, 7.2vmin, 4.25rem); padding: 0.18rem; font-size: clamp(1.6rem, 5.2vmin, 3rem); transform: translate(-50%, -50%) translate(var(--pile-x), var(--pile-y)) rotate(var(--pile-rotate)); border: 2px solid rgba(255,255,255,0.14); box-shadow: 0 var(--pile-shadow-y) var(--pile-shadow-blur) rgba(0,0,0,0.55); transition: transform 150ms ease, filter 150ms ease, outline 150ms ease; }
+.pile-item { position: absolute; left: var(--pile-left); top: var(--pile-top); width: clamp(2.5rem, 7.2vmin, 4.25rem); height: clamp(2.5rem, 7.2vmin, 4.25rem); padding: 0.18rem; touch-action: manipulation; font-size: clamp(1.6rem, 5.2vmin, 3rem); transform: translate(-50%, -50%) translate(var(--pile-x), var(--pile-y)) rotate(var(--pile-rotate)); border: 2px solid rgba(255,255,255,0.14); box-shadow: 0 var(--pile-shadow-y) var(--pile-shadow-blur) rgba(0,0,0,0.55); }
 .pile-item.covered:disabled { opacity: 1; filter: saturate(0.82) brightness(0.72); }
 .pile-item.top { outline: 2px solid rgba(255,210,122,0.82); cursor: grab; }
-.pile-item.top:hover { transform: translate(-50%, -58%) translate(var(--pile-x), var(--pile-y)) rotate(var(--pile-rotate)) scale(1.1); filter: brightness(1.12); z-index: 20 !important; }
 .pile-item.selected { outline: 4px solid #52e39a; }
 .pile-item.held { position: relative; left: auto; top: auto; transform: none; flex: 0 0 auto; box-shadow: 0 5px 12px rgba(0,0,0,0.4); }
 .pile-caption, .batch-status { color: #3a2a1d; font-size: clamp(0.62rem, 1.6vmin, 0.9rem); font-weight: 800; }
