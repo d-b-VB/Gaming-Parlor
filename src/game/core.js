@@ -176,30 +176,6 @@ function rebuildItemExtremes(stats) {
   stats.fastestSeconds = times.length ? Math.min(...times) : null;
   stats.longestSeconds = times.length ? Math.max(...times) : null;
 }
-export function nextRestTime(modeId, roundEntries = [], itemEntries = []) {
-  const realRounds = roundEntries.filter((entry) => entry.entryType === 'actual' && !entry.weightedByBet && Number.isFinite(entry.timeSeconds));
-  if (!realRounds.length) return null;
-  const existingRests = roundEntries.filter((entry) => entry.entryType === 'rest').length;
-  if (existingRests === 0) return Math.max(...realRounds.map((entry) => entry.timeSeconds));
-  const itemTimes = itemEntries.filter((entry) => entry.entryType !== 'rest' && Number.isFinite(entry.timeSeconds)).map((entry) => entry.timeSeconds).sort((a, b) => b - a);
-  const itemCount = modePromptCount(modeId);
-  if (!itemTimes.length || !itemCount) return null;
-  const medianIndex = Math.floor((itemTimes.length - 1) / 2);
-  const skip = existingRests;
-  const selected = Array.from({ length: itemCount }, (_, index) => itemTimes[Math.min(index * (skip + 1), medianIndex)]);
-  const slowestItem = itemTimes[0];
-  const medianItem = itemTimes[medianIndex];
-  const paceRange = Math.max(0.01, slowestItem - medianItem);
-  const selectedMean = mean(selected);
-  const slowestRun = Math.max(...realRounds.map((entry) => entry.timeSeconds));
-  const medianRun = median(realRounds.map((entry) => entry.timeSeconds));
-  const slowPaceRatio = Math.max(0, Math.min(1, (selectedMean - medianItem) / paceRange));
-  const candidate = roundScore(medianRun + slowPaceRatio * Math.max(0, slowestRun - medianRun));
-  const previousRest = [...roundEntries].reverse().find((entry) => entry.entryType === 'rest' && Number.isFinite(entry.timeSeconds));
-  if (previousRest && candidate >= previousRest.timeSeconds) return null;
-  if (previousRest && previousRest.timeSeconds <= medianRun) return null;
-  return Math.max(roundScore(medianRun), candidate);
-}
 function addRestRecordForMode(next, restedModeId, activeModeId, createdAt) {
   next.gameMemory ??= {};
   next.gameMemory[restedModeId] ??= { entries: [] };
