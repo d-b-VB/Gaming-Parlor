@@ -93,6 +93,8 @@ Heart loss:
 
 Between rounds, a large central **PLAY** button is the primary action. Game modes, wagers, and upgrades live in separate collapsible panels, while debug records remain at the bottom. Locked content is hidden until its prerequisite is owned; an available purchase remains visible even when the player cannot currently afford it.
 
+Opening or closing a collapsible panel is persistent for the current app session. Purchases, mode changes, wager selection, and other rerenders inside a panel must not collapse it.
+
 The debug toggle sits after the normal lobby controls at the bottom of the page. When opened, the debug panel includes a graph of the current smooth whole-round reference curve, with performance percentile on the horizontal axis, whole-round time on the vertical axis, and the historical run meta-median marked on the curve.
 
 The first shop can be simple and functional.  It should include:

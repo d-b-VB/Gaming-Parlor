@@ -182,12 +182,13 @@ function addRestRecordForMode(next, restedModeId, activeModeId, createdAt) {
   const entries = next.gameMemory[restedModeId].entries ?? [];
   const timedEntries = realRoundEntries(entries);
   if (!timedEntries.length) return false;
-  const slowestTime = Math.max(...timedEntries.map((entry) => entry.timeSeconds));
+  const stats = ensureItemStats(next, restedModeId);
+  const restTime = nextRestTime(restedModeId, entries, stats.entries);
+  if (!Number.isFinite(restTime)) return false;
   const mistakeEntries = timedEntries.filter((entry) => Number.isFinite(entry.mistakes));
   const highestMistakes = mistakeEntries.length ? Math.max(...mistakeEntries.map((entry) => entry.mistakes)) : 0;
-  const stats = ensureItemStats(next, restedModeId);
   const curve = roundReferenceCurve(restedModeId, stats.entries, entries);
-  entries.push({ timeSeconds: slowestTime, mistakes: highestMistakes, entryType: 'rest', restSource: 'mode_away_block', restedWhilePlaying: activeModeId, createdAt, percentileAtRun: scoreAgainstCurve(slowestTime, curve, entries) });
+  entries.push({ timeSeconds: restTime, mistakes: highestMistakes, entryType: 'rest', restSource: 'mode_away_block', restSequence: entries.filter((entry) => entry.entryType === 'rest').length + 1, restedWhilePlaying: activeModeId, createdAt, percentileAtRun: scoreAgainstCurve(restTime, curve, entries) });
   next.gameMemory[restedModeId].entries = entries;
 
   const seenItemIds = new Set();

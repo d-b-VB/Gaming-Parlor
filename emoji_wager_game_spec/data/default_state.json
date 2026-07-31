@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "0.4.2",
+  "schemaVersion": "0.4.3",
   "resources": {
     "hearts": 5,
     "maxHearts": 5,

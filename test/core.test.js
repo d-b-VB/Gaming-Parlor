@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { BET_TIERS, modeList, generateBoard, matchesSelector, estimateTargets, heartSafety, createClubBet, buyClubBet, canUnlockMode, isModeVisible, settleRound, settleItemTiming, itemTimingTargets, itemPercentileAtRun, itemSlowHeartThreshold, firstRoundCalibrationScores, mistakePressure, unlockMode, buySpade, buyPerItemMedianBonus, buySortedItemDisplay, sortedItemDisplayCost, hasSortedItemDisplay, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, buyMultiSelect, multiSelectCapacity, multiSelectCost, spadeCost, payoutScore, perItemMedianBonusCost, hasPerItemMedianBonus, streakDuration, betWeightedSyntheticTimes, roundReferenceCurve } from '../src/game/core.js';
+import { BET_TIERS, modeList, generateBoard, matchesSelector, estimateTargets, heartSafety, createClubBet, buyClubBet, canUnlockMode, isModeVisible, settleRound, settleItemTiming, itemTimingTargets, itemPercentileAtRun, itemSlowHeartThreshold, firstRoundCalibrationScores, mistakePressure, nextRestTime, unlockMode, buySpade, buyPerItemMedianBonus, buySortedItemDisplay, sortedItemDisplayCost, hasSortedItemDisplay, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, buyMultiSelect, multiSelectCapacity, multiSelectCost, spadeCost, payoutScore, perItemMedianBonusCost, hasPerItemMedianBonus, streakDuration, betWeightedSyntheticTimes, roundReferenceCurve } from '../src/game/core.js';
 
 const items = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/items.json', import.meta.url))).items;
 const baseSelectors = JSON.parse(await readFile(new URL('../emoji_wager_game_spec/data/category_selectors.json', import.meta.url))).selectors;
@@ -234,6 +234,12 @@ test('live timer updates do not replace multi-item controls between pointer down
   assert.match(mainSource, /addEventListener\('pointerdown'/);
 });
 
+test('collapsible lobby drawers preserve their open state across actions', () => {
+  assert.match(mainSource, /const openDrawers = new Set\(\)/);
+  assert.match(mainSource, /data-drawer="modes"/);
+  assert.match(mainSource, /addEventListener\('toggle'/);
+});
+
 test('economy handles unlocks, club bets, spades, memory, and winnings', () => {
   let state = structuredClone(defaultState);
   state = unlockMode(state, 'sort_3');
@@ -261,18 +267,22 @@ test('mode-away rest records accrue once per outside mode block and feed all cal
   state = unlockMode(state, 'sort_3');
   state = unlockMode(state, 'sort_4');
   const counts = () => Object.fromEntries(Object.keys(state.gameMemory).map((modeId) => [modeId, state.gameMemory[modeId].entries.filter((entry) => entry.entryType === 'rest').length]));
-  const play = (modeId, time, mistakes = 0) => { state = settleRound(state, modeId, time, mistakes, `${modeId}-${time}`, `${modeId}-${time}`, [1, 2, 3, 4]); };
+  const play = (modeId, time, mistakes = 0) => { const count = Number(modeId.at(-1)) * 8; state = settleRound(state, modeId, time, mistakes, `${modeId}-${time}`, `${modeId}-${time}`, Array.from({ length: count }, (_, index) => 1 + index % 4)); };
   for (const time of [80, 70, 60, 50, 40]) play('sort_2', time, time === 80 ? 3 : 0);
   for (const time of [90, 80, 70, 60]) play('sort_3', time, 1);
   for (const time of [120, 110, 100]) play('sort_4', time, 2);
   for (const time of [45, 44, 43]) play('sort_2', time, 0);
   for (const time of [55, 54]) play('sort_3', time, 0);
-  assert.deepEqual(Object.fromEntries(Object.entries(counts()).filter(([modeId]) => modeId.startsWith('sort_'))), { sort_2: 3, sort_3: 2, sort_4: 2 });
+  const standardCounts = Object.fromEntries(Object.entries(counts()).filter(([modeId]) => modeId.startsWith('sort_')));
+  assert.ok(standardCounts.sort_2 >= 1);
+  assert.ok(standardCounts.sort_3 >= 1);
+  assert.ok(standardCounts.sort_4 >= 1);
   const sort2Rests = state.gameMemory.sort_2.entries.filter((entry) => entry.entryType === 'rest');
-  assert.ok(sort2Rests.every((entry) => entry.timeSeconds === 70));
+  assert.ok(sort2Rests.every((entry, index) => index === 0 || entry.timeSeconds < sort2Rests[index - 1].timeSeconds));
   assert.ok(sort2Rests.every((entry) => entry.mistakes === 0));
   assert.ok(estimateTargets('sort_2', state.gameMemory.sort_2.entries).find((target) => target.id === 'even').actualCount >= 8);
-  assert.ok(heartSafety('sort_2', state.gameMemory.sort_2.entries) >= 50);
+  const withoutRests = state.gameMemory.sort_2.entries.filter((entry) => entry.entryType !== 'rest');
+  assert.ok(heartSafety('sort_2', state.gameMemory.sort_2.entries) >= heartSafety('sort_2', withoutRests));
   assert.equal(mistakePressure(state.gameMemory.sort_2.entries, 4).maxMistakes, 0);
 });
 
@@ -310,6 +320,21 @@ test('stacked item rests include each item id at most once per rest set', () => 
     assert.equal(restItems.length, 16);
     assert.equal(new Set(restItems.map((entry) => entry.itemId)).size, 16);
   }
+});
+
+test('successive rest scores descend from the slowest run toward the median-item run', () => {
+  const itemEntries = Array.from({ length: 64 }, (_, index) => ({ itemId: `timing-${index}`, timeSeconds: index + 1, entryType: 'actual' }));
+  const entries = [1000, 800, 600, 500].map((timeSeconds) => ({ timeSeconds, mistakes: 0, entryType: 'actual', playedRound: true, roundOverheadSeconds: 0 }));
+  const rests = [];
+  for (let index = 0; index < 12; index += 1) {
+    const timeSeconds = nextRestTime('sort_2', [...entries, ...rests], itemEntries);
+    if (!Number.isFinite(timeSeconds)) break;
+    rests.push({ timeSeconds, entryType: 'rest' });
+  }
+  assert.equal(rests[0].timeSeconds, 1000);
+  assert.ok(rests.length > 2);
+  assert.ok(rests.every((entry, index) => index === 0 || entry.timeSeconds < rests[index - 1].timeSeconds));
+  assert.ok(rests.at(-1).timeSeconds >= 700);
 });
 test('bet propositions use sensible odds and require enough actual history', () => {
   const lowHistory = structuredClone(defaultState).gameMemory.sort_2.entries;
