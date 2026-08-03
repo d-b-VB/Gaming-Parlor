@@ -102,6 +102,7 @@
 - Multi-Item piles vary item X/Y position, rotation, and depth while keeping every remaining item rendered from the beginning.
 - The bottom debug control reveals a smooth reference-curve graph and marks the historical run meta-median percentile and corresponding current time.
 - Interacting with controls inside an open Game Modes, Wagers, or Upgrades panel does not collapse that panel.
+- A stalled animation, settlement exception, or `localStorage` quota failure cannot leave the player trapped on the final empty board; the lobby returns and any persistence warning is visible.
 
 ## Non-goals
 

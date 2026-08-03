@@ -1,8 +1,8 @@
-import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, itemPercentileAtRun, createClubBet, buyClubBet, unlockMode, canUnlockMode, isModeVisible, buySpade, buyPerItemMedianBonus, buySortedItemDisplay, restoreHeart, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, buyMultiSelect, multiSelectCost, multiSelectCapacity, sortedItemDisplayCost, hasSortedItemDisplay, settleRound, settleItemTiming, itemTimingTargets, roundReferenceCurve, spadeCost, payoutScore, perItemMedianBonusCost, hasModeBetHistory, streakDuration } from './game/core.js?v=0.4.3';
+import { MODES, modeList, STORAGE_KEY, generateBoard, estimateTargets, heartSafety, itemPercentileAtRun, createClubBet, buyClubBet, unlockMode, canUnlockMode, isModeVisible, buySpade, buyPerItemMedianBonus, buySortedItemDisplay, restoreHeart, buyMaxHeart, maxHeartCost, buyAnimationSpeed, animationSpeedCost, animationDuration, buyStudyTime, studyTimeCost, buyPauseCount, pauseCountCost, buyPauseLength, pauseLengthCost, buyQueueVision, queueVisionCost, buyMultiSelect, multiSelectCost, multiSelectCapacity, sortedItemDisplayCost, hasSortedItemDisplay, settleRound, settleItemTiming, itemTimingTargets, roundReferenceCurve, spadeCost, payoutScore, perItemMedianBonusCost, hasModeBetHistory, streakDuration } from './game/core.js?v=0.4.4';
 
 const root = document.querySelector('#root');
-const APP_VERSION = 'v0.4.3';
-const SAVE_SCHEMA_VERSION = '0.4.3-local';
+const APP_VERSION = 'v0.4.4';
+const SAVE_SCHEMA_VERSION = '0.4.4-local';
 const arrows = { left: '←', right: '→', up: '↑', down: '↓' };
 let items = [];
 let selectors = [];
@@ -40,6 +40,8 @@ let sortedByGroup = {};
 let itemHistoryCountAtRoundStart = 0;
 let selectedItemIds = new Set();
 const openDrawers = new Set();
+let persistenceWarning = '';
+let roundFinishing = false;
 
 function fmt(seconds) {
   return `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
@@ -98,7 +100,14 @@ function normalizeSave(candidate, defaultState) {
 }
 function save() {
   state.saveMeta = { ...state.saveMeta, schemaVersion: SAVE_SCHEMA_VERSION, appVersion: APP_VERSION, savedAt: new Date().toISOString() };
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    persistenceWarning = '';
+    return true;
+  } catch (error) {
+    persistenceWarning = `Progress remains available for this session, but the browser could not save it (${error?.name || 'storage error'}).`;
+    return false;
+  }
 }
 function loadSaved(defaultState) {
   try { return normalizeSave(JSON.parse(localStorage.getItem(STORAGE_KEY)), defaultState); } catch { return normalizeSave(defaultState, defaultState); }
@@ -350,8 +359,12 @@ async function animateGlyphTravel(html, direction, isCorrect) {
         { left: `${zone.x}px`, top: `${zone.y}px`, transform: 'translate(-50%, -50%) scale(0.58) rotate(-7deg)', opacity: 0.96, offset: 0.62 },
         { left: `${back.x}px`, top: `${back.y}px`, transform: 'translate(-50%, -50%) scale(0.34)', opacity: 0, offset: 1 },
       ];
-  const animation = clone.animate(keyframes, { duration: animationDuration(adaptiveBase, state, modeId), easing: 'cubic-bezier(0.18, 0.84, 0.24, 1)', fill: 'forwards' });
-  await animation.finished.catch(() => {});
+  const duration = animationDuration(adaptiveBase, state, modeId);
+  const animation = clone.animate(keyframes, { duration, easing: 'cubic-bezier(0.18, 0.84, 0.24, 1)', fill: 'forwards' });
+  await Promise.race([
+    animation.finished.catch(() => {}),
+    new Promise((resolve) => window.setTimeout(resolve, duration + 350)),
+  ]);
   clone.remove();
 }
 
@@ -375,42 +388,51 @@ function showItemOutcomeFloat({ diamonds = 0, hearts = 0 } = {}) {
 }
 
 function finishRound() {
+  if (roundFinishing) return;
+  roundFinishing = true;
   const finalElapsed = startedAt ? (Date.now() - startedAt - pausedAccumMs - (paused ? Date.now() - pauseStartedAt : 0)) / 1000 : elapsed;
   const final = Math.max(1, Number(finalElapsed.toFixed(2)));
   stopTimer();
-  const before = state;
-  const activeBet = before.activeClubBet;
-  const completedAt = new Date().toISOString();
-  const nextState = settleRound(before, modeId, final, mistakes, board.seed, completedAt, roundItemTimes, itemHistoryCountAtRoundStart);
-  const event = nextState.eventLog.at(-1);
-  const percentile = nextState.gameMemory?.[modeId]?.entries?.findLast((entry) => entry.playedRound && entry.createdAt === completedAt)?.percentileAtRun ?? 0.5;
-  state = nextState;
-  save();
-  lastSummary = {
-    modeName: MODES[modeId].name,
-    timeSeconds: final,
-    mistakes,
-    percentile,
-    diamondsDelta: event?.diamondsDelta ?? 0,
-    heartsDelta: event?.heartsDelta ?? 0,
-    betWinnings: event?.betWinnings ?? 0,
-    betConfidenceWeight: event?.betConfidenceWeight ?? 0,
-    betTarget: activeBet?.targetSeconds,
-    betMistakeLimit: activeBet?.mistakeLimit,
-    betWon: Boolean(activeBet && final <= activeBet.targetSeconds && mistakes <= activeBet.mistakeLimit),
-    itemHeartLosses,
-    itemDiamondBonuses,
-    itemRecordCount,
-    mistakeHeartsLost: event?.mistakeHeartsLost ?? 0,
-    medianMistakes: event?.medianMistakes,
-    maxMistakes: event?.maxMistakes,
-  };
-  feedback = `Round complete in ${final.toFixed(2)}s with ${mistakes} mistake${mistakes === 1 ? '' : 's'}.`;
-  startedAt = null;
-  inRound = false;
-  elapsed = final;
-  motion = null;
-  render();
+  try {
+    const before = state;
+    const activeBet = before.activeClubBet;
+    const completedAt = new Date().toISOString();
+    const nextState = settleRound(before, modeId, final, mistakes, board.seed, completedAt, roundItemTimes, itemHistoryCountAtRoundStart);
+    const event = nextState.eventLog.at(-1);
+    const percentile = nextState.gameMemory?.[modeId]?.entries?.findLast((entry) => entry.playedRound && entry.createdAt === completedAt)?.percentileAtRun ?? 0.5;
+    state = nextState;
+    save();
+    lastSummary = {
+      modeName: MODES[modeId].name,
+      timeSeconds: final,
+      mistakes,
+      percentile,
+      diamondsDelta: event?.diamondsDelta ?? 0,
+      heartsDelta: event?.heartsDelta ?? 0,
+      betWinnings: event?.betWinnings ?? 0,
+      betConfidenceWeight: event?.betConfidenceWeight ?? 0,
+      betTarget: activeBet?.targetSeconds,
+      betMistakeLimit: activeBet?.mistakeLimit,
+      betWon: Boolean(activeBet && final <= activeBet.targetSeconds && mistakes <= activeBet.mistakeLimit),
+      itemHeartLosses,
+      itemDiamondBonuses,
+      itemRecordCount,
+      mistakeHeartsLost: event?.mistakeHeartsLost ?? 0,
+      medianMistakes: event?.medianMistakes,
+      maxMistakes: event?.maxMistakes,
+    };
+    feedback = `Round complete in ${final.toFixed(2)}s with ${mistakes} mistake${mistakes === 1 ? '' : 's'}.`;
+  } catch (error) {
+    lastSummary = null;
+    feedback = `The round ended, but settlement failed: ${error?.message || 'unknown error'}. You can safely start another round.`;
+  } finally {
+    startedAt = null;
+    inRound = false;
+    elapsed = final;
+    motion = null;
+    roundFinishing = false;
+    render();
+  }
 }
 
 function assignedGroupsForDirection(direction) {
@@ -613,6 +635,7 @@ function render() {
     </main>` : `
     <main class="app-shell">
       <div class="version-banner"><span>Emoji Wager Sort ${APP_VERSION}</span><span>Between rounds</span></div>
+      ${persistenceWarning ? `<p class="storage-warning" role="alert">⚠ ${escapeHtml(persistenceWarning)}</p>` : ''}
       <header class="hero"><div><p class="eyebrow">Gaming Parlor</p><h1>Emoji Wager Sort</h1><p>Set your mode, shop, and bet here. When the round starts, sorting takes the whole screen.</p><p class="save-scope">Save ${escapeHtml(state.saveMeta.localSaveId)} is local to this browser profile. If another device looks identical, it is probably still on the seeded starter stats unless you imported or synced site data outside the game.</p></div><div class="resources"><span>${heartsHtml()}</span><span>♦ ${state.resources.diamonds}</span><span>♠ ${modePayout(modeId)} · ♦ ${modePayout(modeId)}</span></div></header>
       ${summaryHtml}
       <section class="play-launch panel"><p class="eyebrow">Ready now</p><h2>${mode.name}</h2><p>${board.queue.length} items · ${mode.directions.map((direction) => arrows[direction]).join(' ')}</p><button id="start-round" class="primary-action giant-play">PLAY</button><p class="feedback" role="status">${feedback}</p></section>

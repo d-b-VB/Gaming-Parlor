@@ -97,6 +97,8 @@ Opening or closing a collapsible panel is persistent for the current app session
 
 The debug toggle sits after the normal lobby controls at the bottom of the page. When opened, the debug panel includes a graph of the current smooth whole-round reference curve, with performance percentile on the horizontal axis, whole-round time on the vertical axis, and the historical run meta-median marked on the curve.
 
+Round completion must always return control to the between-round lobby. Animation completion has a bounded fallback, settlement runs behind a completion guard, and browser persistence failures are reported in the lobby without trapping the player on an empty board.
+
 The first shop can be simple and functional.  It should include:
 
 - Restore 1 Heart.

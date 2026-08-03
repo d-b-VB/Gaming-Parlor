@@ -240,6 +240,17 @@ test('collapsible lobby drawers preserve their open state across actions', () =>
   assert.match(mainSource, /addEventListener\('toggle'/);
 });
 
+test('round completion cannot be blocked by animation or browser storage failures', () => {
+  const finishBody = mainSource.slice(mainSource.indexOf('function finishRound()'), mainSource.indexOf('function assignedGroupsForDirection'));
+  const saveBody = mainSource.slice(mainSource.indexOf('function save()'), mainSource.indexOf('function loadSaved'));
+  assert.match(mainSource, /Promise\.race\(\[/);
+  assert.match(saveBody, /localStorage\.setItem/);
+  assert.match(saveBody, /catch \(error\)/);
+  assert.match(finishBody, /finally/);
+  assert.match(finishBody, /inRound = false/);
+  assert.match(finishBody, /render\(\)/);
+});
+
 test('economy handles unlocks, club bets, spades, memory, and winnings', () => {
   let state = structuredClone(defaultState);
   state = unlockMode(state, 'sort_3');

@@ -8,6 +8,7 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 .app-shell { width: min(1380px, 100%); margin: 0 auto; padding: 24px; }
 .version-banner { display: flex; justify-content: space-between; gap: 1rem; align-items: center; margin-bottom: 1rem; padding: 0.75rem 1rem; border-radius: 999px; color: #201811; background: linear-gradient(135deg, #ffd27a, #f7bd57); font-weight: 900; letter-spacing: 0.03em; box-shadow: 0 12px 30px rgba(0,0,0,0.25); }
 .save-scope { max-width: 62ch; margin-top: 0.75rem; color: #ffe2a3; font-size: 0.92rem; line-height: 1.45; }
+.storage-warning { margin: 0 0 1rem; padding: 0.8rem 1rem; border: 1px solid #ffb86b; border-radius: 14px; color: #fff1d7; background: rgba(143,65,20,0.72); font-weight: 750; }
 .hero, .panel { border: 1px solid rgba(255,255,255,0.14); background: rgba(35, 27, 20, 0.86); border-radius: 24px; box-shadow: 0 18px 60px rgba(0,0,0,0.32); }
 .hero { display: flex; justify-content: space-between; gap: 2rem; padding: 1.5rem; align-items: center; }
 h1 { margin: 0; font-size: clamp(2rem, 5vw, 4.5rem); }
