@@ -1,0 +1,967 @@
+{
+  "schemaVersion": "0.1.0",
+  "description": "Cross-cutting category overlay for curated associations. These selectors intentionally live outside items.json so broad category work can be reviewed as one compact data change instead of hundreds of per-item tag edits.",
+  "selectors": [
+    {
+      "id": "cc_school_education",
+      "label": "School / Education",
+      "selector": {
+        "itemIds": [
+          "emoji:school",
+          "emoji:graduation_cap",
+          "emoji:school_satchel",
+          "emoji:books",
+          "emoji:open_book",
+          "emoji:notebook",
+          "emoji:pencil",
+          "emoji:teacher",
+          "emoji:student",
+          "emoji:microscope",
+          "emoji:abacus",
+          "emoji:scales",
+          "emoji:artist_palette"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 13
+    },
+    {
+      "id": "cc_june_graduation",
+      "label": "June / Graduation",
+      "selector": {
+        "itemIds": [
+          "emoji:graduation_cap",
+          "emoji:school",
+          "emoji:party_popper",
+          "emoji:confetti_ball",
+          "emoji:bouquet",
+          "emoji:sun",
+          "emoji:gemini",
+          "emoji:cancer",
+          "emoji:bride_with_veil",
+          "emoji:ring"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 10
+    },
+    {
+      "id": "cc_headwear",
+      "label": "Headwear",
+      "selector": {
+        "itemIds": [
+          "emoji:graduation_cap",
+          "emoji:top_hat",
+          "emoji:crown",
+          "emoji:womans_hat",
+          "emoji:billed_cap",
+          "emoji:helmet_with_white_cross",
+          "emoji:military_helmet",
+          "emoji:firefighter"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 8
+    },
+    {
+      "id": "cc_emergency_response",
+      "label": "Emergency Response",
+      "selector": {
+        "itemIds": [
+          "emoji:fire_engine",
+          "emoji:ambulance",
+          "emoji:police_car",
+          "emoji:oncoming_police_car",
+          "emoji:firefighter",
+          "emoji:police_officer",
+          "emoji:hospital",
+          "emoji:fire_extinguisher",
+          "symbol:warning",
+          "emoji:staff_of_aesculapius"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 10
+    },
+    {
+      "id": "cc_wheels",
+      "label": "Wheels",
+      "selector": {
+        "itemIds": [
+          "emoji:fire_engine",
+          "emoji:ambulance",
+          "emoji:police_car",
+          "emoji:taxi",
+          "emoji:bus",
+          "emoji:delivery_truck",
+          "emoji:pickup_truck",
+          "emoji:tractor",
+          "emoji:racing_car",
+          "emoji:bicycle"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 10
+    },
+    {
+      "id": "cc_hot_danger",
+      "label": "Hot Danger",
+      "selector": {
+        "itemIds": [
+          "emoji:fire",
+          "emoji:fire_engine",
+          "emoji:fire_extinguisher",
+          "emoji:firecracker",
+          "emoji:fireworks",
+          "emoji:sun",
+          "emoji:hot_pepper",
+          "symbol:warning"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 8
+    },
+    {
+      "id": "cc_art_studio",
+      "label": "Art Studio",
+      "selector": {
+        "itemIds": [
+          "emoji:artist_palette",
+          "emoji:artist",
+          "emoji:paintbrush",
+          "emoji:pencil",
+          "emoji:performing_arts",
+          "emoji:camera",
+          "emoji:rainbow"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 7
+    },
+    {
+      "id": "cc_performance_stage",
+      "label": "Performance / Stage",
+      "selector": {
+        "itemIds": [
+          "emoji:microphone",
+          "emoji:studio_microphone",
+          "emoji:musical_note",
+          "emoji:musical_keyboard",
+          "emoji:guitar",
+          "emoji:violin",
+          "emoji:trumpet",
+          "emoji:saxophone",
+          "emoji:performing_arts"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 9
+    },
+    {
+      "id": "cc_farm_to_table",
+      "label": "Farm to Table",
+      "selector": {
+        "itemIds": [
+          "emoji:ear_of_rice",
+          "emoji:corn",
+          "emoji:seedling",
+          "emoji:tractor",
+          "emoji:cow",
+          "emoji:chicken",
+          "emoji:egg",
+          "emoji:bread",
+          "emoji:cooked_rice",
+          "emoji:rice_ball",
+          "emoji:popcorn"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 11
+    },
+    {
+      "id": "cc_north_america",
+      "label": "North America",
+      "selector": {
+        "itemIds": [
+          "flag:united_states",
+          "flag:canada",
+          "flag:mexico",
+          "emoji:maple_leaf",
+          "emoji:eagle",
+          "emoji:bison",
+          "emoji:corn",
+          "emoji:american_football",
+          "emoji:fireworks"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 9
+    },
+    {
+      "id": "cc_law_justice",
+      "label": "Law / Justice",
+      "selector": {
+        "itemIds": [
+          "emoji:scales",
+          "emoji:scales_2",
+          "symbol:yin_yang",
+          "symbol:equals",
+          "symbol:check",
+          "symbol:cross_mark",
+          "emoji:police_officer",
+          "emoji:police_car",
+          "emoji:briefcase"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 9
+    },
+    {
+      "id": "cc_medicine",
+      "label": "Medicine / Healthcare",
+      "selector": {
+        "itemIds": [
+          "emoji:staff_of_aesculapius",
+          "emoji:hospital",
+          "emoji:ambulance",
+          "emoji:pill",
+          "emoji:syringe",
+          "emoji:stethoscope",
+          "emoji:anatomical_heart",
+          "symbol:warning"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 8
+    },
+    {
+      "id": "cc_positive",
+      "label": "Positive",
+      "selector": {
+        "itemIds": [
+          "symbol:check",
+          "emoji:white_heavy_check_mark",
+          "emoji:heavy_check_mark",
+          "emoji:thumbs_up_sign",
+          "emoji:grinning_face",
+          "emoji:smiling_face_with_smiling_eyes",
+          "emoji:party_popper",
+          "emoji:confetti_ball",
+          "emoji:trophy",
+          "emoji:clapping_hands_sign"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 10
+    },
+    {
+      "id": "cc_negative",
+      "label": "Negative",
+      "selector": {
+        "itemIds": [
+          "symbol:cross_mark",
+          "emoji:cross_mark",
+          "emoji:negative_squared_cross_mark",
+          "emoji:thumbs_down_sign",
+          "emoji:crying_face",
+          "emoji:loudly_crying_face",
+          "emoji:skull",
+          "symbol:skull",
+          "emoji:coffin",
+          "emoji:headstone",
+          "symbol:warning"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 11
+    },
+    {
+      "id": "cc_warning_status",
+      "label": "Warning / Status",
+      "selector": {
+        "itemIds": [
+          "symbol:warning",
+          "symbol:check",
+          "symbol:cross_mark",
+          "emoji:white_heavy_check_mark",
+          "emoji:cross_mark"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 5
+    },
+    {
+      "id": "cc_balance_symmetry",
+      "label": "Balance / Symmetry",
+      "selector": {
+        "itemIds": [
+          "symbol:yin_yang",
+          "emoji:scales",
+          "emoji:scales_2",
+          "symbol:equals",
+          "symbol:divide",
+          "symbol:infinity",
+          "emoji:gemini",
+          "emoji:libra",
+          "emoji:hourglass"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 9
+    },
+    {
+      "id": "cc_direction_up",
+      "label": "Pointing Up",
+      "selector": {
+        "itemIds": [
+          "symbol:up_arrow",
+          "symbol:filled_triangle",
+          "symbol:outline_triangle",
+          "emoji:chart_with_upwards_trend",
+          "emoji:rocket"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 5
+    },
+    {
+      "id": "cc_direction_down",
+      "label": "Pointing Down",
+      "selector": {
+        "itemIds": [
+          "symbol:down_arrow",
+          "emoji:chart_with_downwards_trend",
+          "emoji:anchor",
+          "emoji:parachute"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 4
+    },
+    {
+      "id": "cc_circles_loops",
+      "label": "Circles / Loops",
+      "selector": {
+        "itemIds": [
+          "symbol:filled_circle",
+          "symbol:outline_circle",
+          "symbol:circle",
+          "symbol:yin_yang",
+          "symbol:infinity",
+          "emoji:heavy_large_circle",
+          "emoji:ring",
+          "emoji:wheel",
+          "emoji:soccer_ball"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 9
+    },
+    {
+      "id": "cc_squares_boxes",
+      "label": "Squares / Boxes",
+      "selector": {
+        "itemIds": [
+          "symbol:filled_square",
+          "symbol:outline_square",
+          "symbol:square",
+          "emoji:black_large_square",
+          "emoji:squared_id",
+          "emoji:ballot_box_with_check",
+          "emoji:package",
+          "emoji:bento_box",
+          "emoji:inbox_tray"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 9
+    },
+    {
+      "id": "cc_triangles_points",
+      "label": "Triangles / Points",
+      "selector": {
+        "itemIds": [
+          "symbol:filled_triangle",
+          "symbol:outline_triangle",
+          "symbol:triangle",
+          "symbol:warning"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 4
+    },
+    {
+      "id": "cc_card_table",
+      "label": "Card Table",
+      "selector": {
+        "itemIds": [
+          "symbol:club",
+          "symbol:spade",
+          "symbol:heart",
+          "symbol:diamond_suit",
+          "emoji:game_die",
+          "emoji:playing_card_black_joker",
+          "emoji:flower_playing_cards",
+          "emoji:money_bag"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 8
+    },
+    {
+      "id": "cc_toxin",
+      "label": "Toxin",
+      "selector": {
+        "itemIds": [
+          "emoji:spider",
+          "emoji:scorpion",
+          "emoji:snake",
+          "emoji:blowfish",
+          "emoji:butterfly",
+          "emoji:lady_beetle",
+          "emoji:mushroom",
+          "symbol:skull",
+          "symbol:warning"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 9
+    },
+    {
+      "id": "cc_march",
+      "label": "March",
+      "selector": {
+        "itemIds": [
+          "emoji:shamrock",
+          "emoji:four_leaf_clover",
+          "flag:ireland",
+          "emoji:rainbow",
+          "emoji:umbrella_with_rain_drops",
+          "emoji:seedling",
+          "emoji:aries",
+          "emoji:pisces",
+          "emoji:basketball_and_hoop"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 9
+    },
+    {
+      "id": "cc_april",
+      "label": "April",
+      "selector": {
+        "itemIds": [
+          "emoji:umbrella_with_rain_drops",
+          "emoji:cloud_with_rain",
+          "emoji:tulip",
+          "emoji:seedling",
+          "emoji:rabbit",
+          "emoji:aries",
+          "emoji:taurus"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 7
+    },
+    {
+      "id": "cc_may",
+      "label": "May",
+      "selector": {
+        "itemIds": [
+          "emoji:bouquet",
+          "emoji:cherry_blossom",
+          "emoji:blossom",
+          "emoji:rose",
+          "emoji:bee",
+          "emoji:taurus",
+          "emoji:gemini",
+          "emoji:graduation_cap"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 8
+    },
+    {
+      "id": "cc_july",
+      "label": "July",
+      "selector": {
+        "itemIds": [
+          "emoji:fireworks",
+          "emoji:firework_sparkler",
+          "flag:united_states",
+          "emoji:sun",
+          "emoji:sunflower",
+          "emoji:watermelon",
+          "emoji:crab",
+          "emoji:leo",
+          "emoji:cancer"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 9
+    },
+    {
+      "id": "cc_october",
+      "label": "October",
+      "selector": {
+        "itemIds": [
+          "emoji:jack_o_lantern",
+          "emoji:ghost",
+          "emoji:bat",
+          "emoji:spider",
+          "emoji:candy",
+          "emoji:lollipop",
+          "emoji:fallen_leaf",
+          "emoji:scorpion",
+          "emoji:libra"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 9
+    },
+    {
+      "id": "cc_december",
+      "label": "December",
+      "selector": {
+        "itemIds": [
+          "emoji:snowflake",
+          "emoji:snowman",
+          "emoji:christmas_tree",
+          "emoji:wrapped_present",
+          "emoji:father_christmas",
+          "emoji:mother_christmas",
+          "emoji:deer",
+          "emoji:capricorn",
+          "emoji:sagittarius"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 9
+    },
+    {
+      "id": "cc_asia",
+      "label": "Asia Associations",
+      "selector": {
+        "itemIds": [
+          "flag:japan",
+          "flag:india",
+          "emoji:panda_face",
+          "emoji:steaming_bowl",
+          "emoji:rice_ball",
+          "emoji:kaaba",
+          "emoji:prayer_beads"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 7
+    },
+    {
+      "id": "cc_africa",
+      "label": "Africa Associations",
+      "selector": {
+        "itemIds": [
+          "flag:egypt",
+          "flag:kenya",
+          "emoji:lion",
+          "emoji:elephant",
+          "emoji:giraffe",
+          "emoji:zebra",
+          "emoji:dromedary_camel"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 7
+    },
+    {
+      "id": "cc_australia_oceania",
+      "label": "Australia / Oceania",
+      "selector": {
+        "itemIds": [
+          "flag:australia",
+          "flag:new_zealand",
+          "emoji:kangaroo",
+          "emoji:koala",
+          "emoji:boomerang",
+          "emoji:tropical_fish"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 6
+    },
+    {
+      "id": "cc_factory_chain",
+      "label": "Factory Chain",
+      "selector": {
+        "itemIds": [
+          "emoji:factory",
+          "emoji:factory_worker",
+          "emoji:gear",
+          "emoji:hammer_and_wrench",
+          "emoji:package",
+          "emoji:delivery_truck",
+          "emoji:robot_face",
+          "emoji:desktop_computer",
+          "emoji:electric_plug"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 9
+    },
+    {
+      "id": "cc_music_tools",
+      "label": "Music Tools",
+      "selector": {
+        "itemIds": [
+          "emoji:microphone",
+          "emoji:studio_microphone",
+          "emoji:headphone",
+          "emoji:musical_score",
+          "emoji:musical_keyboard",
+          "emoji:drum_with_drumsticks",
+          "emoji:guitar",
+          "emoji:saxophone",
+          "emoji:trumpet",
+          "emoji:violin"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 10
+    },
+    {
+      "id": "cc_black_things",
+      "label": "Black Things",
+      "selector": {
+        "itemIds": [
+          "emoji:graduation_cap",
+          "symbol:filled_square",
+          "symbol:filled_circle",
+          "symbol:spade",
+          "symbol:club",
+          "emoji:black_heart",
+          "emoji:black_large_square",
+          "emoji:top_hat",
+          "emoji:gorilla"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 9
+    },
+    {
+      "id": "cc_red_things",
+      "label": "Red Things",
+      "selector": {
+        "itemIds": [
+          "emoji:fire_engine",
+          "emoji:car",
+          "emoji:apple",
+          "emoji:strawberry",
+          "emoji:tomato",
+          "emoji:rose",
+          "emoji:hot_pepper",
+          "symbol:heart",
+          "symbol:cross",
+          "flag:united_states"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 10
+    },
+    {
+      "id": "cc_yellow_things",
+      "label": "Yellow Things",
+      "selector": {
+        "itemIds": [
+          "emoji:corn",
+          "emoji:sun",
+          "emoji:sunflower",
+          "emoji:banana",
+          "emoji:lemon",
+          "emoji:taxi",
+          "symbol:warning"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 7
+    },
+    {
+      "id": "cc_green_things",
+      "label": "Green Things",
+      "selector": {
+        "itemIds": [
+          "emoji:four_leaf_clover",
+          "emoji:shamrock",
+          "emoji:seedling",
+          "emoji:broccoli",
+          "emoji:cucumber",
+          "emoji:green_heart",
+          "flag:ireland"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 7
+    },
+    {
+      "id": "cc_blue_things",
+      "label": "Blue Things",
+      "selector": {
+        "itemIds": [
+          "emoji:water_wave",
+          "emoji:droplet",
+          "emoji:blue_heart",
+          "emoji:whale",
+          "emoji:dolphin",
+          "emoji:jeans"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 6
+    },
+    {
+      "id": "cc_white_things",
+      "label": "White Things",
+      "selector": {
+        "itemIds": [
+          "emoji:airplane",
+          "emoji:airplane_2",
+          "emoji:snowflake",
+          "emoji:cloud",
+          "emoji:dove_of_peace",
+          "emoji:goat",
+          "emoji:white_heart",
+          "symbol:outline_square"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 8
+    },
+    {
+      "id": "cc_brown_things",
+      "label": "Brown Things",
+      "selector": {
+        "itemIds": [
+          "emoji:ear_of_rice",
+          "emoji:bread",
+          "emoji:chestnut",
+          "emoji:potato",
+          "emoji:bear",
+          "emoji:monkey_face",
+          "emoji:brown_heart",
+          "emoji:wood"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 8
+    },
+    {
+      "id": "cc_transport_hub",
+      "label": "Transport Hub",
+      "selector": {
+        "itemIds": [
+          "emoji:airplane",
+          "emoji:airplane_2",
+          "emoji:airplane_departure",
+          "emoji:airplane_arriving",
+          "emoji:fire_engine",
+          "emoji:ambulance",
+          "emoji:bus",
+          "emoji:train",
+          "emoji:ship",
+          "emoji:bicycle",
+          "emoji:rocket"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 11
+    },
+    {
+      "id": "cc_airport_travel",
+      "label": "Airport / Travel",
+      "selector": {
+        "itemIds": [
+          "emoji:airplane",
+          "emoji:airplane_2",
+          "emoji:airplane_departure",
+          "emoji:airplane_arriving",
+          "emoji:hotel",
+          "emoji:taxi"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 6
+    },
+    {
+      "id": "cc_celebration_broad",
+      "label": "Celebration Broad",
+      "selector": {
+        "itemIds": [
+          "emoji:graduation_cap",
+          "emoji:party_popper",
+          "emoji:confetti_ball",
+          "emoji:balloon",
+          "emoji:wrapped_present",
+          "emoji:fireworks",
+          "emoji:firework_sparkler",
+          "emoji:birthday_cake",
+          "emoji:clinking_glasses",
+          "emoji:trophy"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 10
+    },
+    {
+      "id": "cc_clothing_wearables_broad",
+      "label": "Clothing / Wearables Broad",
+      "selector": {
+        "itemIds": [
+          "emoji:graduation_cap",
+          "emoji:school_satchel",
+          "emoji:crown",
+          "emoji:top_hat",
+          "emoji:t_shirt",
+          "emoji:jeans",
+          "emoji:dress",
+          "emoji:running_shirt_with_sash",
+          "emoji:dark_sunglasses",
+          "emoji:helmet_with_white_cross"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 10
+    },
+    {
+      "id": "cc_books_paper_office",
+      "label": "Books / Paper / Office",
+      "selector": {
+        "itemIds": [
+          "emoji:school",
+          "emoji:graduation_cap",
+          "emoji:briefcase",
+          "emoji:ledger",
+          "emoji:open_book",
+          "emoji:notebook",
+          "emoji:memo",
+          "emoji:card_index",
+          "emoji:paperclip",
+          "emoji:scales"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 10
+    },
+    {
+      "id": "cc_corn_maize",
+      "label": "Corn / Maize",
+      "selector": {
+        "itemIds": [
+          "emoji:corn",
+          "emoji:popcorn",
+          "emoji:ear_of_rice",
+          "emoji:tractor",
+          "emoji:seedling",
+          "emoji:sun",
+          "flag:united_states",
+          "flag:mexico"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 8
+    },
+    {
+      "id": "cc_rescue_red",
+      "label": "Red Rescue",
+      "selector": {
+        "itemIds": [
+          "emoji:fire_engine",
+          "emoji:ambulance",
+          "emoji:fire_extinguisher",
+          "emoji:hospital",
+          "emoji:helmet_with_white_cross",
+          "symbol:warning",
+          "symbol:cross"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 7
+    },
+    {
+      "id": "cc_math_school",
+      "label": "Math School",
+      "selector": {
+        "itemIds": [
+          "symbol:plus",
+          "symbol:minus",
+          "symbol:times",
+          "symbol:divide",
+          "symbol:equals",
+          "symbol:greater_equal",
+          "symbol:less_equal",
+          "emoji:abacus",
+          "emoji:school",
+          "emoji:graduation_cap",
+          "emoji:scales"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 11
+    },
+    {
+      "id": "cc_space_flight",
+      "label": "Space / Flight",
+      "selector": {
+        "itemIds": [
+          "emoji:airplane",
+          "emoji:airplane_2",
+          "emoji:rocket",
+          "emoji:flying_saucer",
+          "emoji:satellite",
+          "emoji:sun",
+          "emoji:star",
+          "emoji:milky_way",
+          "emoji:comet"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 9
+    },
+    {
+      "id": "cc_food_plants",
+      "label": "Food Plants",
+      "selector": {
+        "itemIds": [
+          "emoji:corn",
+          "emoji:ear_of_rice",
+          "emoji:tomato",
+          "emoji:carrot",
+          "emoji:potato",
+          "emoji:broccoli",
+          "emoji:mushroom",
+          "emoji:grapes",
+          "emoji:watermelon",
+          "emoji:lemon",
+          "emoji:banana"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 11
+    },
+    {
+      "id": "cc_money_work",
+      "label": "Money / Work",
+      "selector": {
+        "itemIds": [
+          "emoji:factory",
+          "emoji:briefcase",
+          "emoji:money_bag",
+          "emoji:credit_card",
+          "emoji:bank",
+          "emoji:chart_with_upwards_trend",
+          "emoji:factory_worker",
+          "symbol:diamond_suit"
+        ]
+      },
+      "minimumItems": 4,
+      "eligibleCount": 8
+    }
+  ]
+}
